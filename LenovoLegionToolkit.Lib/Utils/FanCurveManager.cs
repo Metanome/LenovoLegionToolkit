@@ -85,8 +85,12 @@ public class FanCurveManager : IDisposable
 
     private bool TryLoadPlugin(string path)
     {
+        ResolveEventHandler resolver = (_, args) => 
+            args.Name.Contains(typeof(IExtensionProvider).Assembly.GetName().Name!) ? typeof(IExtensionProvider).Assembly : null;
+
         try
         {
+            AppDomain.CurrentDomain.AssemblyResolve += resolver;
             Log.Instance.Trace($"Attempting to load: {path}");
             var assembly = Assembly.LoadFrom(path);
             var types = assembly.GetTypes();
@@ -105,6 +109,10 @@ public class FanCurveManager : IDisposable
         catch (Exception ex)
         {
             Log.Instance.Trace($"Failed to load plugin assembly: {path}. Error: {ex}");
+        }
+        finally
+        {
+            AppDomain.CurrentDomain.AssemblyResolve -= resolver;
         }
         return false;
     }

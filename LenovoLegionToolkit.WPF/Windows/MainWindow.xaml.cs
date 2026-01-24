@@ -29,7 +29,6 @@ using LenovoLegionToolkit.WPF.Windows.Utils;
 using Microsoft.Xaml.Behaviors.Core;
 using Wpf.Ui.Controls;
 #if !DEBUG
-using System.Reflection;
 using LenovoLegionToolkit.Lib.Extensions;
 #endif
 
