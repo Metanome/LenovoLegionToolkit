@@ -1,7 +1,4 @@
 ﻿using LenovoLegionToolkit.Lib.Controllers.Sensors;
-using LenovoLegionToolkit.Lib.Features;
-using LenovoLegionToolkit.Lib.Listeners;
-using LenovoLegionToolkit.Lib.Settings;
 using LenovoLegionToolkit.Lib.View;
 using System;
 using System.Collections.Generic;
@@ -34,7 +31,12 @@ public class FanCurveManager : IDisposable
     public void Initialize()
     {
         Log.Instance.Trace($"FanCurveManager.Initialize called.");
-        if (IsEnabled) return;
+
+        if (IsEnabled)
+        {
+            Log.Instance.Trace($"FanCurveManager is already enabled. Skipping initialization.");
+            return;
+        }
 
         LoadPlugin();
         if (_extension != null)
@@ -51,7 +53,12 @@ public class FanCurveManager : IDisposable
 
     private void LoadPlugin()
     {
-        if (_pluginLoaded) return;
+        if (_pluginLoaded)
+        {
+            Log.Instance.Trace($"Plugin loaded.");
+            return;
+        }
+
         _pluginLoaded = true;
 
         try
