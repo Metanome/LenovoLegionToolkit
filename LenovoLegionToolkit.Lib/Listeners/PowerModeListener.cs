@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LenovoLegionToolkit.Lib.Utils;
+using System;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.Controllers;
 using LenovoLegionToolkit.Lib.Controllers.GodMode;
@@ -38,6 +39,12 @@ public class PowerModeListener(
     {
         await ChangeDependenciesAsync(value).ConfigureAwait(false);
         RaiseChanged(value);
+    }
+
+    protected override async Task<bool> CanStartAsync()
+    {
+        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
+        return Compatibility.IsLegion(mi.LegionSeries);
     }
 
     private async Task ChangeDependenciesAsync(PowerModeState value)

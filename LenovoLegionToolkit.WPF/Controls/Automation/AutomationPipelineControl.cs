@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Humanizer;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Automation;
@@ -19,6 +20,9 @@ using LenovoLegionToolkit.WPF.Resources;
 using LenovoLegionToolkit.WPF.Utils;
 using LenovoLegionToolkit.WPF.Windows.Automation;
 using Wpf.Ui.Common;
+using System.Windows.Documents;
+using System.Windows.Media;
+using Wpf.Ui.Controls;
 using Button = Wpf.Ui.Controls.Button;
 using CardExpander = LenovoLegionToolkit.WPF.Controls.Custom.CardExpander;
 using MenuItem = Wpf.Ui.Controls.MenuItem;
@@ -325,7 +329,8 @@ public class AutomationPipelineControl : UserControl
         };
         button.Click += (_, _) =>
         {
-            var window = new AutomationPipelineTriggerConfigurationWindow(triggers) { Owner = Window.GetWindow(this) };
+            var isOr = AutomationPipeline.Trigger is OrAutomationPipelineTrigger;
+            var window = new AutomationPipelineTriggerConfigurationWindow(triggers, isOr) { Owner = Window.GetWindow(this) };
             window.OnSave += (_, e) =>
             {
                 AutomationPipeline.Trigger = e;
@@ -385,6 +390,7 @@ public class AutomationPipelineControl : UserControl
             WinKeyAutomationStep s => new WinKeyAutomationStepControl(s),
             CloseAutomationStep s => new CloseAutomationStepControl(s),
             FloatingGadgetAutomationStep s => new FloatingGadgetAutomationStepControl(s),
+            FanMaxSpeedAutomationStep s => new FanMaxSpeedAutomationStepControl(s),
             _ => throw new InvalidOperationException("Unknown step type"),
         };
         control.MouseRightButtonUp += (_, e) =>
@@ -401,11 +407,94 @@ public class AutomationPipelineControl : UserControl
             if (s is AbstractAutomationStepControl step)
                 DeleteStep(step);
         };
+        control.AllowDrop = true;
+        control.PreviewDragOver += Control_PreviewDragOver;
+        control.Drop += HandleDrop;
+        control.GiveFeedback += Control_GiveFeedback;
         return control;
+    }
+
+    private DragAdorner? _adorner;
+
+    private void Control_PreviewDragOver(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent("AutomationStep"))
+        {
+            e.Effects = DragDropEffects.Move;
+            e.Handled = true;
+
+            var position = e.GetPosition(this);
+            if (_adorner == null)
+            {
+                var source = e.Data.GetData("AutomationStep") as UIElement;
+                if (source != null)
+                {
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(this);
+                    if (adornerLayer != null)
+                    {
+                        var offset = new Point(10, 10); 
+                        _adorner = new DragAdorner(this, source, offset);
+                        adornerLayer.Add(_adorner);
+                    }
+                }
+            }
+            _adorner?.UpdatePosition(position);
+        }
+    }
+
+    private void Control_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+    {
+        if (e.Effects.HasFlag(DragDropEffects.Move))
+        {
+            Mouse.SetCursor(Cursors.SizeAll);
+            e.UseDefaultCursors = false;
+            e.Handled = true;
+        }
+        else
+        {
+            e.UseDefaultCursors = true;
+            e.Handled = true;
+        }
+    }
+    
+    private void CleanupAdorner()
+    {
+         if (_adorner != null)
+         {
+             var adornerLayer = AdornerLayer.GetAdornerLayer(this);
+             adornerLayer?.Remove(_adorner);
+             _adorner = null;
+         }
+    }
+
+    private void HandleDrop(object sender, DragEventArgs e)
+    {
+        CleanupAdorner();
+
+        if (sender is not AbstractAutomationStepControl targetControl ||
+            !e.Data.GetDataPresent("AutomationStep"))
+        {
+            return;
+        }
+
+        var sourceControl = e.Data.GetData("AutomationStep") as AbstractAutomationStepControl;
+        if (sourceControl is null || sourceControl == targetControl)
+            return;
+
+        int oldIndex = _stepsStackPanel.Children.IndexOf(sourceControl);
+        int newIndex = _stepsStackPanel.Children.IndexOf(targetControl);
+
+        if (oldIndex != -1 && newIndex != -1)
+        {
+            _stepsStackPanel.Children.RemoveAt(oldIndex);
+            _stepsStackPanel.Children.Insert(newIndex, sourceControl);
+            OnChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void ShowContextMenu(FrameworkElement control)
     {
+        CleanupAdorner();
         var menuItems = new List<MenuItem>();
 
         var index = _stepsStackPanel.Children.IndexOf(control);

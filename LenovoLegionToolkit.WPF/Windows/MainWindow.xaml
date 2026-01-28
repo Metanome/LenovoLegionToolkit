@@ -89,6 +89,7 @@
                 x:Name="_navigationStore"
                 Grid.Column="0"
                 Margin="0,0,12,12"
+                Cursor=""
                 Frame="{Binding ElementName=_rootFrame}"
                 Navigated="NavigationStore_Navigated"
                 SelectedPageIndex="0">
@@ -110,6 +111,12 @@
                         Icon="BatteryCheckmark24"
                         PageTag="battery"
                         PageType="{x:Type pages:BatteryPage}" />
+                    <custom:NavigationItem
+                        x:Name="_fanItem"   
+                        Content="{x:Static resources:Resource.MainWindow_NavigationItem_FanCurve}"
+                        Icon="Gauge24"
+                        PageTag="fanCurve"
+                        PageType="{x:Type pages:StandaloneFanCurvePage}" />
                     <custom:NavigationItem
                         Content="{x:Static resources:Resource.MainWindow_NavigationItem_Actions}"
                         Icon="Rocket24"

@@ -12,14 +12,20 @@ public abstract class AbstractWMIListener<TEventArgs, TValue, TRawValue>(Func<Ac
 
     public event EventHandler<TEventArgs>? Changed;
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
         try
         {
             if (_disposable is not null)
             {
                 Log.Instance.Trace($"Already started. [listener={GetType().Name}]");
-                return Task.CompletedTask;
+                return;
+            }
+
+            if (!await CanStartAsync().ConfigureAwait(false))
+            {
+                Log.Instance.Trace($"Startup prevented by CanStartAsync check. [listener={GetType().Name}]");
+                return;
             }
 
             Log.Instance.Trace($"Starting... [listener={GetType().Name}]");
@@ -30,9 +36,9 @@ public abstract class AbstractWMIListener<TEventArgs, TValue, TRawValue>(Func<Ac
         {
             Log.Instance.Trace($"Couldn't start listener. [listener={GetType().Name}]", ex);
         }
-
-        return Task.CompletedTask;
     }
+
+    protected virtual Task<bool> CanStartAsync() => Task.FromResult(true);
 
     public Task StopAsync()
     {

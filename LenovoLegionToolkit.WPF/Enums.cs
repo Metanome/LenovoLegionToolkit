@@ -1,4 +1,7 @@
-﻿namespace LenovoLegionToolkit.WPF;
+﻿using System.ComponentModel.DataAnnotations;
+using LenovoLegionToolkit.WPF.Resources;
+
+namespace LenovoLegionToolkit.WPF;
 
 public enum DashboardGroupType
 {

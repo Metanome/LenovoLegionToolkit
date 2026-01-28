@@ -568,4 +568,40 @@
   <data name="FloatingGadgetItem_E_Core_Frequency" xml:space="preserve">
     <value>E Core Frequency</value>
   </data>
+  <data name="AmdOverclocking_Not_Initialized_Message" xml:space="preserve">
+    <value>Not initialized.</value>
+  </data>
+  <data name="FloatingGadgetState_Toggle" xml:space="preserve">
+    <value>Toggle</value>
+  </data>
+  <data name="AmdOverclocking_Not_Supported" xml:space="preserve">
+    <value>Not supported.</value>
+  </data>
+  <data name="AmdOverclocking_Ac_Message" xml:space="preserve">
+    <value>Profile will not apply without AC adapter (Full wattage) connected.</value>
+  </data>
+  <data name="FloatingGadgetItem_Disk1Temperature" xml:space="preserve">
+    <value>Disk 1 Temperature</value>
+  </data>
+  <data name="FloatingGadgetItem_Disk2Temperature" xml:space="preserve">
+    <value>Disk 2 Temperature</value>
+  </data>
+  <data name="CustomFanCurveControl_Fan_CPU" xml:space="preserve">
+    <value>CPU Fan</value>
+  </data>
+  <data name="CustomFanCurveControl_Fan_GPU" xml:space="preserve">
+    <value>GPU Fan</value>
+  </data>
+  <data name="CustomFanCurveControl_Fan_System" xml:space="preserve">
+    <value>System Fan</value>
+  </data>
+  <data name="FanMaxSpeedState_Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="FanMaxSpeedState_On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="FanMaxSpeedState_Toggle" xml:space="preserve">
+    <value>Toggle</value>
+  </data>
 </root>

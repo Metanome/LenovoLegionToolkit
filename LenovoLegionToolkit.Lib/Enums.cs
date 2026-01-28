@@ -89,6 +89,12 @@ public enum CPUOverclockingID
     AllCoreCurveOptimizer = 0x414D4403,
 }
 
+public enum CpuProfileMode
+{
+    Productivity,
+    X3DGaming
+}
+
 [Flags]
 public enum DriverKey
 {
@@ -97,6 +103,23 @@ public enum DriverKey
     FnF8 = 8192,
     FnSpace = 4096,
 }
+
+public enum FanState
+{
+    Auto,
+    Manual,
+}
+
+public enum FanType
+{
+    [Display(ResourceType = typeof(Resource), Name = "CustomFanCurveControl_Fan_CPU")]
+    Cpu = 0,
+    [Display(ResourceType = typeof(Resource), Name = "CustomFanCurveControl_Fan_GPU")]
+    Gpu = 1,
+    [Display(ResourceType = typeof(Resource), Name = "CustomFanCurveControl_Fan_System")]
+    System = 2,
+}
+
 
 public enum FanTableType
 {
@@ -150,9 +173,9 @@ public enum FloatingGadgetItem
     GpuPower,
     [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Fan")]
     GpuFan,
-    [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Temperature")]
+    [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Disk1Temperature")]
     Disk1Temperature,
-    [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Temperature")]
+    [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Disk2Temperature")]
     Disk2Temperature,
     [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Utilization")]
     MemoryUtilization,
@@ -162,6 +185,16 @@ public enum FloatingGadgetItem
     PchTemperature,
     [Display(ResourceType = typeof(Resource), Name = "FloatingGadgetItem_Fan")]
     PchFan,
+}
+
+public enum FanMaxSpeedState
+{
+    [Display(ResourceType = typeof(Resource), Name = "FanMaxSpeedState_Off")]
+    Off,
+    [Display(ResourceType = typeof(Resource), Name = "FanMaxSpeedState_On")]
+    On,
+    [Display(ResourceType = typeof(Resource), Name = "FanMaxSpeedState_Toggle")]
+    Toggle,
 }
 
 public enum FloatingGadgetState
@@ -451,6 +484,12 @@ public enum PanelLogoBacklightState
     On
 }
 
+public enum PawnIOState
+{
+    NotInstalled,
+    Installed,
+}
+
 public enum PortsBacklightState
 {
     [Display(ResourceType = typeof(Resource), Name = "PortsBacklightState_Off")]
@@ -575,6 +614,30 @@ public enum RGBKeyboardBacklightSpeed
     Fast,
     [Display(ResourceType = typeof(Resource), Name = "RGBKeyboardBacklightSpeed_Fastest")]
     Fastest
+}
+
+public enum SensorItem
+{
+    CpuUtilization,
+    CpuFrequency,
+    CpuFanSpeed,
+    CpuTemperature,
+    CpuPower,
+    GpuUtilization,
+    GpuFrequency,
+    GpuFanSpeed,
+    GpuCoreTemperature,
+    GpuVramTemperature,
+    GpuTemperatures,
+    GpuPower,
+    PchFanSpeed,
+    PchTemperature,
+    BatteryState,
+    BatteryLevel,
+    MemoryUtilization,
+    MemoryTemperature,
+    Disk1Temperature,
+    Disk2Temperature
 }
 
 public enum SpeakerState

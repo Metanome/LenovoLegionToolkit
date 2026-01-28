@@ -8,11 +8,11 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
 using System.Windows.Interop;
-using LenovoLegionToolkit.Lib.Utils;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
+using LenovoLegionToolkit.Lib.Utils;
 using Wpf.Ui.Controls;
 
 namespace LenovoLegionToolkit.WPF.Utils;
@@ -174,7 +174,7 @@ public class NotifyIcon : NativeWindow, IDisposable
 
         _showToolTipCancellationTokenSource?.Cancel();
 
-        _currentToolTipWindow?.Hide();
+        _currentToolTipWindow?.Close();
         _currentToolTipWindow = null;
     }
 
@@ -210,7 +210,7 @@ public class NotifyIcon : NativeWindow, IDisposable
                 uID = _id,
                 uCallbackMessage = TRAY_MESSAGE_ID,
                 uFlags = NOTIFY_ICON_DATA_FLAGS.NIF_MESSAGE | NOTIFY_ICON_DATA_FLAGS.NIF_TIP,
-                szTip = " "
+                szTip = ""
             };
 
             if (_visible && Handle == IntPtr.Zero)

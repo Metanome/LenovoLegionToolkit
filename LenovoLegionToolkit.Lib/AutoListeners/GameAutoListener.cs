@@ -132,6 +132,11 @@ public class GameAutoListener : AbstractAutoListener<GameAutoListener.ChangedEve
     {
         lock (Lock)
         {
+            if (e)
+            {
+                TryPinForegroundProcess();
+            }
+
             if (_processCache.Count != 0)
             {
                 Log.Instance.Trace($"Ignoring, process cache is not empty.");
@@ -142,12 +147,82 @@ public class GameAutoListener : AbstractAutoListener<GameAutoListener.ChangedEve
         }
     }
 
+    private unsafe void TryPinForegroundProcess()
+    {
+        try
+        {
+            var hWnd = Windows.Win32.PInvoke.GetForegroundWindow();
+            if (hWnd != Windows.Win32.Foundation.HWND.Null)
+            {
+                uint processId = 0;
+                Windows.Win32.PInvoke.GetWindowThreadProcessId(hWnd, &processId);
+
+                if (processId != 0)
+                {
+                    var process = Process.GetProcessById((int)processId);
+                    if (process != null && !_processCache.Contains(process))
+                    {
+                        var processName = process.ProcessName;
+                        if (IsBlacklisted(processName))
+                        {
+                             Log.Instance.Trace($"Ignoring blacklisted process {processName} ({process.Id}).");
+                             return;
+                        }
+
+                        Log.Instance.Trace($"Game Mode detected. Pinning process {process.Id} ({processName}).");
+                        Attach(process);
+                        _processCache.Add(process);
+                        RaiseChangedIfNeeded(true);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Failed to pin process on Game Mode detection.", ex);
+        }
+    }
+
+    private static bool IsBlacklisted(string processName)
+    {
+        return processName.Equals("explorer", StringComparison.OrdinalIgnoreCase)
+            || processName.Equals("LenovoLegionToolkit", StringComparison.OrdinalIgnoreCase)
+            || processName.Equals("SearchUI", StringComparison.OrdinalIgnoreCase)
+            || processName.Equals("LockApp", StringComparison.OrdinalIgnoreCase);
+    }
+
     private void InstanceStartedEventAutoAutoListener_Changed(object? sender, InstanceStartedEventAutoAutoListener.ChangedEventArgs e)
     {
         lock (Lock)
         {
             if (e.ProcessId < 0)
                 return;
+
+            try
+            {
+                if (_processCache.Count > 0 && e.ParentProcessId > 0)
+                {
+                    if (_processCache.Any(p => p.Id == e.ParentProcessId))
+                    {
+                        var process = Process.GetProcessById(e.ProcessId);
+                        if (process != null)
+                        {
+                            var processName = process.ProcessName;
+                            if (!IsBlacklisted(processName))
+                            {
+                                Log.Instance.Trace($"Child process {e.ProcessId} ({processName}) spawned by tracked game {e.ParentProcessId}. Pinning.");
+                                Attach(process);
+                                _processCache.Add(process);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Failed to check parent process for {e.ProcessName} ({e.ProcessId}).", ex);
+            }
 
             if (!_detectedGamePathsCache.Any(p => e.ProcessName.Equals(p.Name, StringComparison.CurrentCultureIgnoreCase)))
                 return;

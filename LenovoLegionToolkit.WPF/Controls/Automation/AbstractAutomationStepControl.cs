@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using LenovoLegionToolkit.Lib.Automation.Steps;
 using LenovoLegionToolkit.WPF.Resources;
 using Wpf.Ui.Common;
+using Wpf.Ui.Controls;
 using Button = Wpf.Ui.Controls.Button;
 using CardControl = LenovoLegionToolkit.WPF.Controls.Custom.CardControl;
 
@@ -30,6 +31,14 @@ public abstract class AbstractAutomationStepControl : UserControl
     private readonly StackPanel _stackPanel = new()
     {
         Orientation = Orientation.Horizontal,
+    };
+
+    private readonly SymbolIcon _dragHandle = new()
+    {
+        Symbol = SymbolRegular.GridDots24,
+        Margin = new(-8, 0, 8, 0),
+        Cursor = System.Windows.Input.Cursors.SizeAll,
+        Opacity = 0.5,
     };
 
     private readonly Button _deleteButton = new()
@@ -85,6 +94,12 @@ public abstract class AbstractAutomationStepControl : UserControl
 
     private void InitializeComponent()
     {
+        _dragHandle.MouseLeftButtonDown += (_, e) =>
+        {
+            if (e.ClickCount > 1) return;
+            DragDrop.DoDragDrop(this, new DataObject("AutomationStep", this), DragDropEffects.Move);
+        };
+
         _deleteButton.Click += (_, _) => Delete?.Invoke(this, EventArgs.Empty);
 
         var control = GetCustomControl();
@@ -93,7 +108,12 @@ public abstract class AbstractAutomationStepControl : UserControl
         _stackPanel.Children.Add(_deleteButton);
 
         _cardHeaderControl.Accessory = _stackPanel;
-        _cardControl.Header = _cardHeaderControl;
+        
+        var headerPanel = new StackPanel { Orientation = Orientation.Horizontal };
+        headerPanel.Children.Add(_dragHandle);
+        headerPanel.Children.Add(_cardHeaderControl);
+
+        _cardControl.Header = headerPanel;
 
         Content = _cardControl;
     }

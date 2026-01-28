@@ -1,7 +1,4 @@
-﻿using LenovoLegionToolkit.Lib.Extensions;
-using Newtonsoft.Json;
-using Octokit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -10,8 +7,45 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using LenovoLegionToolkit.Lib.Extensions;
+using Newtonsoft.Json;
+using Octokit;
+
 
 namespace LenovoLegionToolkit.Lib;
+
+internal static class AuroraColorUtils
+{
+    public static readonly RGBColor[] HueToRGBLut = new RGBColor[361];
+
+    static AuroraColorUtils()
+    {
+        for (var h = 0; h <= 360; h++)
+        {
+            const byte c = 255;
+            var x = (byte)Math.Round(c * (1 - Math.Abs(h / 60.0 % 2 - 1)));
+
+            HueToRGBLut[h] = h switch
+            {
+                < 60 => new RGBColor(c, x, 0),
+                < 120 => new RGBColor(x, c, 0),
+                < 180 => new RGBColor(0, c, x),
+                < 240 => new RGBColor(0, x, c),
+                < 300 => new RGBColor(x, 0, c),
+                _ => new RGBColor(c, 0, x)
+            };
+        }
+    }
+}
+
+public readonly struct AmdWmiCommand
+{
+    public string Name { get; init; }
+    public uint Id { get; init; }
+    public bool IsSet { get; init; }
+
+    public override string ToString() => $"{Name} (0x{Id:X8})";
+}
 
 public readonly struct BatteryInformation(
     bool isCharging,
@@ -446,6 +480,16 @@ public readonly struct HidDeviceConfig(
     public ushort DescriptorLength { get; } = descriptorLength;
 }
 
+public readonly struct KeyMap(int width, int height, ushort[,] keyCodes, ushort[] additionalKeyCodes)
+{
+    public static readonly KeyMap Empty = new(0, 0, new ushort[0, 0], []);
+
+    public readonly int Width = width;
+    public readonly int Height = height;
+    public readonly ushort[,] KeyCodes = keyCodes;
+    public readonly ushort[] AdditionalKeyCodes = additionalKeyCodes;
+}
+
 public readonly struct MachineInformation
 {
     public readonly struct FeatureData(FeatureData.SourceType sourceType, IEnumerable<CapabilityID> capabilities)
@@ -520,6 +564,13 @@ public readonly struct MachineInformation
     public int LegionZoneVersion { get; init; }
     public FeatureData Features { get; init; }
     public PropertyData Properties { get; init; }
+}
+
+public readonly struct OverclockingProfile
+{
+    public uint? FMax { get; init; }
+    public bool ProchotEnabled { get; init; }
+    public List<double?> CoreValues { get; init; }
 }
 
 public struct Package
@@ -768,6 +819,12 @@ public readonly struct SensorsData(SensorData cpu, SensorData gpu, SensorData pc
     public override string ToString() => $"{nameof(CPU)}: {CPU}, {nameof(GPU)}: {GPU}, {nameof(PCH)}: {PCH}";
 }
 
+public readonly struct ShutdownInfo
+{
+    public string Status { get; init; }
+    public int AbnormalCount { get; init; }
+}
+
 [method: JsonConstructor]
 public readonly struct DpiScale(int scale) : IDisplayName, IEquatable<DpiScale>
 {
@@ -870,7 +927,8 @@ public readonly struct SpectrumKeyboardBacklightEffect(
     SpectrumKeyboardBacklightDirection direction,
     SpectrumKeyboardBacklightClockwiseDirection clockwiseDirection,
     RGBColor[] colors,
-    ushort[] keys)
+    ushort[] keys,
+    bool useVantageColorBoost = false)
 {
     public SpectrumKeyboardBacklightEffectType Type { get; } = type;
     public SpectrumKeyboardBacklightSpeed Speed { get; } = speed;
@@ -878,6 +936,7 @@ public readonly struct SpectrumKeyboardBacklightEffect(
     public SpectrumKeyboardBacklightClockwiseDirection ClockwiseDirection { get; } = clockwiseDirection;
     public RGBColor[] Colors { get; } = colors;
     public ushort[] Keys { get; } = type.IsAllLightsEffect() ? [] : keys;
+    public bool UseVantageColorBoost { get; } = useVantageColorBoost;
 }
 
 public readonly struct StepperValue(int value, int min, int max, int step, int[] steps, int? defaultValue)

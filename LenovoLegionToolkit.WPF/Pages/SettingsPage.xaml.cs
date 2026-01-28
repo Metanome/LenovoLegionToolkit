@@ -1,4 +1,12 @@
-﻿using LenovoLegionToolkit.Lib;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Controllers;
 using LenovoLegionToolkit.Lib.Controllers.Sensors;
 using LenovoLegionToolkit.Lib.Extensions;
@@ -19,14 +27,6 @@ using LenovoLegionToolkit.WPF.Windows.FloatingGadgets;
 using LenovoLegionToolkit.WPF.Windows.Settings;
 using LenovoLegionToolkit.WPF.Windows.Utils;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace LenovoLegionToolkit.WPF.Pages;
 
@@ -369,7 +369,7 @@ public partial class SettingsPage
 
         var feature = IoCContainer.Resolve<SensorsGroupController>();
 
-        if (state.Value && !feature.IsPawnIOInnstalled())
+        if (state.Value && !PawnIOHelper.IsPawnIOInnstalled())
         {
             var dialog = new DialogWindow
             {
@@ -410,7 +410,6 @@ public partial class SettingsPage
         }
     }
 
-    // 注意：事件处理程序需要改为 async void
     private async void EnableLoggingToggle_Click(object sender, RoutedEventArgs e)
     {
         if (_isRefreshing)
@@ -441,6 +440,7 @@ public partial class SettingsPage
         });
 
         Log.Instance.IsTraceEnabled = state.Value;
+        AppFlags.Instance.IsTraceEnabled = state.Value;
         _settings.Store.EnableLogging = state.Value;
         _settings.SynchronizeStore();
 
@@ -888,8 +888,7 @@ public partial class SettingsPage
 
             if (state.Value)
             {
-                var feature = IoCContainer.Resolve<SensorsGroupController>();
-                if (!feature.IsPawnIOInnstalled())
+                if (!PawnIOHelper.IsPawnIOInnstalled())
                 {
                     var dialog = new DialogWindow
                     {
@@ -1129,6 +1128,14 @@ public partial class SettingsPage
         EditSensorGroupWindow = ShowOrActivateWindow(EditSensorGroupWindow,
             () => new EditSensorGroupWindow { Owner = Window.GetWindow(this) },
             w => w.BringToForeground());
+    }
+
+    private void ArgumentWindowButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_isRefreshing)
+            return;
+
+        ArgumentWindow.ShowInstance();
     }
 
     #region Helper

@@ -1,11 +1,4 @@
-﻿using LenovoLegionToolkit.Lib;
-using LenovoLegionToolkit.Lib.Controllers.Sensors;
-using LenovoLegionToolkit.Lib.Messaging;
-using LenovoLegionToolkit.Lib.Messaging.Messages;
-using LenovoLegionToolkit.Lib.Settings;
-using LenovoLegionToolkit.Lib.Utils;
-using LenovoLegionToolkit.WPF.Resources;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -17,6 +10,13 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using LenovoLegionToolkit.Lib;
+using LenovoLegionToolkit.Lib.Controllers.Sensors;
+using LenovoLegionToolkit.Lib.Messaging;
+using LenovoLegionToolkit.Lib.Messaging.Messages;
+using LenovoLegionToolkit.Lib.Settings;
+using LenovoLegionToolkit.Lib.Utils;
+using LenovoLegionToolkit.WPF.Resources;
 
 namespace LenovoLegionToolkit.WPF.Windows.FloatingGadgets;
 
@@ -100,8 +100,7 @@ public partial class FloatingGadgetUpper
     private long _lastValidFpsTick;
     private long _lastFpsUiUpdateTick;
 
-    private CancellationTokenSource? _cts;
-    private bool _positionSet;
+    private bool _positionSet;   
     private bool _fpsMonitoringStarted;
 
     private HashSet<FloatingGadgetItem> _activeItems;
@@ -187,29 +186,6 @@ public partial class FloatingGadgetUpper
 
     private void SubscribeEvents()
     {
-        MessagingCenter.Subscribe<FloatingGadgetChangedMessage>(this, (message) =>
-        {
-            Dispatcher.Invoke(() =>
-            {
-                if (App.Current.FloatingGadget == null)
-                {
-                    return;
-                }
-
-                var gadget = App.Current.FloatingGadget;
-                switch (message.State)
-                {
-                    case FloatingGadgetState.Show: gadget.Show(); break;
-                    case FloatingGadgetState.Hidden: gadget.Hide(); break;
-                    case FloatingGadgetState.Toggle:
-                        if (gadget.IsVisible) {gadget.Hide();}
-                        else gadget.Show();
-                        break;
-                    default: throw new ArgumentOutOfRangeException();
-                }
-            });
-        });
-
         MessagingCenter.Subscribe<FloatingGadgetElementChangedMessage>(this, (message) =>
         {
             Dispatcher.Invoke(() =>
@@ -249,30 +225,26 @@ public partial class FloatingGadgetUpper
             Dispatcher.BeginInvoke(new Action(SetWindowPosition), DispatcherPriority.Render);
     }
 
-    private async void FloatingGadget_IsVisibleChanged(object? sender, DependencyPropertyChangedEventArgs e)
+    private void FloatingGadget_IsVisibleChanged(object? sender, DependencyPropertyChangedEventArgs e)
     {
         if (IsVisible)
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = new CancellationTokenSource();
-
             CheckAndUpdateFpsMonitoring();
             UpdateGadgetControlsVisibility();
 
-            await TheRing(_cts.Token);
+            _sensorsGroupControllers.SensorsUpdated += OnSensorsUpdated;
+            _sensorsGroupControllers.Start(this, TimeSpan.FromSeconds(_settings.Store.FloatingGadgetsRefreshInterval));
         }
         else
         {
-            _cts?.Cancel();
             CheckAndUpdateFpsMonitoring();
+            _sensorsGroupControllers.Stop(this);
+            _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
         }
     }
 
     private void FloatingGadget_Closed(object? sender, EventArgs e)
     {
-        _cts?.Cancel();
-        _cts?.Dispose();
         _refreshLock.Dispose();
 
         _fpsController.FpsDataUpdated -= OnFpsDataUpdated;
@@ -296,14 +268,22 @@ public partial class FloatingGadgetUpper
 
     private void UpdateGadgetControlsVisibility()
     {
+        bool isHybrid = _sensorsGroupControllers.IsHybrid;
+
         foreach (var (item, element) in _itemsMap)
         {
             bool shouldShow = _activeItems.Contains(item);
 
-            if (item is FloatingGadgetItem.CpuPCoreFrequency or FloatingGadgetItem.CpuECoreFrequency &&
-                !_sensorsGroupControllers.IsHybrid)
+            if (isHybrid)
             {
-                shouldShow = false;
+                if (item == FloatingGadgetItem.CpuFrequency) shouldShow = false;
+            }
+            else
+            {
+                if (item is FloatingGadgetItem.CpuPCoreFrequency or FloatingGadgetItem.CpuECoreFrequency)
+                {
+                    shouldShow = false;
+                }
             }
 
             element.Visibility = shouldShow ? Visibility.Visible : Visibility.Collapsed;
@@ -314,9 +294,20 @@ public partial class FloatingGadgetUpper
         foreach (var (groupPanel, (items, _)) in _gadgetGroups)
         {
             bool isGroupActive = items.Any(item =>
-                _activeItems.Contains(item) &&
-                !(item is FloatingGadgetItem.CpuPCoreFrequency or FloatingGadgetItem.CpuECoreFrequency && !_sensorsGroupControllers.IsHybrid)
-            );
+            {
+                if (!_activeItems.Contains(item)) return false;
+
+                if (isHybrid)
+                {
+                    if (item == FloatingGadgetItem.CpuFrequency) return false;
+                }
+                else
+                {
+                    if (item is FloatingGadgetItem.CpuPCoreFrequency or FloatingGadgetItem.CpuECoreFrequency) return false;
+                }
+
+                return true;
+            });
 
             groupPanel.Visibility = isGroupActive ? Visibility.Visible : Visibility.Collapsed;
             if (isGroupActive) visibleGroups.Add(groupPanel);
@@ -552,108 +543,63 @@ public partial class FloatingGadgetUpper
     }
     #endregion
 
-    public async Task TheRing(CancellationToken token)
+    private async void OnSensorsUpdated(object? sender, EventArgs e)
     {
-        if (!await _refreshLock.WaitAsync(0, token)) return;
-
-        try
-        {
-            while (!token.IsCancellationRequested)
-            {
-                var loopStart = DateTime.Now;
-                try
-                {
-                    await RefreshSensorsDataAsync(token);
-                }
-                catch (OperationCanceledException) { break; }
-                catch (Exception ex)
-                {
-                    Log.Instance.Trace($"Exception occurred when executing TheRing()", ex);
-                    await Task.Delay(1000, token);
-                }
-
-                var elapsed = DateTime.Now - loopStart;
-                var delay = TimeSpan.FromSeconds(_settings.Store.FloatingGadgetsRefreshInterval) - elapsed;
-                if (delay > TimeSpan.Zero)
-                {
-                    await Task.Delay(delay, token);
-                }
-            }
-        }
-        finally
-        {
-            try { _refreshLock.Release(); } catch (ObjectDisposedException) { }
-        }
-    }
-
-    private async Task RefreshSensorsDataAsync(CancellationToken token)
-    {
-        await _sensorsGroupControllers.UpdateAsync();
-
-        var dataTask = _controller.GetDataAsync();
-        var cpuUsageTask = _sensorsGroupControllers.GetCpuUsageAsync();
-        var cpuPowerTask = _sensorsGroupControllers.GetCpuPowerAsync();
-        var cpuTempTask = _sensorsGroupControllers.GetCpuTemperatureAsync();
-        var gpuClockTask = _sensorsGroupControllers.GetGpuCoreClockAsync();
-        var gpuPowerTask = _sensorsGroupControllers.GetGpuPowerAsync();
-        var gpuTempTask = _sensorsGroupControllers.GetGpuTemperatureAsync();
-        var gpuVramTask = _sensorsGroupControllers.GetGpuVramTemperatureAsync();
-        var memUsageTask = _sensorsGroupControllers.GetMemoryUsageAsync();
-        var memTempTask = _sensorsGroupControllers.GetHighestMemoryTemperatureAsync();
-
-        var cpuClockTask = !_sensorsGroupControllers.IsHybrid ? _sensorsGroupControllers.GetCpuCoreClockAsync() : Task.FromResult(float.NaN);
-        var cpuPClockTask = _sensorsGroupControllers.IsHybrid ? _sensorsGroupControllers.GetCpuPCoreClockAsync() : Task.FromResult(float.NaN);
-        var cpuEClockTask = _sensorsGroupControllers.IsHybrid ? _sensorsGroupControllers.GetCpuECoreClockAsync() : Task.FromResult(float.NaN);
-
-        await Task.WhenAll(dataTask, cpuUsageTask, cpuPowerTask, cpuTempTask, gpuClockTask, gpuPowerTask, gpuTempTask, gpuVramTask, memUsageTask, memTempTask, cpuPClockTask, cpuEClockTask);
-
-        if (token.IsCancellationRequested)
-        {
-            return;
-        }
-
-        if ((DateTime.Now - _lastUpdate).TotalMilliseconds < UI_UPDATE_THROTTLE_MS)
-        {
-            return;
-        }
+        var interval = TimeSpan.FromSeconds(_settings.Store.FloatingGadgetsRefreshInterval);
+        if (DateTime.Now - _lastUpdate < interval) return;
 
         _lastUpdate = DateTime.Now;
 
-        var mainData = await dataTask;
-
-        var snapshot = new SensorSnapshot
+        try
         {
-            CpuUsage = await cpuUsageTask,
-            CpuFrequency = await cpuClockTask,
-            CpuPClock = await cpuPClockTask,
-            CpuEClock = await cpuEClockTask,
-            CpuTemp = await cpuTempTask,
-            CpuPower = await cpuPowerTask,
-            CpuFanSpeed = mainData.CPU.FanSpeed,
+            var dataTask = _controller.GetDataAsync();
+            var cpuUsageTask = _sensorsGroupControllers.GetCpuUsageAsync();
+            var cpuPowerTask = _sensorsGroupControllers.GetCpuPowerAsync();
+            var cpuTempTask = _sensorsGroupControllers.GetCpuTemperatureAsync();
+            var gpuClockTask = _sensorsGroupControllers.GetGpuCoreClockAsync();
+            var gpuPowerTask = _sensorsGroupControllers.GetGpuPowerAsync();
+            var gpuTempTask = _sensorsGroupControllers.GetGpuTemperatureAsync();
+            var gpuVramTask = _sensorsGroupControllers.GetGpuVramTemperatureAsync();
+            var memUsageTask = _sensorsGroupControllers.GetMemoryUsageAsync();
+            var memTempTask = _sensorsGroupControllers.GetHighestMemoryTemperatureAsync();
 
-            GpuUsage = mainData.GPU.Utilization,
-            GpuFrequency = await gpuClockTask,
-            GpuTemp = await gpuTempTask,
-            GpuVramTemp = await gpuVramTask,
-            GpuPower = await gpuPowerTask,
-            GpuFanSpeed = mainData.GPU.FanSpeed,
+            var cpuClockTask = !_sensorsGroupControllers.IsHybrid ? _sensorsGroupControllers.GetCpuCoreClockAsync() : Task.FromResult(float.NaN);
+            var cpuPClockTask = _sensorsGroupControllers.IsHybrid ? _sensorsGroupControllers.GetCpuPCoreClockAsync() : Task.FromResult(float.NaN);
+            var cpuEClockTask = _sensorsGroupControllers.IsHybrid ? _sensorsGroupControllers.GetCpuECoreClockAsync() : Task.FromResult(float.NaN);
 
-            MemUsage = await memUsageTask,
-            MemTemp = await memTempTask,
+            await Task.WhenAll(dataTask, cpuUsageTask, cpuPowerTask, cpuTempTask, gpuClockTask, gpuPowerTask, gpuTempTask, gpuVramTask, memUsageTask, memTempTask, cpuPClockTask, cpuEClockTask);
 
-            PchTemp = mainData.PCH.Temperature,
-            PchFanSpeed = mainData.PCH.FanSpeed
-        };
+            var mainData = await dataTask;
 
-        await Dispatcher.BeginInvoke(() => UpdateSensorData(snapshot), DispatcherPriority.Normal);
-    }
+            var snapshot = new SensorSnapshot
+            {
+                CpuUsage = await cpuUsageTask,
+                CpuFrequency = await cpuClockTask,
+                CpuPClock = await cpuPClockTask,
+                CpuEClock = await cpuEClockTask,
+                CpuTemp = await cpuTempTask,
+                CpuPower = await cpuPowerTask,
+                CpuFanSpeed = mainData.CPU.FanSpeed,
 
-    public void Toggle()
-    {
-        if (ShowActivated)
+                GpuUsage = mainData.GPU.Utilization,
+                GpuFrequency = await gpuClockTask,
+                GpuTemp = await gpuTempTask,
+                GpuVramTemp = await gpuVramTask,
+                GpuPower = await gpuPowerTask,
+                GpuFanSpeed = mainData.GPU.FanSpeed,
+
+                MemUsage = await memUsageTask,
+                MemTemp = await memTempTask,
+
+                PchTemp = mainData.PCH.Temperature,
+                PchFanSpeed = mainData.PCH.FanSpeed
+            };
+
+            await Dispatcher.BeginInvoke(() => UpdateSensorData(snapshot), DispatcherPriority.Normal);
+        }
+        catch (Exception ex)
         {
-            Hide();
-        } else {
-            Show();}
+           Log.Instance.Trace($"Exception occurred when executing OnSensorsUpdated()", ex);
+        }
     }
 }

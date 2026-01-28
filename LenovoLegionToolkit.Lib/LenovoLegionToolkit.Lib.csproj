@@ -4,7 +4,7 @@
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<Platforms>x64</Platforms>
 		<Nullable>enable</Nullable>
-		<Copyright>© 2025 Bartosz Cichecki and Kaguya</Copyright>
+		<Copyright>© 2026 Bartosz Cichecki and Kaguya</Copyright>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<NeutralLanguage>en</NeutralLanguage>
 		<UseWindowsForms>true</UseWindowsForms>
@@ -26,9 +26,10 @@
 		<PackageReference Include="System.Management" Version="10.0.0" />
 		<PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.2" />
 		<PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />	
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="Octokit" Version="14.0.0" />
 		<PackageReference Include="TaskScheduler" Version="2.12.1" />
+		<PackageReference Include="UniversalFanControl.Lib" Version="1.0.2" />
 		<PackageReference Include="WindowsDisplayAPI" Version="1.3.0.13" />
 		<PackageReference Include="PresentMonFps-Modified" Version="2.0.7" />
 		<PackageReference Include="NvAPIWrapper.Net-Modified" Version="0.8.1.117" />

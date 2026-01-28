@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -2399,13 +2399,13 @@ Diğer tam ekran pencereleri etkilemeyecek, ancak bildirimlere tıklayamayacaks�
     <value>Yeni Sensör Gösterge Panelini Kullan</value>
   </data>
   <data name="SettingsPage_UseNewSensorDashboard_Message" xml:space="preserve">
-    <value>Use new sensor dashboard instead of the old one. </value>
+    <value>Eski sensör gösterge paneli yerine yeni sensör gösterge panelini kullan. </value>
   </data>
   <data name="SettingsPage_LockWindowSize_Title" xml:space="preserve">
     <value>Pencere Boyutunu Kilitle</value>
   </data>
   <data name="SettingsPage_LockWindowSize_Message" xml:space="preserve">
-    <value>Lock LLT's window size. To prevent something change it.</value>
+    <value>LLT penceresinin boyutunu kilitleyerek değiştirilmesini önleyin.</value>
   </data>
   <data name="FanCurveControl_PCH" xml:space="preserve">
     <value>PCH</value>
@@ -2629,41 +2629,214 @@ Yanlış yapılandırma; ciddi sistem kararsızlığına, termal kısıtlamaya v
 
 Gerekli teknik uzmanlığa sahip değilseniz devam etmeyin.</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="PeriodicActionPipelineTriggerTabItemContent_Minutes" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="PeriodicActionPipelineTriggerTabItemContent_Minutes" xml:space="preserve">
+    <value>Dakika</value>
   </data>
-  <data name="PeriodicActionPipelineTriggerTabItemContent_Seconds" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="PeriodicActionPipelineTriggerTabItemContent_Seconds" xml:space="preserve">
+    <value>Saniye</value>
   </data>
-  <data name="SpeakerVolumeAutomationStepControl_Title" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="SpeakerVolumeAutomationStepControl_Title" xml:space="preserve">
+    <value>Hoparlör Ses Seviyesi</value>
   </data>
-  <data name="SpeakerVolumeAutomationStepControl_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="SpeakerVolumeAutomationStepControl_Message" xml:space="preserve">
+    <value>Hoparlörün ses seviyesini değiştir.</value>
   </data>
-  <data name="AmdOverclocking_Caution_Title" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_Caution_Title" xml:space="preserve">
+    <value>Dikkat</value>
   </data>
-  <data name="AmdOverclocking_Caution_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_Caution_Message" xml:space="preserve">
+    <value>Bu ayarları değiştirmek sistem stabilitesini etkileyebilir. Dikkatli olun.</value>
   </data>
-  <data name="AmdOverclocking_Status_Title" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_Status_Title" xml:space="preserve">
+    <value>Durum</value>
   </data>
-  <data name="AmdOverclocking_FMax_Frequency_Title" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_FMax_Frequency_Title" xml:space="preserve">
+    <value>FMax Frekansı</value>
   </data>
-  <data name="AmdOverclocking_FMax_Frequency_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_FMax_Frequency_Message" xml:space="preserve">
+    <value>Maksimum CPU boost frekansını geçersiz kılma (MHz)</value>
   </data>
-  <data name="AmdOverclocking_Core_Title" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_Core_Title" xml:space="preserve">
+    <value>Çekirdek</value>
   </data>
-  <data name="Reset" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Reset" xml:space="preserve">
+    <value>Sıfırla</value>
   </data>
-  <data name="AmdOverclocking_Apply_Changes" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="AmdOverclocking_Apply_Changes" xml:space="preserve">
+    <value>Değişiklikleri Uygula</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="AmdOverclocking_Do_Not_Apply_Message" xml:space="preserve">
+    <value>Anormal yeniden başlatma nedeniyle profil uygulaması iptal edildi.</value>
+  </data>
+  <data name="RunAutomationStepControl_ProcessCheckInstance" xml:space="preserve">
+    <value>Örneği Kontrol Et</value>
+  </data>
+  <data name="RunAutomationStepControl_ProcessCheckInstance_Description" xml:space="preserve">
+    <value>İşlemin başlatılmış olup olmadığını kontrol edin.</value>
+  </data>
+  <data name="AmdOverclocking_Success_Title" xml:space="preserve">
+    <value>Başarılı</value>
+  </data>
+  <data name="AmdOverclocking_Success_Message" xml:space="preserve">
+    <value>Ayarlar başarıyla uygulandı.</value>
+  </data>
+  <data name="AmdOverclocking_X3D_Gaming_Mode_Title" xml:space="preserve">
+    <value>X3D Oyun Modu</value>
+  </data>
+  <data name="AmdOverclocking_X3D_Gaming_Mode_Message" xml:space="preserve">
+    <value>FPS ve sıcaklıklarda stabilite sağlamak için CCD 1'i devre dışı bırak</value>
+  </data>
+  <data name="ArgumentWindow_Title" xml:space="preserve">
+    <value>Argument Window</value>
+  </data>
+  <data name="ArgumentWindow_Category_General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="ArgumentWindow_Category_Hardware_Automation" xml:space="preserve">
+    <value>Hardware &amp; Automation</value>
+  </data>
+  <data name="ArgumentWindow_Category_Lighting" xml:space="preserve">
+    <value>Lighting</value>
+  </data>
+  <data name="ArgumentWindow_Category_Network_Proxy" xml:space="preserve">
+    <value>Network Proxy</value>
+  </data>
+  <data name="ArgumentWindow_Category_Debugging" xml:space="preserve">
+    <value>Debugging</value>
+  </data>
+  <data name="ArgumentWindow_Flag_StartMinimized" xml:space="preserve">
+    <value>Start Minimized</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DisableTrayTooltip" xml:space="preserve">
+    <value>Disable Tray Tooltip</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DisableUpdateChecker" xml:space="preserve">
+    <value>Disable Update Checker</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DisableConflictWarning" xml:space="preserve">
+    <value>Disable Conflict Warning</value>
+  </data>
+  <data name="ArgumentWindow_Flag_AllowPowerModesBattery" xml:space="preserve">
+    <value>Allow All Power Modes on Battery</value>
+  </data>
+  <data name="ArgumentWindow_Flag_SkipCompatCheck" xml:space="preserve">
+    <value>Skip Compatibility Check</value>
+  </data>
+  <data name="ArgumentWindow_Flag_ExpGpuMode" xml:space="preserve">
+    <value> Experimental GPU Working Mode</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DisableLenovoLighting" xml:space="preserve">
+    <value>Disable Lenovo Lighting</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DisableRgbKb" xml:space="preserve">
+    <value>Disable RGB Keyboard</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DisableSpectrumKb" xml:space="preserve">
+    <value>Disable Spectrum Keyboard</value>
+  </data>
+  <data name="ArgumentWindow_Flag_TraceEnabled" xml:space="preserve">
+    <value>Enable Trace Logging</value>
+  </data>
+  <data name="ArgumentWindow_Flag_DebugMode" xml:space="preserve">
+    <value>Debug Mode</value>
+  </data>
+  <data name="ArgumentWindow_Flag_ProxyUrl" xml:space="preserve">
+    <value> Proxy URL</value>
+  </data>
+  <data name="ArgumentWindow_Flag_ProxyUsername" xml:space="preserve">
+    <value>Proxy Username</value>
+  </data>
+  <data name="ArgumentWindow_Flag_ProxyPassword" xml:space="preserve">
+    <value>Proxy Password</value>
+  </data>
+  <data name="ArgumentWindow_Flag_AllowAllCerts" xml:space="preserve">
+    <value>Allow All Certificates</value>
+  </data>
+  <data name="ArgumentWindow_NotSet" xml:space="preserve">
+    <value>Not Set</value>
+  </data>
+  <data name="ArgumentWindow_Edit_Title" xml:space="preserve">
+    <value>Edit Arguments</value>
+  </data>
+  <data name="ArgumentWindow_Edit_Message" xml:space="preserve">
+    <value>Open an argument window for convenient modification of arguments.</value>
+  </data>
+  <data name="SpectrumKeyboardBacklightEditEffectWindow_VantageColorBoost_Title" xml:space="preserve">
+    <value>Vantage Color Boost</value>
+  </data>
+  <data name="SpectrumKeyboardBacklightEditEffectWindow_VantageColorBoostSettings_Title" xml:space="preserve">
+    <value>Color Boost Settings</value>
+  </data>
+  <data name="RestoreDefaults" xml:space="preserve">
+    <value>Restore Defaults</value>
+  </data>
+  <data name="SpectrumKeyboardBacklightEditEffectWindow_VantageColorBoostSettings_BoostFloor" xml:space="preserve">
+    <value>Boost Floor</value>
+  </data>
+  <data name="SpectrumKeyboardBacklightEditEffectWindow_VantageColorBoostSettings_BoostTarget" xml:space="preserve">
+    <value>Boost Target</value>
+  </data>
+  <data name="SpectrumKeyboardBacklightEditEffectWindow_VantageColorBoostSettings_BoostBrightnessFactor" xml:space="preserve">
+    <value>Boost Brightness Factor</value>
+  </data>
+  <data name="SpectrumKeyboardBacklightEditEffectWindow_VantageColorBoostSettings_WhiteThreshold" xml:space="preserve">
+    <value>White Threshold</value>
+  </data>
+  <data name="CustomFanCurve_Add_Point" xml:space="preserve">
+    <value>Add curve point</value>
+  </data>
+  <data name="CustomFanCurve_Fan_Speed" xml:space="preserve">
+    <value>Fan Speed %</value>
+  </data>
+  <data name="CustomFanCurve_Temperature" xml:space="preserve">
+    <value>Temperature °C </value>
+  </data>
+  <data name="CustomFanCurve_Title" xml:space="preserve">
+    <value>Real-Time Monitoring</value>
+  </data>
+  <data name="CustomFanCurve_PWM_Value" xml:space="preserve">
+    <value>PWM Value</value>
+  </data>
+  <data name="CustomFanCurve_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="CustomFanCurve_Critical_Temp" xml:space="preserve">
+    <value>Critical Temp</value>
+  </data>
+  <data name="CustomFanCurve_Accelerate" xml:space="preserve">
+    <value>Accelerate</value>
+  </data>
+  <data name="CustomFanCurve_Deceleration" xml:space="preserve">
+    <value>Deceleration</value>
+  </data>
+  <data name="CustomFanCurve_Accelerate_Tooltip" xml:space="preserve">
+    <value>Accelerate control's how much PWM is added to the current PWM Value.</value>
+  </data>
+  <data name="CustomFanCurve_Deceleration_Tooltip" xml:space="preserve">
+    <value>Deceleration control's how much PWM is decreased to the current PWM Value.</value>
+  </data>
+  <data name="CustomFanCurve_Critical_Temp_Tooltip" xml:space="preserve">
+    <value>Force the maximum speed when the temperature is greater than or equal to this temperature to prevent burning out.</value>
+  </data>
+  <data name="FanMaxSpeedAutomationStepControl_Title" xml:space="preserve">
+    <value>Fan Max Speed</value>
+  </data>
+  <data name="FanMaxSpeedAutomationStepControl_Message" xml:space="preserve">
+    <value>Set fan to maximum speed.</value>
+  </data>
+  <data name="MainWindow_NavigationItem_FanCurve" xml:space="preserve">
+    <value>Fan Curve</value>
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_Title" xml:space="preserve">
+    <value>Logic</value>
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_And" xml:space="preserve">
+    <value>Match All (And)</value>
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_Or" xml:space="preserve">
+    <value>Match Any (Or)</value>
   </data>
 </root>

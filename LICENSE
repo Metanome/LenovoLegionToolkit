@@ -672,3 +672,9 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+
+ADDITIONAL PERMISSIONS
+
+In addition to the terms of the GNU General Public License, the copyright holders of Lenovo Legion Toolkit grant you the following special exception:
+
+"Permission is hereby granted to link the code of this program with any independent modules that function as plugins (i.e., modules implementing the IExtensionProvider interface or loaded via the plugin system), regardless of the license terms of these independent modules, and to distribute the resulting executable linked with these modules, provided that you also meet the terms and conditions of the licenses of those modules. An independent module is a module which is not derived from or based on this program. If you modify this program, you may extend this exception to your version of the program, but you are not obligated to do so. If you do not wish to do so, delete this exception statement from your version."

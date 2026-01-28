@@ -1,17 +1,17 @@
-﻿using LenovoLegionToolkit.Lib;
-using LenovoLegionToolkit.Lib.Automation.Pipeline.Triggers;
-using LenovoLegionToolkit.Lib.Extensions;
-using LenovoLegionToolkit.Lib.Utils;
-using LenovoLegionToolkit.WPF.Controls;
-using LenovoLegionToolkit.WPF.Extensions;
-using LenovoLegionToolkit.WPF.Resources;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using LenovoLegionToolkit.Lib;
+using LenovoLegionToolkit.Lib.Automation.Pipeline.Triggers;
+using LenovoLegionToolkit.Lib.Extensions;
+using LenovoLegionToolkit.Lib.Utils;
+using LenovoLegionToolkit.WPF.Controls;
+using LenovoLegionToolkit.WPF.Extensions;
+using LenovoLegionToolkit.WPF.Resources;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using CardControl = LenovoLegionToolkit.WPF.Controls.Custom.CardControl;
@@ -99,7 +99,20 @@ public partial class CreateAutomationPipelineWindow
         if (triggers.IsEmpty())
             return;
 
-        var trigger = triggers.Length == 1 ? triggers[0] : new AndAutomationPipelineTrigger(triggers);
+        IAutomationPipelineTrigger trigger;
+
+        if (triggers.Length == 1)
+        {
+            trigger = triggers[0];
+        }
+        else
+        {
+            if (_logicComboBox.SelectedIndex == 1)
+                trigger = new OrAutomationPipelineTrigger(triggers);
+            else
+                trigger = new AndAutomationPipelineTrigger(triggers);
+        }
+
         _createPipeline(trigger);
 
         Close();
@@ -121,6 +134,7 @@ public partial class CreateAutomationPipelineWindow
 
         _createButton.IsEnabled = false;
         _createButton.Visibility = _multiSelect ? Visibility.Visible : Visibility.Collapsed;
+        _logicSelection.Visibility = _multiSelect ? Visibility.Visible : Visibility.Collapsed;
 
         return Task.CompletedTask;
     }

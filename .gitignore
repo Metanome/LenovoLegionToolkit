@@ -579,3 +579,7 @@ obj/
 
 build_installer
 /TemporarySolution/LibreHardwareMonitorLib.dll
+
+# LenovoLegionToolkit Module Isolation (Option B)
+/LenovoLegionToolkit.Plugin/
+FanCurveExtension

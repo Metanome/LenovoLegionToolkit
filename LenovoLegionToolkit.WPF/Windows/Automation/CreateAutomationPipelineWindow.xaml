@@ -1,4 +1,4 @@
-﻿<local:BaseWindow
+﻿    <local:BaseWindow
     x:Class="LenovoLegionToolkit.WPF.Windows.Automation.CreateAutomationPipelineWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -59,6 +59,26 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+
+            <StackPanel
+                x:Name="_logicSelection"
+                Grid.Column="0"
+                Margin="12,0,0,0"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Visibility="Collapsed">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{x:Static resources:Resource.MultipleTriggersAutomationPipelineTrigger_Logic_Title}" />
+                <ComboBox
+                    x:Name="_logicComboBox"
+                    MinWidth="120"
+                    Margin="8,0,0,0"
+                    SelectedIndex="0">
+                    <ComboBoxItem Content="{x:Static resources:Resource.MultipleTriggersAutomationPipelineTrigger_Logic_And}" />
+                    <ComboBoxItem Content="{x:Static resources:Resource.MultipleTriggersAutomationPipelineTrigger_Logic_Or}" />
+                </ComboBox>
+            </StackPanel>
 
             <wpfui:Button
                 x:Name="_createButton"
