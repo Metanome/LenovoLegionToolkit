@@ -4205,6 +4205,33 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Match All (And) 的本地化字符串。
+        /// </summary>
+        public static string MultipleTriggersAutomationPipelineTrigger_Logic_And {
+            get {
+                return ResourceManager.GetString("MultipleTriggersAutomationPipelineTrigger_Logic_And", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Match Any (Or) 的本地化字符串。
+        /// </summary>
+        public static string MultipleTriggersAutomationPipelineTrigger_Logic_Or {
+            get {
+                return ResourceManager.GetString("MultipleTriggersAutomationPipelineTrigger_Logic_Or", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Logic 的本地化字符串。
+        /// </summary>
+        public static string MultipleTriggersAutomationPipelineTrigger_Logic_Title {
+            get {
+                return ResourceManager.GetString("MultipleTriggersAutomationPipelineTrigger_Logic_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 No 的本地化字符串。
         /// </summary>
         public static string No {

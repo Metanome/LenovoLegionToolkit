@@ -99,7 +99,20 @@ public partial class CreateAutomationPipelineWindow
         if (triggers.IsEmpty())
             return;
 
-        var trigger = triggers.Length == 1 ? triggers[0] : new AndAutomationPipelineTrigger(triggers);
+        IAutomationPipelineTrigger trigger;
+
+        if (triggers.Length == 1)
+        {
+            trigger = triggers[0];
+        }
+        else
+        {
+            if (_logicComboBox.SelectedIndex == 1)
+                trigger = new OrAutomationPipelineTrigger(triggers);
+            else
+                trigger = new AndAutomationPipelineTrigger(triggers);
+        }
+
         _createPipeline(trigger);
 
         Close();
@@ -121,6 +134,7 @@ public partial class CreateAutomationPipelineWindow
 
         _createButton.IsEnabled = false;
         _createButton.Visibility = _multiSelect ? Visibility.Visible : Visibility.Collapsed;
+        _logicSelection.Visibility = _multiSelect ? Visibility.Visible : Visibility.Collapsed;
 
         return Task.CompletedTask;
     }

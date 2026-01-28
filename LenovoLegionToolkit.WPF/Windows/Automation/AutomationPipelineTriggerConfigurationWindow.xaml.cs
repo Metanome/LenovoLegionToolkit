@@ -15,12 +15,14 @@ namespace LenovoLegionToolkit.WPF.Windows.Automation;
 public partial class AutomationPipelineTriggerConfigurationWindow
 {
     private readonly IEnumerable<IAutomationPipelineTrigger> _triggers;
+    private readonly bool _isOrLogic;
 
     public event EventHandler<IAutomationPipelineTrigger>? OnSave;
 
-    public AutomationPipelineTriggerConfigurationWindow(IEnumerable<IAutomationPipelineTrigger> triggers)
+    public AutomationPipelineTriggerConfigurationWindow(IEnumerable<IAutomationPipelineTrigger> triggers, bool isOrLogic = false)
     {
         _triggers = triggers;
+        _isOrLogic = isOrLogic;
 
         InitializeComponent();
     }
@@ -54,6 +56,12 @@ public partial class AutomationPipelineTriggerConfigurationWindow
             }
         }
 
+        if (_triggers.Count() > 1)
+        {
+            _logicSelection.Visibility = Visibility.Visible;
+            _logicComboBox.SelectedIndex = _isOrLogic ? 1 : 0;
+        }
+
         if (_tabControl.Items.Count < 2)
             return;
 
@@ -77,9 +85,18 @@ public partial class AutomationPipelineTriggerConfigurationWindow
             .OfType<IAutomationPipelineTrigger>()
             .ToArray();
 
-        var result = triggers.Length > 1
-            ? new AndAutomationPipelineTrigger(triggers)
-            : triggers.FirstOrDefault();
+        IAutomationPipelineTrigger? result;
+
+        if (triggers.Length > 1)
+        {
+            result = _logicComboBox.SelectedIndex == 1
+                ? new OrAutomationPipelineTrigger(triggers)
+                : new AndAutomationPipelineTrigger(triggers);
+        }
+        else
+        {
+            result = triggers.FirstOrDefault();
+        }
 
         if (result is not null)
             OnSave?.Invoke(this, result);

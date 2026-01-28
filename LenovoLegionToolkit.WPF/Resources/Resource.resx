@@ -2829,4 +2829,13 @@ Do not proceed unless you possess the necessary technical expertise.</value>
   <data name="MainWindow_NavigationItem_FanCurve" xml:space="preserve">
     <value>Fan Curve</value>
   </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_Title" xml:space="preserve">
+    <value>Logic</value>
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_And" xml:space="preserve">
+    <value>Match All (And)</value>
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_Or" xml:space="preserve">
+    <value>Match Any (Or)</value>
+  </data>
 </root>

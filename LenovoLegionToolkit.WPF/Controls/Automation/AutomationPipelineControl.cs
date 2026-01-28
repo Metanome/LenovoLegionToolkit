@@ -325,7 +325,8 @@ public class AutomationPipelineControl : UserControl
         };
         button.Click += (_, _) =>
         {
-            var window = new AutomationPipelineTriggerConfigurationWindow(triggers) { Owner = Window.GetWindow(this) };
+            var isOr = AutomationPipeline.Trigger is OrAutomationPipelineTrigger;
+            var window = new AutomationPipelineTriggerConfigurationWindow(triggers, isOr) { Owner = Window.GetWindow(this) };
             window.OnSave += (_, e) =>
             {
                 AutomationPipeline.Trigger = e;

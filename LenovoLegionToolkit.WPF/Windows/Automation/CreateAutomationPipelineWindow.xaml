@@ -60,6 +60,26 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <StackPanel
+                x:Name="_logicSelection"
+                Grid.Column="0"
+                Margin="12,0,0,0"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Visibility="Collapsed">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="Logic:" />
+                <ComboBox
+                    x:Name="_logicComboBox"
+                    MinWidth="120"
+                    Margin="8,0,0,0"
+                    SelectedIndex="0">
+                    <ComboBoxItem Content="Match ALL (AND)" />
+                    <ComboBoxItem Content="Match ANY (OR)" />
+                </ComboBox>
+            </StackPanel>
+
             <wpfui:Button
                 x:Name="_createButton"
                 Grid.Column="1"

@@ -2831,4 +2831,13 @@ Ga niet verder tenzij u over de nodige technische expertise beschikt.</value>
   <data name="MainWindow_NavigationItem_FanCurve" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_Title" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_And" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="MultipleTriggersAutomationPipelineTrigger_Logic_Or" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>
