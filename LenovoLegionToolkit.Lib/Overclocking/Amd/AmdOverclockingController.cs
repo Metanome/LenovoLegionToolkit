@@ -209,6 +209,11 @@ public sealed class AmdOverclockingController : IDisposable
     {
         EnsureInitialized();
         var mapIndex = coreIndex < 8 ? 0 : 1;
+
+        // Bounds check: if the mapIndex is out of range, the core is not active
+        if (mapIndex >= _cpu.info.topology.coreDisableMap.Length)
+            return false;
+
         return ((~_cpu.info.topology.coreDisableMap[mapIndex] >> (coreIndex % 8)) & 1) == 1;
     }
 
