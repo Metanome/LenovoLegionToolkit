@@ -19,6 +19,7 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 9.0.x
+        cache: dotnet
     - name: Restore
       run: dotnet restore
     - name: Build
