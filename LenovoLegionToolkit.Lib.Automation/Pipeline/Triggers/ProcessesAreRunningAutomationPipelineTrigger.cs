@@ -18,9 +18,16 @@ public class ProcessesAreRunningAutomationPipelineTrigger(ProcessInfo[]? process
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not ProcessAutomationEvent { Type: ProcessEventInfoType.Started } e)
+        if (automationEvent is not (ProcessAutomationEvent { Type: ProcessEventInfoType.Started } or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+        {
+            var result = Processes.SelectMany(p => Process.GetProcessesByName(p.Name)).Any();
+            return Task.FromResult(result);
+        }
+
+        var e = (ProcessAutomationEvent)automationEvent;
         Log.Instance.Trace($"Checking for {e.ProcessInfo.Name}... [processes={string.Join(",", Processes.Select(p => p.Name))}]");
 
         if (!Processes.Contains(e.ProcessInfo) && !Processes.Select(p => p.Name).Contains(e.ProcessInfo.Name))
@@ -30,11 +37,11 @@ public class ProcessesAreRunningAutomationPipelineTrigger(ProcessInfo[]? process
             return Task.FromResult(false);
         }
 
-        var result = Processes.SelectMany(p => Process.GetProcessesByName(p.Name)).Any();
+        var isRunning = Processes.SelectMany(p => Process.GetProcessesByName(p.Name)).Any();
 
-        Log.Instance.Trace($"Process name {e.ProcessInfo.Name} found in process list: {result}.");
+        Log.Instance.Trace($"Process name {e.ProcessInfo.Name} found in process list: {isRunning}.");
 
-        return Task.FromResult(result);
+        return Task.FromResult(isRunning);
     }
 
     public Task<bool> IsMatchingState()

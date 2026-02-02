@@ -50,7 +50,11 @@ public class AutomationEnvironment
 
     public bool LidOpen { set => _dictionary[LID_OPEN] = value ? VALUE_TRUE : VALUE_FALSE; }
 
-    public bool Startup { set => _dictionary[STARTUP] = value ? VALUE_TRUE : VALUE_FALSE; }
+    public bool Startup
+    {
+        get => _dictionary.TryGetValue(STARTUP, out var val) && val == VALUE_TRUE;
+        set => _dictionary[STARTUP] = value ? VALUE_TRUE : VALUE_FALSE;
+    }
 
     public bool Resume { set => _dictionary[RESUME] = value ? VALUE_TRUE : VALUE_FALSE; }
 

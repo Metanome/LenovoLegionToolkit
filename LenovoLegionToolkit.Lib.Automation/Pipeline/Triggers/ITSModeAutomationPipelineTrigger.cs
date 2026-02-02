@@ -15,9 +15,13 @@ public class ITSModeAutomationPipelineTrigger(ITSMode powerModeState) : IITSMode
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not ITSModeAutomationEvent e)
+        if (automationEvent is not (ITSModeAutomationEvent or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+            return IsMatchingState();
+
+        var e = (ITSModeAutomationEvent)automationEvent;
         var result = e.ITSModeState == ITSModeState;
         return Task.FromResult(result);
     }

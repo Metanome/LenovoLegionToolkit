@@ -17,9 +17,16 @@ public class WiFiConnectedAutomationPipelineTrigger(string[] ssids) : IWiFiConne
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not WiFiAutomationEvent { IsConnected: true } e)
+        if (automationEvent is not (WiFiAutomationEvent { IsConnected: true } or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+        {
+            var ssid = WiFi.GetConnectedNetworkSsid();
+            return Task.FromResult(Ssids.IsEmpty() ? ssid is not null : Ssids.Contains(ssid));
+        }
+
+        var e = (WiFiAutomationEvent)automationEvent;
         return Task.FromResult(Ssids.IsEmpty() || Ssids.Contains(e.Ssid));
     }
 

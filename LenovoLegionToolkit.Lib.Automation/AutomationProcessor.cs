@@ -194,25 +194,33 @@ public class AutomationProcessor(
 
                 try
                 {
-                    if (pipeline.Trigger is null || !await pipeline.Trigger.IsMatchingEvent(automationEvent).ConfigureAwait(false))
-                    {
-                        Log.Instance.Trace($"Pipeline triggers not satisfied. [name={pipeline.Name}, trigger={pipeline.Trigger}, steps.Count={pipeline.Steps.Count}]");
-                        continue;
-                    }
-
-                    Log.Instance.Trace($"Running pipeline... [name={pipeline.Name}, trigger={pipeline.Trigger}, steps.Count={pipeline.Steps.Count}]");
-
-                    var otherPipelines = pipelines.Where(p => p.Id != pipeline.Id).ToList();
-                    await pipeline.RunAsync(otherPipelines, ct).ConfigureAwait(false);
-
-                    Log.Instance.Trace($"Pipeline completed successfully. [name={pipeline.Name}, trigger={pipeline.Trigger}]");
-                }
-                catch (Exception ex)
+                if (automationEvent is StartupAutomationEvent && 
+                    !pipeline.RunOnStartup && 
+                    pipeline.Trigger is not OnStartupAutomationPipelineTrigger)
                 {
-                    Log.Instance.Trace($"Pipeline run failed. [name={pipeline.Name}, trigger={pipeline.Trigger}]", ex);
+                    Log.Instance.Trace($"Pipeline configured to skip startup. [name={pipeline.Name}]");
+                    continue;
                 }
 
-                if (pipeline.IsExclusive)
+                if (pipeline.Trigger is null || !await pipeline.Trigger.IsMatchingEvent(automationEvent).ConfigureAwait(false))
+                {
+                    Log.Instance.Trace($"Pipeline triggers not satisfied. [name={pipeline.Name}, trigger={pipeline.Trigger}, steps.Count={pipeline.Steps.Count}]");
+                    continue;
+                }
+
+                Log.Instance.Trace($"Running pipeline... [name={pipeline.Name}, trigger={pipeline.Trigger}, steps.Count={pipeline.Steps.Count}]");
+
+                var otherPipelines = pipelines.Where(p => p.Id != pipeline.Id).ToList();
+                await pipeline.RunAsync(otherPipelines, ct).ConfigureAwait(false);
+
+                Log.Instance.Trace($"Pipeline completed successfully. [name={pipeline.Name}, trigger={pipeline.Trigger}]");
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Pipeline run failed. [name={pipeline.Name}, trigger={pipeline.Trigger}]", ex);
+            }
+
+            if (pipeline.IsExclusive)
                 {
                     Log.Instance.Trace($"Pipeline is exclusive. Breaking. [name={pipeline.Name}, trigger={pipeline.Trigger}, steps.Count={pipeline.Steps.Count}]");
                     break;

@@ -24,7 +24,9 @@ public class AutomationPipeline
 
     public List<IAutomationStep> Steps { get; init; } = [];
 
-    public bool IsExclusive { get; init; } = true;
+    public bool IsExclusive { get; set; } = true;
+
+    public bool RunOnStartup { get; set; }
 
     [JsonIgnore]
     public IEnumerable<IAutomationPipelineTrigger> AllTriggers
@@ -68,6 +70,12 @@ public class AutomationPipeline
                 break;
             }
 
+            if (environment.Startup && IsDangerousOnStartup(step))
+            {
+                Log.Instance.Trace($"Skipping dangerous step on startup. [type={step.GetType().Name}]");
+                continue;
+            }
+
             Log.Instance.Trace($"Running step... [type={step.GetType().Name}]");
 
             try
@@ -86,6 +94,12 @@ public class AutomationPipeline
 
         if (stepExceptions.Count != 0)
             throw new AggregateException(stepExceptions);
+    }
+
+    private static bool IsDangerousOnStartup(IAutomationStep step)
+    {
+        var stepType = step.GetType().Name;
+        return stepType is "CloseAutomationStep" or "TurnOffMonitorsAutomationStep" or "TurnOffWiFiAutomationStep";
     }
 
     private IEnumerable<IAutomationStep> GetAllSteps(List<AutomationPipeline> pipelines)
@@ -114,6 +128,7 @@ public class AutomationPipeline
         Trigger = Trigger?.DeepCopy(),
         Steps = Steps.Select(s => s.DeepCopy()).ToList(),
         IsExclusive = IsExclusive,
+        RunOnStartup = RunOnStartup,
     };
 
     public IEnumerable<string> GetValidationWarnings(IEnumerable<AutomationPipeline>? pipelines = null)

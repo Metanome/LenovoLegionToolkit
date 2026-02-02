@@ -13,7 +13,7 @@ public class HDROnAutomationPipelineTrigger : IHDRPipelineTrigger
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        var result = automationEvent is HDRAutomationEvent { IsHDROn: true };
+        var result = automationEvent is HDRAutomationEvent { IsHDROn: true } or StartupAutomationEvent;
         return Task.FromResult(result);
     }
 

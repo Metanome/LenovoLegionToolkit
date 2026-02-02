@@ -15,9 +15,13 @@ public class PowerModeAutomationPipelineTrigger(PowerModeState powerModeState) :
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not PowerModeAutomationEvent e)
+        if (automationEvent is not (PowerModeAutomationEvent or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+            return IsMatchingState();
+
+        var e = (PowerModeAutomationEvent)automationEvent;
         var result = e.PowerModeState == PowerModeState;
         return Task.FromResult(result);
     }

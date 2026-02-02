@@ -17,9 +17,13 @@ public class GodModePresetChangedAutomationPipelineTrigger(Guid presetId)
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not CustomModePresetAutomationEvent e)
+        if (automationEvent is not (CustomModePresetAutomationEvent or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+            return IsMatchingState();
+
+        var e = (CustomModePresetAutomationEvent)automationEvent;
         return Task.FromResult(e.Id == PresetId);
     }
 

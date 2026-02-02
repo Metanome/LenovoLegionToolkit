@@ -26,9 +26,13 @@ public class TimeAutomationPipelineTrigger(bool isSunrise, bool isSunset, Time? 
 
     public async Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not TimeAutomationEvent e)
+        if (automationEvent is not (TimeAutomationEvent or StartupAutomationEvent))
             return false;
 
+        if (automationEvent is StartupAutomationEvent)
+            return await IsMatchingState().ConfigureAwait(false);
+
+        var e = (TimeAutomationEvent)automationEvent;
         return await IsMatching(e.Time, e.Day).ConfigureAwait(false);
     }
 

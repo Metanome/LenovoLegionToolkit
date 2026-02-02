@@ -15,9 +15,13 @@ public class HybridModeAutomationPipelineTrigger(HybridModeState hybridModeState
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not HybridModeAutomationEvent e)
+        if (automationEvent is not (HybridModeAutomationEvent or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+            return IsMatchingState();
+
+        var e = (HybridModeAutomationEvent)automationEvent;
         var result = e.HybridModeState == HybridModeState;
         return Task.FromResult(result);
     }

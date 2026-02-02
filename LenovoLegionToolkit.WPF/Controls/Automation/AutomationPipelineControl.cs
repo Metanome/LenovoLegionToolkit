@@ -52,6 +52,8 @@ public class AutomationPipelineControl : UserControl
         Margin = new(0, 16, 0, 0),
         ColumnDefinitions =
         {
+            new() { Width = GridLength.Auto },
+            new() { Width = GridLength.Auto },
             new() { Width = new(1, GridUnitType.Star) },
             new() { Width = GridLength.Auto },
             new() { Width = GridLength.Auto },
@@ -64,6 +66,15 @@ public class AutomationPipelineControl : UserControl
         HorizontalAlignment = HorizontalAlignment.Left,
         Content = Resource.AutomationPipelineControl_Exclusive,
         ToolTip = Resource.AutomationPipelineControl_Exclusive_ToolTip,
+        MinWidth = 100,
+        Margin = new(0, 0, 8, 0),
+    };
+
+    private readonly CheckBox _runOnStartupCheckBox = new()
+    {
+        HorizontalAlignment = HorizontalAlignment.Left,
+        Content = "Run on startup",
+        ToolTip = "When enabled, this automation will check and apply when the app starts",
         MinWidth = 100,
         Margin = new(0, 0, 8, 0),
     };
@@ -126,6 +137,7 @@ public class AutomationPipelineControl : UserControl
             .Select(s => s.CreateAutomationStep())
             .ToList(),
         IsExclusive = _isExclusiveCheckBox.IsChecked ?? false,
+        RunOnStartup = _runOnStartupCheckBox.IsChecked ?? false,
     };
 
     public string? GetName() => AutomationPipeline.Name;
@@ -185,11 +197,50 @@ public class AutomationPipelineControl : UserControl
         if (AutomationPipeline.Trigger is not null)
         {
             _isExclusiveCheckBox.IsChecked = AutomationPipeline.IsExclusive;
-            _isExclusiveCheckBox.Checked += (_, _) => OnChanged?.Invoke(this, EventArgs.Empty);
+            _isExclusiveCheckBox.Checked += (_, _) =>
+            {
+                AutomationPipeline.IsExclusive = _isExclusiveCheckBox.IsChecked ?? false;
+                OnChanged?.Invoke(this, EventArgs.Empty);
+            };
+            _isExclusiveCheckBox.Unchecked += (_, _) =>
+            {
+                AutomationPipeline.IsExclusive = _isExclusiveCheckBox.IsChecked ?? false;
+                OnChanged?.Invoke(this, EventArgs.Empty);
+            };
+
+            _runOnStartupCheckBox.IsChecked = AutomationPipeline.RunOnStartup;
+            _runOnStartupCheckBox.Checked += (_, _) =>
+            {
+                AutomationPipeline.RunOnStartup = _runOnStartupCheckBox.IsChecked ?? false;
+                OnChanged?.Invoke(this, EventArgs.Empty);
+            };
+            _runOnStartupCheckBox.Unchecked += (_, _) =>
+            {
+                AutomationPipeline.RunOnStartup = _runOnStartupCheckBox.IsChecked ?? false;
+                OnChanged?.Invoke(this, EventArgs.Empty);
+            };
         }
         else
         {
             _isExclusiveCheckBox.Visibility = Visibility.Hidden;
+            _runOnStartupCheckBox.Visibility = Visibility.Hidden;
+        }
+
+        if (AutomationPipeline.Trigger is ACAdapterDisconnectedAutomationPipelineTrigger
+            or GamesStopAutomationPipelineTrigger
+            or ProcessesStopRunningAutomationPipelineTrigger
+            or WiFiDisconnectedAutomationPipelineTrigger
+            or ExternalDisplayDisconnectedAutomationPipelineTrigger
+            or DisplayOffAutomationPipelineTrigger
+            or HDROffAutomationPipelineTrigger
+            or LidClosedAutomationPipelineTrigger
+            or DeviceDisconnectedAutomationPipelineTrigger
+            or SessionLockAutomationPipelineTrigger
+            or OnResumeAutomationPipelineTrigger
+            or OnStartupAutomationPipelineTrigger
+            or PeriodicAutomationPipelineTrigger)
+        {
+            _runOnStartupCheckBox.Visibility = Visibility.Collapsed;
         }
 
         _runNowButton.Click += async (_, _) => await RunAsync();
@@ -207,11 +258,13 @@ public class AutomationPipelineControl : UserControl
         _deletePipelineButton.Click += (_, _) => OnDelete?.Invoke(this, EventArgs.Empty);
 
         Grid.SetColumn(_isExclusiveCheckBox, 0);
-        Grid.SetColumn(_runNowButton, 1);
-        Grid.SetColumn(_addStepButton, 2);
-        Grid.SetColumn(_deletePipelineButton, 3);
+        Grid.SetColumn(_runOnStartupCheckBox, 1);
+        Grid.SetColumn(_runNowButton, 3);
+        Grid.SetColumn(_addStepButton, 4);
+        Grid.SetColumn(_deletePipelineButton, 5);
 
         _buttonsStackPanel.Children.Add(_isExclusiveCheckBox);
+        _buttonsStackPanel.Children.Add(_runOnStartupCheckBox);
         _buttonsStackPanel.Children.Add(_runNowButton);
         _buttonsStackPanel.Children.Add(_addStepButton);
         _buttonsStackPanel.Children.Add(_deletePipelineButton);

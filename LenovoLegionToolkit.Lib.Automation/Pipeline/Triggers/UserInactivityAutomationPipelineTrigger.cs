@@ -17,9 +17,13 @@ public class UserInactivityAutomationPipelineTrigger(TimeSpan inactivityTimeSpan
 
     public Task<bool> IsMatchingEvent(IAutomationEvent automationEvent)
     {
-        if (automationEvent is not UserInactivityAutomationEvent e)
+        if (automationEvent is not (UserInactivityAutomationEvent or StartupAutomationEvent))
             return Task.FromResult(false);
 
+        if (automationEvent is StartupAutomationEvent)
+            return IsMatchingState();
+
+        var e = (UserInactivityAutomationEvent)automationEvent;
         var result = InactivityTimeSpan == e.InactivityTimeSpan;
         return Task.FromResult(result);
     }
