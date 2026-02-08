@@ -1,30 +1,20 @@
-﻿using System.Windows;
+using System;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace LenovoLegionToolkit.WPF.Controls.KeyboardBacklight.Spectrum.Device;
+namespace LenovoLegionToolkit.WPF.Controls.LampArray;
 
-public partial class SpectrumZoneControl
+public partial class LampArrayZoneControl : UserControl
 {
-    private ushort _keyCode;
+    public static readonly DependencyProperty KeyCodeProperty = DependencyProperty.Register(
+        nameof(KeyCode), typeof(ushort), typeof(LampArrayZoneControl), new PropertyMetadata(default(ushort)));
 
-    public ushort KeyCode
-    {
-        get => _keyCode;
-        set
+        public ushort KeyCode
         {
-            _keyCode = value;
-
-#if DEBUG
-            _button.ToolTip = $"0x{value:X2}";
-#endif
+            get => (ushort)GetValue(KeyCodeProperty);
+            set => SetValue(KeyCodeProperty, value);
         }
-    }
-
-    public double RotationAngle
-    {
-        get => _rotateTransform.Angle;
-        set => _rotateTransform.Angle = value;
-    }
 
     public Color? Color
     {
@@ -53,7 +43,7 @@ public partial class SpectrumZoneControl
         remove => _clickHandlers -= value;
     }
 
-    public SpectrumZoneControl()
+    public LampArrayZoneControl()
     {
         InitializeComponent();
         _button.Click += (s, e) => _clickHandlers?.Invoke(this, e);
