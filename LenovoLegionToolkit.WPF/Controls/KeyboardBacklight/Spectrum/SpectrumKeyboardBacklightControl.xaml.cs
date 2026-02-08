@@ -137,15 +137,14 @@ public partial class SpectrumKeyboardBacklightControl
         }
     });
 
-    private async void BrightnessSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => await _changeBrightnessDispatcher.DispatchAsync(async () =>
+     private async void BrightnessSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => await _changeBrightnessDispatcher.DispatchAsync(async () =>
     {
         await Dispatcher.InvokeAsync(async () =>
         {
             var value = (int)_brightnessSlider.Value;
             if (await _controller.GetBrightnessAsync() != value)
             {
-                // await _controller.SetBrightnessAsync(value);
-                Log.Instance.Trace($"VERIFICATION MODE: Skipped sending HID Brightness.");
+                await _controller.SetBrightnessAsync(value);
             }
         });
     });
@@ -163,8 +162,7 @@ public partial class SpectrumKeyboardBacklightControl
 
         if (await _controller.GetProfileAsync() != profile)
         {
-            // await _controller.SetProfileAsync(profile);
-            Log.Instance.Trace($"VERIFICATION MODE: Skipped sending HID Profile Switch.");
+            await _controller.SetProfileAsync(profile);
             await RefreshProfileDescriptionAsync();
         }
 
@@ -585,8 +583,7 @@ public partial class SpectrumKeyboardBacklightControl
  
          try
          {
-             // await _controller.SetProfileDescriptionAsync(profile, effects);
-             Log.Instance.Trace($"VERIFICATION MODE: Skipped sending HID Profile Data.");
+             await _controller.SetProfileDescriptionAsync(profile, effects);
          }
          catch (Exception ex)
          {
@@ -598,7 +595,7 @@ public partial class SpectrumKeyboardBacklightControl
         if (_previewController.IsAvailable)
             _previewController.ApplyProfile(effects);
  
-         await RefreshProfileDescriptionAsync();
+        await RefreshProfileDescriptionAsync();
      }
  
      private async Task ResetToDefaultAsync()
@@ -606,11 +603,11 @@ public partial class SpectrumKeyboardBacklightControl
          DeselectAllButtons();
  
          var profile = await _controller.GetProfileAsync();
-         // await _controller.SetProfileDefaultAsync(profile);
-         Log.Instance.Trace($"VERIFICATION MODE: Skipped sending HID Default Reset.");
+         await _controller.SetProfileDefaultAsync(profile);
  
          await RefreshProfileDescriptionAsync();
      }
+
  
      private void CreateEffect(ushort[] keyCodes, ushort[] allKeyboardKeyCodes)
      {

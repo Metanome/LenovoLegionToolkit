@@ -181,6 +181,10 @@ public partial class App
             MainWindow = mainWindow;
             MainWindowInstance = mainWindow;
 
+            // DEBUG: Open LampArray Debug Window
+            var debugWindow = new LenovoLegionToolkit.WPF.Windows.Debug.LampArrayDebugWindow();
+            debugWindow.Show();
+
             IoCContainer.Resolve<ThemeManager>().Apply();
             InitSetLogIndicator();
 

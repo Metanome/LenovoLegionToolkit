@@ -1,4 +1,7 @@
-﻿using System;
+﻿using LenovoLegionToolkit.Lib.Extensions;
+using Newtonsoft.Json;
+using Octokit;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -7,9 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using LenovoLegionToolkit.Lib.Extensions;
-using Newtonsoft.Json;
-using Octokit;
+using Windows.Devices.Lights;
 
 
 namespace LenovoLegionToolkit.Lib;
@@ -488,6 +489,14 @@ public readonly struct KeyMap(int width, int height, ushort[,] keyCodes, ushort[
     public readonly int Height = height;
     public readonly ushort[,] KeyCodes = keyCodes;
     public readonly ushort[] AdditionalKeyCodes = additionalKeyCodes;
+}
+
+public readonly struct LampArrayInfo(string id, string displayName, LampArray lampArray)
+{
+    public static readonly LampArrayInfo Empty = new();
+    public readonly string Id = id;
+    public readonly string DisplayName = displayName;
+    public readonly LampArray LampArray = lampArray;
 }
 
 public readonly struct MachineInformation
