@@ -20,7 +20,7 @@ public partial class LampArrayKeyboardControl : UserControl
     private void InitializeKeyMap()
     {
         _keyMap.Clear();
-        foreach (var child in KeyboardCanvas.Children)
+        foreach (var child in _keyboardCanvas.Children)
         {
             if (child is LampArrayZoneControl zone)
             {
