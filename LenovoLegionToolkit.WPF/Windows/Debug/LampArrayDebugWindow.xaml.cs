@@ -253,7 +253,8 @@ public partial class LampArrayDebugWindow : Window
 
         try
         {
-            foreach (var index in allIndices)
+            /*foreach (var index in allIndices)*/
+            for (var index = 240; index <= 310; index++)
             {
                 if (token.IsCancellationRequested) break;
 

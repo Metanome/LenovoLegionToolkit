@@ -122,10 +122,16 @@
             Grid.Row="1"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto">
-            <controls:LampArrayKeyboardControl
-                x:Name="_visualKeyboard"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center" />
+            <StackPanel>
+                <controls:LampArrayKeyboardControl
+                    x:Name="_visualKeyboard"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+                <controls:LampArrayAmbientControl
+                    x:Name="_visualAmbientLight"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+            </StackPanel>
         </ScrollViewer>
 
         <TextBox
