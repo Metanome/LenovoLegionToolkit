@@ -178,7 +178,6 @@ There are two main ways you can use your dGPU:
 
 1. Hybrid mode on - internal laptop display is connected to integrated GPU, discrete GPU will work when needed and power off when not in use, giving better battery life
 2. Hybrid mode off (aka dGPU) - internal laptop display is connected directly to discrete GPU, giving best performance but also worst battery life
-3. Hybrid iGPU-only - in this mode dGPU will be disconnected (think of it like ejecting USB drive), so there is no risk of it using power when you want to achieve best battery life
 
 Switching between two modes requires restart.
 
