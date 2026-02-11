@@ -385,7 +385,11 @@ public partial class SensorsControlV2
 
     private static void UpdateValue(RangeBase bar, TextBlock label, double max, double value, string text, string? toolTipText = null)
     {
-        if (max <= 0 || value < 0 || double.IsNaN(value))
+        bool isMaxInvalid = double.IsNaN(max) || double.IsInfinity(max) || max <= 0;
+
+        bool isValueInvalid = double.IsNaN(value) || double.IsInfinity(value) || value < 0;
+
+        if (isMaxInvalid || isValueInvalid)
         {
             bar.Minimum = 0;
             bar.Maximum = 1;
