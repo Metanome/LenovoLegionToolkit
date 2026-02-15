@@ -59,13 +59,12 @@ jobs:
                 exit 1
             }
             $tagName = "v$version"
-            $tagName = "v$version"
         } else {
             # Release publish trigger
             $tagName = "${{ github.event.release.tag_name }}"
             $version = $tagName -replace '^v', ''
             
-            # Trust the release event payload directly
+            # Retrieve release metadata directly from the event payload
             $isPrerelease = "${{ github.event.release.prerelease }}"
             $targetCommitish = "${{ github.event.release.target_commitish }}"
 
@@ -134,10 +133,22 @@ jobs:
         }
       shell: powershell
         
-    - name: Create Release and Upload Installer
+    - name: Update Release (Published)
+      if: github.event_name == 'release'
       uses: softprops/action-gh-release@v2.0.8
       with:
-        draft: ${{ github.event_name == 'workflow_dispatch' }}
+        tag_name: ${{ steps.release_meta.outputs.tag_name }}
+        target_commitish: ${{ steps.release_meta.outputs.target_commitish }}
+        prerelease: ${{ steps.release_meta.outputs.prerelease }}
+        name: Lenovo Legion Toolkit v${{ steps.release_meta.outputs.version }} (${{ steps.release_meta.outputs.channel }})
+        files: build_installer/LenovoLegionToolkitSetup-v${{ steps.release_meta.outputs.version }}.exe
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create Draft Release (Manual)
+      if: github.event_name == 'workflow_dispatch'
+      uses: softprops/action-gh-release@v2.0.8
+      with:
+        draft: true
         tag_name: ${{ steps.release_meta.outputs.tag_name }}
         target_commitish: ${{ steps.release_meta.outputs.target_commitish }}
         prerelease: ${{ steps.release_meta.outputs.prerelease }}
