@@ -997,7 +997,7 @@ public readonly struct Update(Release release)
     public string Description { get; } = release.Body;
     public DateTimeOffset Date { get; } = release.PublishedAt ?? release.CreatedAt;
     public string? Url { get; } = release.Assets
-        .Where(ra => ra.Name.EndsWith("setup.exe", StringComparison.InvariantCultureIgnoreCase))
+        .Where(ra => ra.Name.StartsWith("LenovoLegionToolkitSetup", StringComparison.InvariantCultureIgnoreCase) && ra.Name.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase))
         .Select(ra => ra.BrowserDownloadUrl)
         .FirstOrDefault();
 

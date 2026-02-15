@@ -28,6 +28,7 @@ OutputBaseFilename=LenovoLegionToolkitSetup
 Compression=lzma2/ultra64  
 SolidCompression=yes
 WizardStyle=modern
+UninstallDisplayName={#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 OutputDir=build_installer
 ArchitecturesInstallIn64BitMode=x64compatible
