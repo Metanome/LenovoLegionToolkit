@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 
 namespace LenovoLegionToolkit.Lib.Utils;
 
@@ -30,7 +31,7 @@ public static class HidUtils
                     Marshal.StructureToPtr(data, ptr, false);
                 }
 
-                return PInvoke.HidD_SetFeature(handle, ptr.ToPointer(), (uint)size);
+                return PInvoke.HidD_SetFeature(new HANDLE(handle.DangerousGetHandle()), ptr.ToPointer(), (uint)size);
             }
             finally
             {
@@ -51,7 +52,7 @@ public static class HidUtils
                 ptr = Marshal.AllocHGlobal(size);
                 Marshal.Copy(new byte[] { 7 }, 0, ptr, 1);
 
-                if (!PInvoke.HidD_GetFeature(handle, ptr.ToPointer(), (uint)size))
+                if (!PInvoke.HidD_GetFeature(new HANDLE(handle.DangerousGetHandle()), ptr.ToPointer(), (uint)size))
                     return false;
 
                 result = Marshal.PtrToStructure<T>(ptr);
@@ -75,7 +76,7 @@ public static class HidUtils
                 ptr = Marshal.AllocHGlobal(size);
                 Marshal.Copy(new byte[] { 7 }, 0, ptr, 1);
 
-                if (!PInvoke.HidD_GetFeature(handle, ptr.ToPointer(), (uint)size))
+                if (!PInvoke.HidD_GetFeature(new HANDLE(handle.DangerousGetHandle()), ptr.ToPointer(), (uint)size))
                     return false;
 
                 bytes = new byte[size];

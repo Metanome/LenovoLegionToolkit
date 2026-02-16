@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Features;
 using LenovoLegionToolkit.Lib.Features.WhiteKeyboardBacklight;
@@ -156,7 +157,7 @@ public class DriverKeyListener(
     private static unsafe bool BindListener(WaitHandle waitHandle)
     {
         var handle = (uint)waitHandle.SafeWaitHandle.DangerousGetHandle();
-        return PInvoke.DeviceIoControl(Drivers.GetEnergy(),
+        return PInvoke.DeviceIoControl(new HANDLE(Drivers.GetEnergy().DangerousGetHandle()),
             Drivers.IOCTL_KEY_WAIT_HANDLE,
             &handle,
             16,
@@ -170,7 +171,7 @@ public class DriverKeyListener(
     {
         uint inBuff = 0;
         uint outBuff = 0;
-        var result = PInvoke.DeviceIoControl(Drivers.GetEnergy(),
+        var result = PInvoke.DeviceIoControl(new HANDLE(Drivers.GetEnergy().DangerousGetHandle()),
             Drivers.IOCTL_KEY_VALUE,
             &inBuff,
             4,

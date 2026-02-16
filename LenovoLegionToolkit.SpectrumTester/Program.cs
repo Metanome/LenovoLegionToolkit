@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.System;
 
@@ -251,7 +252,7 @@ unsafe void SetFeature<T>(SafeHandle handle, T str) where T : notnull
             Marshal.StructureToPtr(str, ptr, false);
         }
 
-        var result = PInvoke.HidD_SetFeature(handle, ptr.ToPointer(), (uint)size);
+        var result = PInvoke.HidD_SetFeature(new HANDLE(handle.DangerousGetHandle()), ptr.ToPointer(), (uint)size);
         if (!result)
             PInvokeExtensions.ThrowIfWin32Error(typeof(T).Name);
     }
@@ -270,7 +271,7 @@ unsafe void GetFeature<T>(SafeHandle handle, out T str) where T : struct
         ptr = Marshal.AllocHGlobal(size);
         Marshal.Copy(new byte[] { 7 }, 0, ptr, 1);
 
-        var result = PInvoke.HidD_GetFeature(handle, ptr.ToPointer(), (uint)size);
+        var result = PInvoke.HidD_GetFeature(new HANDLE(handle.DangerousGetHandle()), ptr.ToPointer(), (uint)size);
         if (!result)
             PInvokeExtensions.ThrowIfWin32Error(typeof(T).Name);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using Microsoft.Win32.SafeHandles;
 
 namespace LenovoLegionToolkit.Lib.Extensions;
@@ -43,7 +44,7 @@ public static class PInvokeExtensions
 
             Marshal.StructureToPtr(inVal, lpInBuffer, false);
 
-            var ret = PInvoke.DeviceIoControl(hDevice,
+            var ret = PInvoke.DeviceIoControl(new HANDLE(hDevice.DangerousGetHandle()),
                 dwIoControlCode,
                 lpInBuffer.ToPointer(),
                 (uint)nInBufferSize,

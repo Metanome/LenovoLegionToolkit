@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.Lib.Features;
@@ -49,7 +50,9 @@ public abstract class AbstractUEFIFeature<T>(string guid, string scopeName, uint
             }
 
             var ptrSize = (uint)Marshal.SizeOf<TS>();
-            if (PInvoke.GetFirmwareEnvironmentVariableEx(scopeName, guid, ptr.ToPointer(), ptrSize, null) != 0)
+            fixed (char* pScopeName = scopeName)
+            fixed (char* pGuid = guid)
+            if (PInvoke.GetFirmwareEnvironmentVariableEx(new PCWSTR(pScopeName), new PCWSTR(pGuid), ptr.ToPointer(), ptrSize, null) != 0)
             {
                 var result = Marshal.PtrToStructure<TS>(ptr);
 
@@ -86,7 +89,9 @@ public abstract class AbstractUEFIFeature<T>(string guid, string scopeName, uint
 
             Marshal.StructureToPtr(structure, ptr, false);
             var ptrSize = (uint)Marshal.SizeOf<TS>();
-            if (!PInvoke.SetFirmwareEnvironmentVariableEx(scopeName, guid, ptr.ToPointer(), ptrSize, scopeAttribute))
+            fixed (char* pScopeName = scopeName)
+            fixed (char* pGuid = guid)
+            if (!PInvoke.SetFirmwareEnvironmentVariableEx(new PCWSTR(pScopeName), new PCWSTR(pGuid), ptr.ToPointer(), ptrSize, scopeAttribute))
             {
                 Log.Instance.Trace($"Cannot write variable {scopeName} to UEFI [feature={GetType().Name}]");
 

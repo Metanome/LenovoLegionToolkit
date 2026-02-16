@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Utils;
 
@@ -102,9 +103,13 @@ public static class BootLogo
 
             var ptrSize = (uint)Marshal.SizeOf<BootLogoInfo>();
 
-            var size = PInvoke.GetFirmwareEnvironmentVariableEx(LBLDESP, LBLDESP_GUID, ptr.ToPointer(), ptrSize, null);
-            if (size != ptrSize)
-                PInvokeExtensions.ThrowIfWin32Error("GetFirmwareEnvironmentVariableEx");
+            fixed (char* pName = LBLDESP)
+            fixed (char* pGuid = LBLDESP_GUID)
+            {
+                var size = PInvoke.GetFirmwareEnvironmentVariableEx(new PCWSTR(pName), new PCWSTR(pGuid), ptr.ToPointer(), ptrSize, null);
+                if (size != ptrSize)
+                    PInvokeExtensions.ThrowIfWin32Error("GetFirmwareEnvironmentVariableEx");
+            }
 
             var str = Marshal.PtrToStructure<BootLogoInfo>(ptr);
 
@@ -138,8 +143,12 @@ public static class BootLogo
             Marshal.StructureToPtr(info, ptr, false);
             var ptrSize = (uint)Marshal.SizeOf<BootLogoInfo>();
 
-            if (!PInvoke.SetFirmwareEnvironmentVariableEx(LBLDESP, LBLDESP_GUID, ptr.ToPointer(), ptrSize, SCOPE_ATTR))
-                PInvokeExtensions.ThrowIfWin32Error("SetFirmwareEnvironmentVariableEx");
+            fixed (char* pName = LBLDESP)
+            fixed (char* pGuid = LBLDESP_GUID)
+            {
+                if (!PInvoke.SetFirmwareEnvironmentVariableEx(new PCWSTR(pName), new PCWSTR(pGuid), ptr.ToPointer(), ptrSize, SCOPE_ATTR))
+                    PInvokeExtensions.ThrowIfWin32Error("SetFirmwareEnvironmentVariableEx");
+            }
 
             Log.Instance.Trace($"Info set. [enabled={info.Enabled}, supportedWidth={info.SupportedWidth}, supportedHeight={info.SupportedHeight}, supportedFormat={(int)info.SupportedFormat}]");
         }
@@ -168,9 +177,13 @@ public static class BootLogo
 
             var ptrSize = (uint)Marshal.SizeOf<BootLogoChecksum>();
 
-            var size = PInvoke.GetFirmwareEnvironmentVariableEx(LBLDVC, LBLDVC_GUID, ptr.ToPointer(), ptrSize, null);
-            if (size != ptrSize)
-                PInvokeExtensions.ThrowIfWin32Error("GetFirmwareEnvironmentVariableEx");
+            fixed (char* pName = LBLDVC)
+            fixed (char* pGuid = LBLDVC_GUID)
+            {
+                var size = PInvoke.GetFirmwareEnvironmentVariableEx(new PCWSTR(pName), new PCWSTR(pGuid), ptr.ToPointer(), ptrSize, null);
+                if (size != ptrSize)
+                    PInvokeExtensions.ThrowIfWin32Error("GetFirmwareEnvironmentVariableEx");
+            }
 
             var checksum = Marshal.PtrToStructure<BootLogoChecksum>(ptr).Crc;
 
@@ -205,8 +218,12 @@ public static class BootLogo
             Marshal.StructureToPtr(str, ptr, false);
             var ptrSize = (uint)Marshal.SizeOf<BootLogoChecksum>();
 
-            if (!PInvoke.SetFirmwareEnvironmentVariableEx(LBLDVC, LBLDVC_GUID, ptr.ToPointer(), ptrSize, SCOPE_ATTR))
-                PInvokeExtensions.ThrowIfWin32Error("SetFirmwareEnvironmentVariableEx");
+            fixed (char* pName = LBLDVC)
+            fixed (char* pGuid = LBLDVC_GUID)
+            {
+                if (!PInvoke.SetFirmwareEnvironmentVariableEx(new PCWSTR(pName), new PCWSTR(pGuid), ptr.ToPointer(), ptrSize, SCOPE_ATTR))
+                    PInvokeExtensions.ThrowIfWin32Error("SetFirmwareEnvironmentVariableEx");
+            }
 
             Log.Instance.Trace($"Checksum set. [checksum={checksum:X2}]");
         }
