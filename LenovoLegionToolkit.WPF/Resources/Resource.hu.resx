@@ -2436,6 +2436,9 @@ Nincs hatással a többi teljes képernyős ablakokra, de nem lehet kattintani a
   <data name="MainWindow_PawnIO_Warning_Title" xml:space="preserve">
     <value>Warning</value>
   </data>
+  <data name="MainWindow_PawnIO_Warning_Message" xml:space="preserve">
+    <value>You need install PawnIO first to use the new dashboard!</value>
+  </data>
   <data name="Warning" xml:space="preserve">
     <value>Warning</value>
   </data>
@@ -2886,8 +2889,5 @@ Do not proceed unless you possess the necessary technical expertise.</value>
   </data>
   <data name="SettingsPage_UpdateMethod_Title" xml:space="preserve">
     <value>Update Method</value>
-  </data>
-  <data name="MainWindow_PawnIO_Warning_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
 </root>

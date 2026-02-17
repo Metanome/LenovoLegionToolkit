@@ -2437,6 +2437,9 @@ Chức năng này không ảnh hưởng các cửa sổ ở chế độ toàn m�
   <data name="MainWindow_PawnIO_Warning_Title" xml:space="preserve">
     <value>Cảnh báo</value>
   </data>
+  <data name="MainWindow_PawnIO_Warning_Message" xml:space="preserve">
+    <value>Bạn cần cài đặt PawnIO trước để sử dụng bảng cảm biến mới!</value>
+  </data>
   <data name="Warning" xml:space="preserve">
     <value>Cảnh báo</value>
   </data>
@@ -2888,8 +2891,5 @@ Vui lòng không tiếp tục trừ khi bạn có kiến thức và chuyên môn
   </data>
   <data name="SettingsPage_UpdateMethod_Title" xml:space="preserve">
     <value>Phương thức cập nhật</value>
-  </data>
-  <data name="MainWindow_PawnIO_Warning_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
 </root>

@@ -2437,6 +2437,9 @@ Dit heeft geen invloed op andere schermvensters, maar je kunt niet op de notific
   <data name="MainWindow_PawnIO_Warning_Title" xml:space="preserve">
     <value>Waarschuwing</value>
   </data>
+  <data name="MainWindow_PawnIO_Warning_Message" xml:space="preserve">
+    <value>Je moet eerst PawnIO installeren om het nieuwe dashboard te gebruiken!</value>
+  </data>
   <data name="Warning" xml:space="preserve">
     <value>Waarschuwing</value>
   </data>
@@ -2887,8 +2890,5 @@ Ga niet verder tenzij u over de nodige technische expertise beschikt.</value>
   </data>
   <data name="SettingsPage_UpdateMethod_Title" xml:space="preserve">
     <value>Update methode</value>
-  </data>
-  <data name="MainWindow_PawnIO_Warning_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
 </root>

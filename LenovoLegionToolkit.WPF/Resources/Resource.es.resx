@@ -2440,6 +2440,9 @@ No afectará a otras ventanas a pantalla completa, pero no podrá hacer clic en 
   <data name="MainWindow_PawnIO_Warning_Title" xml:space="preserve">
     <value>Aviso</value>
   </data>
+  <data name="MainWindow_PawnIO_Warning_Message" xml:space="preserve">
+    <value>¡Necesitas instalar primero PawnIO para poder usar el nuevo panel de control!</value>
+  </data>
   <data name="Warning" xml:space="preserve">
     <value>Aviso</value>
   </data>
@@ -2890,8 +2893,5 @@ No proceda a menos que posea la experiencia técnica necesaria.</value>
   </data>
   <data name="SettingsPage_UpdateMethod_Title" xml:space="preserve">
     <value>Modo de actualización</value>
-  </data>
-  <data name="MainWindow_PawnIO_Warning_Message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
 </root>
