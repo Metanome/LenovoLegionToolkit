@@ -267,7 +267,7 @@ public partial class SettingsAppBehaviorControl
         ArgumentWindow.ShowInstance();
     }
 
-    private void FloatingGadgets_Click(object sender, RoutedEventArgs e)
+    private async void FloatingGadgets_Click(object sender, RoutedEventArgs e)
     {
         if (_isRefreshing)
             return;
@@ -282,16 +282,14 @@ public partial class SettingsAppBehaviorControl
             {
                 if (!PawnIOHelper.IsPawnIOInnstalled())
                 {
-                    var dialog = new DialogWindow
-                    {
-                        Title = Resource.MainWindow_PawnIO_Warning_Title,
-                        Content = Resource.MainWindow_PawnIO_Warning_Message,
-                        Owner = Application.Current.MainWindow
-                    };
+                    var result = await MessageBoxHelper.ShowAsync(
+                        this,
+                        Resource.MainWindow_PawnIO_Warning_Title,
+                        Resource.MainWindow_PawnIO_Warning_Message,
+                        Resource.Yes,
+                        Resource.No);
 
-                    dialog.ShowDialog();
-
-                    if (dialog.Result.Item1)
+                    if (result)
                     {
                         Process.Start(new ProcessStartInfo
                         {
