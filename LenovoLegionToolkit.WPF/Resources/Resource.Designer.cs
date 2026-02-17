@@ -3848,15 +3848,6 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Live Preview.
-        /// </summary>
-        public static string LivePreview {
-            get {
-                return ResourceManager.GetString("LivePreview", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Custom Mode grants access to critical system parameters such as power limits and fan curves. 
         ///
         ///Misconfiguration can lead to severe system instability, thermal throttling, or permanent hardware damage. Modifications made here may void your manufacturer warranty. 
@@ -3895,6 +3886,312 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string KeyboardBacklightPage_Title {
             get {
                 return ResourceManager.GetString("KeyboardBacklightPage_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Aft Ambient 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Aft_Ambient {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Aft_Ambient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 All 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_All {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Aurora Sync 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Aurora_Sync {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Aurora_Sync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Bottom to Top 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Bottom_to_Top {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Bottom_to_Top", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Breathe 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Breathe {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Breathe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Brightness 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Brightness {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Brightness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Clear Colors 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Clear_Colors {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Clear_Colors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Custom 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Custom {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Custom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Direction 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Direction {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Direction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Effect 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Effect {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Effect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Export Profile 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Export_Profile {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Export_Profile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Gradient 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Gradient {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Gradient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Import Profile 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Import_Profile {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Import_Profile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Keyboard 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Keyboard {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Keyboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Left to Right 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Left_to_Right {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Left_to_Right", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Meteor 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Meteor {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Meteor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No Selection 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_No_Selection {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_No_Selection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 None 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_None {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Probe Indices 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Probe_Indices {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Probe_Indices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Rainbow 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Rainbow {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Rainbow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Rainbow Wave 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Rainbow_Wave {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Rainbow_Wave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Rear Ambient 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Rear_Ambient {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Rear_Ambient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Right to Left 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Right_to_Left {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Right_to_Left", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Ripple 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Ripple {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Ripple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Selection 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Selection {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Selection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Smooth Transition 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Smooth_Transition {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Smooth_Transition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Sparkle 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Sparkle {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Sparkle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Speed 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Speed {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Speed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Spiral Rainbow 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Spiral_Rainbow {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Spiral_Rainbow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Static 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Static {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Static", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Target Zone 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Target_Zone {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Target_Zone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Top to Bottom 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Top_to_Bottom {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Top_to_Bottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Wave 的本地化字符串。
+        /// </summary>
+        public static string LampArrayRGBKeyboardPage_Wave {
+            get {
+                return ResourceManager.GetString("LampArrayRGBKeyboardPage_Wave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Live Preview 的本地化字符串。
+        /// </summary>
+        public static string LivePreview {
+            get {
+                return ResourceManager.GetString("LivePreview", resourceCulture);
             }
         }
         

@@ -29,10 +29,9 @@
             Text="{x:Static resources:Resource.KeyboardBacklightPage_Title}" />
 
         <StackPanel Margin="0,60,8,0">
-            <!--  Global Settings  -->
             <custom:CardControl Margin="0,0,0,24" Icon="Settings24">
                 <custom:CardControl.Header>
-                    <controls:CardHeaderControl Title="Global Settings" />
+                    <controls:CardHeaderControl Title="{x:Static resources:Resource.Settings}" />
                 </custom:CardControl.Header>
                 <StackPanel>
                     <Grid Margin="0,0,0,8">
@@ -41,7 +40,7 @@
                             <ColumnDefinition Width="200" />
                             <ColumnDefinition Width="50" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Text="Brightness" />
+                        <TextBlock VerticalAlignment="Center" Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Brightness}" />
                         <Slider
                             Grid.Column="1"
                             Maximum="100"
@@ -62,7 +61,7 @@
                             <ColumnDefinition Width="200" />
                             <ColumnDefinition Width="50" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Text="Speed" />
+                        <TextBlock VerticalAlignment="Center" Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Speed}" />
                         <Slider
                             x:Name="_speedSlider"
                             Grid.Column="1"
@@ -83,7 +82,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Stretch" Text="Smooth Transition" />
+                        <TextBlock VerticalAlignment="Stretch" Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Smooth_Transition}" />
                         <CheckBox
                             x:Name="_smoothTransitionCheckBox"
                             Grid.Column="1"
@@ -94,7 +93,6 @@
                 </StackPanel>
             </custom:CardControl>
 
-            <!--  Preview Area (Large Panel)  -->
             <Border
                 Margin="0,0,0,24"
                 Padding="24"
@@ -109,25 +107,21 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  Visualizers (Centered & Large)  -->
                     <Viewbox
                         Grid.Column="0"
                         MaxHeight="600"
                         Stretch="Uniform">
                         <Grid x:Name="_previewGrid">
-                            <!--  Keyboard  -->
                             <lamp:LampArrayKeyboardControl
                                 x:Name="_visualKeyboard"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center" />
 
-                            <!--  Rear Ambient  -->
                             <lamp:LampArrayRearAmbientControl
                                 x:Name="_rearAmbientLight"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center" />
 
-                            <!--  Aft Ambient  -->
                             <lamp:LampArrayAftAmbientControl
                                 x:Name="_aftAmbientLight"
                                 HorizontalAlignment="Center"
@@ -135,26 +129,25 @@
                         </Grid>
                     </Viewbox>
 
-                    <!--  Side Controls  -->
                     <StackPanel
                         Grid.Column="1"
                         Margin="24,0,0,0"
                         VerticalAlignment="Center">
-                        <TextBlock FontWeight="SemiBold" Text="Target Zone" />
+                        <TextBlock FontWeight="SemiBold" Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Target_Zone}" />
                         <ComboBox
                             x:Name="_zoneSelect"
                             Width="160"
                             Margin="0,8,0,0"
                             SelectionChanged="ZoneSelect_SelectionChanged">
-                            <ComboBoxItem x:Name="_cbiKeyboard" Content="Keyboard" />
-                            <ComboBoxItem x:Name="_cbiRear" Content="Rear Ambient" />
-                            <ComboBoxItem x:Name="_cbiAft" Content="Aft Ambient" />
+                            <ComboBoxItem x:Name="_cbiKeyboard" Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Keyboard}" />
+                            <ComboBoxItem x:Name="_cbiRear" Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Rear_Ambient}" />
+                            <ComboBoxItem x:Name="_cbiAft" Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Aft_Ambient}" />
                         </ComboBox>
 
                         <TextBlock
                             Margin="0,24,0,8"
                             FontWeight="SemiBold"
-                            Text="Selection" />
+                            Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Selection}" />
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -163,18 +156,17 @@
                             <Button
                                 Margin="0,0,4,0"
                                 Click="SelectAll_Click"
-                                Content="All" />
+                                Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_All}" />
                             <Button
                                 Grid.Column="1"
                                 Margin="4,0,0,0"
                                 Click="DeselectAll_Click"
-                                Content="None" />
+                                Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_None}" />
                         </Grid>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <!--  Effect Settings  -->
             <custom:CardControl Margin="0,0,0,24" Icon="ColorFill24">
                 <custom:CardControl.Header>
                     <controls:CardHeaderControl Title="Effects" />
@@ -184,49 +176,52 @@
                         x:Name="_selectionSummary"
                         Margin="0,0,0,8"
                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                        Text="No selection" />
+                        Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_No_Selection}" />
 
                     <Grid Margin="0,0,0,16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Text="Effect" />
+                        <TextBlock VerticalAlignment="Center" Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Effect}" />
                         <ComboBox
                             x:Name="_effectSelect"
                             Grid.Column="1"
                             Width="200"
                             SelectionChanged="EffectSelect_SelectionChanged">
-                            <ComboBoxItem Content="Static" />
-                            <ComboBoxItem Content="Breathe" />
-                            <ComboBoxItem Content="Wave" />
-                            <ComboBoxItem Content="Rainbow" />
-                            <ComboBoxItem Content="Meteor" />
-                            <ComboBoxItem Content="Ripple" />
-                            <ComboBoxItem Content="Sparkle" />
-                            <ComboBoxItem Content="Gradient" />
-                            <ComboBoxItem Content="Custom (Spatial)" />
-                            <ComboBoxItem Content="Rainbow Wave" />
-                            <ComboBoxItem Content="Spiral Rainbow" />
-                            <ComboBoxItem Content="Aurora Sync" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Static}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Breathe}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Wave}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Rainbow}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Meteor}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Ripple}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Sparkle}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Gradient}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Custom}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Rainbow_Wave}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Spiral_Rainbow}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Aurora_Sync}" />
                         </ComboBox>
                     </Grid>
 
-                    <Grid Margin="0,0,0,16" x:Name="_directionPanel" Visibility="Collapsed">
+                    <Grid
+                        x:Name="_directionPanel"
+                        Margin="0,0,0,16"
+                        Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Text="Direction" />
+                        <TextBlock VerticalAlignment="Center" Text="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Direction}" />
                         <ComboBox
                             x:Name="_directionSelect"
                             Grid.Column="1"
                             Width="200"
                             SelectionChanged="EffectSelect_SelectionChanged">
-                            <ComboBoxItem Content="Left to Right" />
-                            <ComboBoxItem Content="Right to Left" />
-                            <ComboBoxItem Content="Top to Bottom" />
-                            <ComboBoxItem Content="Bottom to Top" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Left_to_Right}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Right_to_Left}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Top_to_Bottom}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Bottom_to_Top}" />
                         </ComboBox>
                     </Grid>
 
@@ -235,20 +230,20 @@
                         <Button
                             Margin="10,0,0,0"
                             Click="ClearCustomColors_Click"
-                            Content="Clear Colors" />
+                            Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Clear_Colors}" />
                         <Button
                             x:Name="_probeBtn"
                             Margin="10,0,0,0"
                             Click="ProbeLamps_Click"
-                            Content="Probe Indices" />
+                            Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Probe_Indices}" />
                         <Button
                             Margin="10,0,0,0"
                             Click="ExportProfile_Click"
-                            Content="Export Profile" />
+                            Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Export_Profile}" />
                         <Button
                             Margin="10,0,0,0"
                             Click="ImportProfile_Click"
-                            Content="Import Profile" />
+                            Content="{x:Static resources:Resource.LampArrayRGBKeyboardPage_Import_Profile}" />
                     </StackPanel>
                 </StackPanel>
             </custom:CardControl>

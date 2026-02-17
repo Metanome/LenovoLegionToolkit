@@ -2886,4 +2886,103 @@ Do not proceed unless you possess the necessary technical expertise.</value>
   <data name="AmdOverclocking_Global_Dim" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="LampArrayRGBKeyboardPage_Brightness" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Speed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Smooth_Transition" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Target_Zone" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Selection" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_No_Selection" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Effect" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Direction" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Keyboard" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Rear_Ambient" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Aft_Ambient" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_All" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_None" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Static" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Breathe" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Wave" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Rainbow" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Meteor" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Ripple" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Sparkle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Gradient" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Custom" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Rainbow_Wave" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Spiral_Rainbow" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Aurora_Sync" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Left_to_Right" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Right_to_Left" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Top_to_Bottom" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Bottom_to_Top" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Clear_Colors" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Probe_Indices" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Export_Profile" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="LampArrayRGBKeyboardPage_Import_Profile" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>
