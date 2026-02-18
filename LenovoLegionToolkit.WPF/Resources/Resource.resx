@@ -2835,10 +2835,10 @@ Click Yes to disable and No to ignore.</value>
     <value>Excluded Processes</value>
   </data>
   <data name="ExcludeProcessesWindow_ProcessNamePlaceholder" xml:space="preserve">
-    <value>Process Name (e.g. chrome)</value>
+    <value>Process Name (e.g. discord)</value>
   </data>
   <data name="ExcludeProcessesWindow_Description" xml:space="preserve">
-    <value>Processes in this list will be ignored by Game Detection. Enter the process name without path (e.g., 'chrome' or 'spotify').</value>
+    <value>Processes in this list will be ignored by game start/stop triggers and Lenovo's AI/Intelligent Mode. Enter the process name without the path (e.g., "discord" or "blender").</value>
   </data>
   <data name="SettingsPage_ExcludeProcesses_Message" xml:space="preserve">
     <value>Manage processes that are ignored by Game Detection.</value>
