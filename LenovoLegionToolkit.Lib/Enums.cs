@@ -882,8 +882,8 @@ public enum StatusCode
 
 public enum UpdateMethod
 {
-    [Display(ResourceType = typeof(Resource), Name = "UpdateMethod_Github")]
-    Github,
+    [Display(ResourceType = typeof(Resource), Name = "UpdateMethod_GitHub")]
+    GitHub,
     [Display(ResourceType = typeof(Resource), Name = "UpdateMethod_Server")]
     Server,
 }

@@ -59,7 +59,7 @@ public class UpdateChecker
             var timeSpanSinceLastUpdate = DateTime.UtcNow - _lastUpdate;
             var shouldCheck = timeSpanSinceLastUpdate > _minimumTimeSpanForRefresh;
 
-            if (_updateSettings.Store.UpdateMethod == UpdateMethod.Github)
+            if (_updateSettings.Store.UpdateMethod == UpdateMethod.GitHub)
             {
                 try
                 {
@@ -205,7 +205,7 @@ public class UpdateChecker
         {
             var tempPath = Path.Combine(Folders.Temp, $"LenovoLegionToolkitSetup_{Guid.NewGuid()}.exe");
 
-            if (_updateSettings.Store.UpdateMethod == UpdateMethod.Github)
+            if (_updateSettings.Store.UpdateMethod == UpdateMethod.GitHub)
             {
                 var latestUpdate = _updates.OrderByDescending(u => u.Version).FirstOrDefault();
 
