@@ -706,6 +706,11 @@ public partial class App
         try
         {
             var feature = IoCContainer.Resolve<PowerModeFeature>();
+            if (!await feature.IsSupportedAsync().ConfigureAwait(false))
+            {
+                return;
+            }
+
             var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
 
             if (await Power.IsPowerAdapterConnectedAsync() == PowerAdapterStatus.Connected
