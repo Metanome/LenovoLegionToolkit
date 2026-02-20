@@ -79,19 +79,17 @@ public partial class UpdateWindow : IProgress<float>
         {
             SetDownloading(false);
         }
-        catch (Exception ex)
+        catch (SecurityException ex)
         {
-            if (ex.Message.Contains("Security Check"))
-            {
-                throw new Exception(ex.Message);
-            }
-            else
-            {
-                SetDownloading(false);
+            SetDownloading(false);
+            throw new SecurityException(ex.Message);
+        }
+        catch
+        {
+            SetDownloading(false);
 
-                Constants.LatestReleaseUri.Open();
-                Close();
-            }
+            Constants.LatestReleaseUri.Open();
+            Close();
         }
     }
 

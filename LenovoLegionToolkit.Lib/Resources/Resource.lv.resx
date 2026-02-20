@@ -392,12 +392,6 @@
     <value>Iespējots</value>
     <comment>Informs the user that Touchpad Lock is or will be turned on.</comment>
   </data>
-  <data name="UpdateMethod_Server" xml:space="preserve">
-    <value>Server</value>
-  </data>
-  <data name="UpdateMethod_Github" xml:space="preserve">
-    <value>Github</value>
-  </data>
   <data name="WhiteKeyboardBacklightState_High" xml:space="preserve">
     <value>Augsts</value>
   </data>
@@ -607,5 +601,11 @@
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Automation_Warning_Startup" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
+  </data>
+  <data name="UpdateMethod_Server" xml:space="preserve">
+    <value>Server</value>
+  </data>
+  <data name="UpdateMethod_Github" xml:space="preserve">
+    <value>Github</value>
   </data>
 </root>

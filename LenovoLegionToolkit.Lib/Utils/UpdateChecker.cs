@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Octokit;
 using Octokit.Internal;
 using System.Security.Cryptography.X509Certificates;
+using LenovoLegionToolkit.Lib.Resources;
 
 namespace LenovoLegionToolkit.Lib.Utils;
 
@@ -259,7 +260,8 @@ public class UpdateChecker
 
             if (!cert.Thumbprint.Equals(TRUSTED_SIGNATURE_THUMBPRINT, StringComparison.OrdinalIgnoreCase))
             {
-                throw new Exception($"Security Check Failed: Invalid signature thumbprint {cert.Thumbprint}");
+                var detail = $"Thumbprint mismatch (Actual: {cert.Thumbprint})";
+                throw new SecurityException(string.Format(Resource.UpdateChecker_Security_Thumbprint, detail));
             }
         }
         catch (Exception ex)
@@ -274,7 +276,7 @@ public class UpdateChecker
             catch { /* Ignore */ }
 
             Log.Instance.Trace($"Signature verification failed for '{filePath}': {ex.Message}");
-            throw new Exception("Security Check Failed: The downloaded update is not signed by the trusted server certificate.");
+            throw new SecurityException(string.Format(Resource.UpdateChecker_Security_Invalid, ex.Message), ex);
         }
     }
 
@@ -563,4 +565,11 @@ public class UpdateChecker
         return (currentVersion, newVersion, statusCode, projectInfo, patchNote);
     }
     #endregion
+}
+
+public class SecurityException : Exception
+{
+    public SecurityException() { }
+    public SecurityException(string message) : base(message) { }
+    public SecurityException(string message, Exception innerException) : base(message, innerException) { }
 }

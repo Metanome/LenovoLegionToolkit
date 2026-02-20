@@ -1384,6 +1384,24 @@ namespace LenovoLegionToolkit.Lib.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The downloaded update is not signed by the trusted server certificate {0} 的本地化字符串。
+        /// </summary>
+        public static string UpdateChecker_Security_Invalid {
+            get {
+                return ResourceManager.GetString("UpdateChecker_Security_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Invalid signature thumbprint {0} 的本地化字符串。
+        /// </summary>
+        public static string UpdateChecker_Security_Thumbprint {
+            get {
+                return ResourceManager.GetString("UpdateChecker_Security_Thumbprint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Never 的本地化字符串。
         /// </summary>
         public static string UpdateCheckFrequency_Never {
