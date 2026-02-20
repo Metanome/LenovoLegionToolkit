@@ -13,6 +13,7 @@ using NeoSmart.AsyncLock;
 using Newtonsoft.Json;
 using Octokit;
 using Octokit.Internal;
+using System.Security.Cryptography.X509Certificates;
 
 namespace LenovoLegionToolkit.Lib.Utils;
 
@@ -24,6 +25,7 @@ public class UpdateChecker
 
     private static readonly Dictionary<string, ProjectEntry> ProjectEntries = new();
     private const string SERVER_URL = "http://kaguya.net.cn:9999";
+    private const string TRUSTED_SIGNATURE_THUMBPRINT = "86CCA5127557A2DE9649F44337A755FFD014F7B1";
     private const int MAX_RETRY_COUNT = 3;
 
     private DateTime _lastUpdate;
@@ -221,9 +223,13 @@ public class UpdateChecker
                 if (UpdateFromServer?.Url is null)
                     throw new InvalidOperationException("Setup file URL could not be found");
 
-                await using var fileStream = File.OpenWrite(tempPath);
                 using var httpClient = _httpClientFactory.Create();
+                using var fileStream = File.Create(tempPath);
+
                 await httpClient.DownloadAsync(UpdateFromServer?.Url!, fileStream, progress, cancellationToken, true).ConfigureAwait(false);
+                fileStream.Dispose();
+
+                VerifySignature(tempPath);
             }
 
             return tempPath;
@@ -241,6 +247,36 @@ public class UpdateChecker
         UpdateCheckFrequency.PerMonth => TimeSpan.FromDays(30),
         _ => throw new ArgumentException(nameof(_updateSettings.Store.UpdateCheckFrequency))
     };
+
+    private static void VerifySignature(string filePath)
+    {
+        try
+        {
+#pragma warning disable SYSLIB0057
+            using var baseCert = X509Certificate.CreateFromSignedFile(filePath);
+#pragma warning restore SYSLIB0057
+            using var cert = new X509Certificate2(baseCert);
+
+            if (!cert.Thumbprint.Equals(TRUSTED_SIGNATURE_THUMBPRINT, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception($"Security Check Failed: Invalid signature thumbprint {cert.Thumbprint}");
+            }
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            }
+            catch { /* Ignore */ }
+
+            Log.Instance.Trace($"Signature verification failed for '{filePath}': {ex.Message}");
+            throw new Exception("Security Check Failed: The downloaded update is not signed by the trusted server certificate.");
+        }
+    }
 
     #region GitHub Methods
 
