@@ -6421,60 +6421,6 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use hardware acceleration for the user interface. This can improve performance and fluidity..
-        /// </summary>
-        public static string SettingsAppearancePage_HardwareAcceleration_Message {
-            get {
-                return ResourceManager.GetString("SettingsAppearancePage_HardwareAcceleration_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Hardware Acceleration.
-        /// </summary>
-        public static string SettingsAppearancePage_HardwareAcceleration_Title {
-            get {
-                return ResourceManager.GetString("SettingsAppearancePage_HardwareAcceleration_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enabling hardware acceleration may cause flickering or black flashes on some hybrid graphics systems, and may prevent the discrete GPU from being turned off..
-        /// </summary>
-        public static string SettingsAppearancePage_HardwareAcceleration_Warning {
-            get {
-                return ResourceManager.GetString("SettingsAppearancePage_HardwareAcceleration_Warning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to If you experience visual artifacts on Snackbars in HDR or ACM mode, set this to &quot;None&quot;..
-        /// </summary>
-        public static string SettingsAppearancePage_WindowBackdropType_Info {
-            get {
-                return ResourceManager.GetString("SettingsAppearancePage_WindowBackdropType_Info", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The effect used for the background of the application window..
-        /// </summary>
-        public static string SettingsAppearancePage_WindowBackdropType_Message {
-            get {
-                return ResourceManager.GetString("SettingsAppearancePage_WindowBackdropType_Message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Window Backdrop.
-        /// </summary>
-        public static string SettingsAppearancePage_WindowBackdropType_Title {
-            get {
-                return ResourceManager.GetString("SettingsAppearancePage_WindowBackdropType_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Back Up.
         /// </summary>
         public static string SettingsBackupWindow_Backup {
@@ -7124,6 +7070,60 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use hardware acceleration for the user interface. This can improve performance and fluidity..
+        /// </summary>
+        public static string SettingsPage_HardwareAcceleration_Message {
+            get {
+                return ResourceManager.GetString("SettingsPage_HardwareAcceleration_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hardware Acceleration.
+        /// </summary>
+        public static string SettingsPage_HardwareAcceleration_Title {
+            get {
+                return ResourceManager.GetString("SettingsPage_HardwareAcceleration_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabling hardware acceleration may cause flickering or black flashes on some hybrid graphics systems, and may prevent the discrete GPU from being turned off..
+        /// </summary>
+        public static string SettingsPage_HardwareAcceleration_Warning {
+            get {
+                return ResourceManager.GetString("SettingsPage_HardwareAcceleration_Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto (Let Windows decide).
+        /// </summary>
+        public static string SettingsPage_HWA_GPUPreference_Auto {
+            get {
+                return ResourceManager.GetString("SettingsPage_HWA_GPUPreference_Auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High performance (dGPU).
+        /// </summary>
+        public static string SettingsPage_HWA_GPUPreference_HighPerformance {
+            get {
+                return ResourceManager.GetString("SettingsPage_HWA_GPUPreference_HighPerformance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power saving (iGPU).
+        /// </summary>
+        public static string SettingsPage_HWA_GPUPreference_PowerSaving {
+            get {
+                return ResourceManager.GetString("SettingsPage_HWA_GPUPreference_PowerSaving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Share fan speed, battery temperature etc. with HWiNFO64..
         /// </summary>
         public static string SettingsPage_HWiNFO_Message {
@@ -7516,6 +7516,33 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string SettingsPage_UseNewSensorDashboard_Title {
             get {
                 return ResourceManager.GetString("SettingsPage_UseNewSensorDashboard_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you experience visual artifacts on Snackbars in HDR or ACM mode, set this to &quot;None&quot;..
+        /// </summary>
+        public static string SettingsPage_WindowBackdropType_Info {
+            get {
+                return ResourceManager.GetString("SettingsPage_WindowBackdropType_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The effect used for the background of the application window..
+        /// </summary>
+        public static string SettingsPage_WindowBackdropType_Message {
+            get {
+                return ResourceManager.GetString("SettingsPage_WindowBackdropType_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Window Backdrop.
+        /// </summary>
+        public static string SettingsPage_WindowBackdropType_Title {
+            get {
+                return ResourceManager.GetString("SettingsPage_WindowBackdropType_Title", resourceCulture);
             }
         }
         

@@ -2308,6 +2308,9 @@ Asegúrese primero de que su script se ejecuta correctamente.</value>
   <data name="SettingsPage_BackupSettings_Title" xml:space="preserve">
     <value>Back Up Settings</value>
   </data>
+  <data name="SettingsPage_BootLogo_EFIInfo" xml:space="preserve">
+    <value>This feature modifies the EFI partition. Use with caution.</value>
+  </data>
   <data name="SettingsPage_BootLogo_Message" xml:space="preserve">
     <value>Personalizar la imagen del logo de arranque, visible durante el inicio del sistema.</value>
   </data>
@@ -2367,6 +2370,9 @@ Asegúrese primero de que su script se ejecuta correctamente.</value>
   </data>
   <data name="SettingsPage_CLI_Title" xml:space="preserve">
     <value>Interfaz de línea de comandos (CLI)</value>
+  </data>
+  <data name="SettingsPage_Common_RestartRecommended" xml:space="preserve">
+    <value>Restart is recommended after changing this option.</value>
   </data>
   <data name="SettingsPage_Custom_BackgroundImage_Message" xml:space="preserve">
     <value>Imagen de fondo personalizada</value>
@@ -2478,8 +2484,29 @@ Se recomienda reiniciar después de cambiar esta opción.</value>
   <data name="SettingsPage_FloatingGadgets_Tooltip" xml:space="preserve">
     <value>Controla el intervalo de actualización del sensor.</value>
   </data>
+  <data name="SettingsPage_HardwareAcceleration_Message" xml:space="preserve">
+    <value>Use hardware acceleration for the user interface. This can improve performance and fluidity.</value>
+  </data>
+  <data name="SettingsPage_HardwareAcceleration_Title" xml:space="preserve">
+    <value>Hardware Acceleration</value>
+  </data>
+  <data name="SettingsPage_HardwareAcceleration_Warning" xml:space="preserve">
+    <value>Enabling hardware acceleration may cause flickering or black flashes on some hybrid graphics systems, and may prevent the discrete GPU from being turned off.</value>
+  </data>
+  <data name="SettingsPage_HWA_GPUPreference_Auto" xml:space="preserve">
+    <value>Auto (Let Windows decide)</value>
+  </data>
+  <data name="SettingsPage_HWA_GPUPreference_HighPerformance" xml:space="preserve">
+    <value>High performance (dGPU)</value>
+  </data>
+  <data name="SettingsPage_HWA_GPUPreference_PowerSaving" xml:space="preserve">
+    <value>Power saving (iGPU)</value>
+  </data>
   <data name="SettingsPage_HWiNFO_Message" xml:space="preserve">
     <value>Compartir la velocidad del ventilador, la temperatura de la batería, etc... con HWiNFO64. Puede que tenga que reiniciar HWiNFO64 después de cambiar esta opción.</value>
+  </data>
+  <data name="SettingsPage_HWiNFO_RestartInfo" xml:space="preserve">
+    <value>You may need to restart HWiNFO64 after changing this option.</value>
   </data>
   <data name="SettingsPage_HWiNFO_Title" xml:space="preserve">
     <value>HWiNFO64</value>
@@ -2607,6 +2634,15 @@ Se recomienda reiniciar después de cambiar esta opción.</value>
   </data>
   <data name="SettingsPage_UseNewSensorDashboard_Title" xml:space="preserve">
     <value>Utiliza el nuevo panel de control</value>
+  </data>
+  <data name="SettingsPage_WindowBackdropType_Info" xml:space="preserve">
+    <value>If you experience visual artifacts on Snackbars in HDR or ACM mode, set this to "None".</value>
+  </data>
+  <data name="SettingsPage_WindowBackdropType_Message" xml:space="preserve">
+    <value>The effect used for the background of the application window.</value>
+  </data>
+  <data name="SettingsPage_WindowBackdropType_Title" xml:space="preserve">
+    <value>Window Backdrop</value>
   </data>
   <data name="SettingsPage_WindowsPowerModes_Message" xml:space="preserve">
     <value>Seleccionar el modo de energía de Windows para aplicarlo al cambiar el modo de energía.</value>

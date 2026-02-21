@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Settings;
+using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.Utils;
 using LenovoLegionToolkit.WPF.Extensions;
 using LenovoLegionToolkit.WPF.Resources;
@@ -71,6 +72,23 @@ public partial class SettingsAppearanceControl
         _backgroundImageOpacitySlider.Visibility = Visibility.Visible;
         _backdropTypeComboBox.SetItems(Enum.GetValues<WindowBackdropType>(), _settings.Store.BackdropType, t => t.GetDisplayName());
         _hardwareAccelerationToggle.IsChecked = _settings.Store.EnableHardwareAcceleration;
+
+        if (!Displays.HasMultipleGpus())
+        {
+            _gpuPreferenceComboBox.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            _gpuPreferenceComboBox.Visibility = Visibility.Visible;
+            var exePath = Environment.ProcessPath ?? string.Empty;
+            var prefString = LenovoLegionToolkit.Lib.System.Registry.GetValue("HKEY_CURRENT_USER", @"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", exePath, string.Empty);
+            if (prefString.Contains("GpuPreference=1"))
+                _gpuPreferenceComboBox.SelectedIndex = 1;
+            else if (prefString.Contains("GpuPreference=2"))
+                _gpuPreferenceComboBox.SelectedIndex = 2;
+            else
+                _gpuPreferenceComboBox.SelectedIndex = 0;
+        }
 
         _isRefreshing = false;
     }
@@ -208,7 +226,7 @@ public partial class SettingsAppearanceControl
         _settings.Store.EnableHardwareAcceleration = true;
         _settings.SynchronizeStore();
 
-        SnackbarHelper.Show(Resource.SettingsAppearancePage_HardwareAcceleration_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
+        SnackbarHelper.Show(Resource.SettingsPage_HardwareAcceleration_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
     }
 
     private void HardwareAccelerationToggle_Unchecked(object sender, RoutedEventArgs e)
@@ -219,7 +237,7 @@ public partial class SettingsAppearanceControl
         _settings.Store.EnableHardwareAcceleration = false;
         _settings.SynchronizeStore();
 
-        SnackbarHelper.Show(Resource.SettingsAppearancePage_HardwareAcceleration_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
+        SnackbarHelper.Show(Resource.SettingsPage_HardwareAcceleration_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
     }
 
     private void BackdropTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -233,6 +251,39 @@ public partial class SettingsAppearanceControl
         _settings.Store.BackdropType = state;
         _settings.SynchronizeStore();
 
-        SnackbarHelper.Show(Resource.SettingsAppearancePage_WindowBackdropType_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
+        SnackbarHelper.Show(Resource.SettingsPage_WindowBackdropType_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
+    }
+
+    private void GpuPreferenceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isRefreshing)
+            return;
+
+        var exePath = Environment.ProcessPath;
+        if (string.IsNullOrEmpty(exePath))
+            return;
+
+        if (_gpuPreferenceComboBox.SelectedIndex == 1)
+        {
+            LenovoLegionToolkit.Lib.System.Registry.SetValue("HKEY_CURRENT_USER", @"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", exePath, "GpuPreference=1;", false, Microsoft.Win32.RegistryValueKind.String);
+        }
+        else if (_gpuPreferenceComboBox.SelectedIndex == 2)
+        {
+            LenovoLegionToolkit.Lib.System.Registry.SetValue("HKEY_CURRENT_USER", @"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", exePath, "GpuPreference=2;", false, Microsoft.Win32.RegistryValueKind.String);
+        }
+        else
+        {
+            try
+            {
+                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", true);
+                key?.DeleteValue(exePath, false);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Failed to reset GPU preference.", ex);
+            }
+        }
+
+        SnackbarHelper.Show(Resource.SettingsPage_HardwareAcceleration_Title, Resource.SettingsPage_UseNewDashboard_Restart_Message, SnackbarType.Success);
     }
 }

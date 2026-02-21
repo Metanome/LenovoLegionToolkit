@@ -103,29 +103,41 @@
             <custom:CardControl Margin="0,0,0,8" Icon="WindowApps24">
                 <custom:CardControl.Header>
                     <controls:CardHeaderControl
-                        Title="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Title}"
-                        Subtitle="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Message}"
-                        Info="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Info}" />
+                        Title="{x:Static resources:Resource.SettingsPage_WindowBackdropType_Title}"
+                        Subtitle="{x:Static resources:Resource.SettingsPage_WindowBackdropType_Message}"
+                        Info="{x:Static resources:Resource.SettingsPage_WindowBackdropType_Info}" />
                 </custom:CardControl.Header>
                 <ComboBox
                     x:Name="_backdropTypeComboBox"
                     MinWidth="160"
                     Margin="0,0,0,8"
-                    AutomationProperties.Name="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Title}"
+                    AutomationProperties.Name="{x:Static resources:Resource.SettingsPage_WindowBackdropType_Title}"
                     MaxDropDownHeight="Auto"
                     SelectionChanged="BackdropTypeComboBox_SelectionChanged" />
             </custom:CardControl>
             <custom:CardControl Margin="0,0,0,8" Icon="Flash24">
                 <custom:CardControl.Header>
                     <controls:CardHeaderControl
-                        Title="{x:Static resources:Resource.SettingsAppearancePage_HardwareAcceleration_Title}"
-                        Subtitle="{x:Static resources:Resource.SettingsAppearancePage_HardwareAcceleration_Message}"
-                        Warning="{x:Static resources:Resource.SettingsAppearancePage_HardwareAcceleration_Warning}" />
+                        Title="{x:Static resources:Resource.SettingsPage_HardwareAcceleration_Title}"
+                        Subtitle="{x:Static resources:Resource.SettingsPage_HardwareAcceleration_Message}"
+                        Warning="{x:Static resources:Resource.SettingsPage_HardwareAcceleration_Warning}" />
                 </custom:CardControl.Header>
-                <wpfui:ToggleSwitch
-                    x:Name="_hardwareAccelerationToggle"
-                    Checked="HardwareAccelerationToggle_Checked"
-                    Unchecked="HardwareAccelerationToggle_Unchecked" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <ComboBox
+                        x:Name="_gpuPreferenceComboBox"
+                        MinWidth="180"
+                        Margin="0,0,16,0"
+                        IsEnabled="{Binding IsChecked, ElementName=_hardwareAccelerationToggle}"
+                        SelectionChanged="GpuPreferenceComboBox_SelectionChanged">
+                        <ComboBoxItem Content="{x:Static resources:Resource.SettingsPage_HWA_GPUPreference_Auto}" />
+                        <ComboBoxItem Content="{x:Static resources:Resource.SettingsPage_HWA_GPUPreference_PowerSaving}" />
+                        <ComboBoxItem Content="{x:Static resources:Resource.SettingsPage_HWA_GPUPreference_HighPerformance}" />
+                    </ComboBox>
+                    <wpfui:ToggleSwitch
+                        x:Name="_hardwareAccelerationToggle"
+                        Checked="HardwareAccelerationToggle_Checked"
+                        Unchecked="HardwareAccelerationToggle_Unchecked" />
+                </StackPanel>
             </custom:CardControl>
         </StackPanel>
     </ScrollViewer>
