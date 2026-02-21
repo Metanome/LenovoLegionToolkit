@@ -104,7 +104,8 @@
                 <custom:CardControl.Header>
                     <controls:CardHeaderControl
                         Title="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Title}"
-                        Subtitle="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Message}" />
+                        Subtitle="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Message}"
+                        Info="{x:Static resources:Resource.SettingsAppearancePage_WindowBackdropType_Info}" />
                 </custom:CardControl.Header>
                 <ComboBox
                     x:Name="_backdropTypeComboBox"

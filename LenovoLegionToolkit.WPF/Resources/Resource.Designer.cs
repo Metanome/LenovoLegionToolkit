@@ -6448,7 +6448,16 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The effect used for the background of the application window. If you experience visual artifacts on Snackbars in HDR or ACM mode, set this to &quot;None&quot;..
+        ///   Looks up a localized string similar to If you experience visual artifacts on Snackbars in HDR or ACM mode, set this to &quot;None&quot;..
+        /// </summary>
+        public static string SettingsAppearancePage_WindowBackdropType_Info {
+            get {
+                return ResourceManager.GetString("SettingsAppearancePage_WindowBackdropType_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The effect used for the background of the application window..
         /// </summary>
         public static string SettingsAppearancePage_WindowBackdropType_Message {
             get {
@@ -6597,6 +6606,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string SettingsPage_BackupSettings_Title {
             get {
                 return ResourceManager.GetString("SettingsPage_BackupSettings_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This feature modifies the EFI partition. Use with caution..
+        /// </summary>
+        public static string SettingsPage_BootLogo_EFIInfo {
+            get {
+                return ResourceManager.GetString("SettingsPage_BootLogo_EFIInfo", resourceCulture);
             }
         }
         
@@ -6781,6 +6799,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Restart is recommended after changing this option..
+        /// </summary>
+        public static string SettingsPage_Common_RestartRecommended {
+            get {
+                return ResourceManager.GetString("SettingsPage_Common_RestartRecommended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Custom Background Image.
         /// </summary>
         public static string SettingsPage_Custom_BackgroundImage_Message {
@@ -6817,8 +6844,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disable Legion Space and its service without uninstalling it.
-        ///Restart is recommended after changing this option..
+        ///   Looks up a localized string similar to Disable Legion Space and its service without uninstalling it..
         /// </summary>
         public static string SettingsPage_DisableLegionSpace_Message {
             get {
@@ -6854,8 +6880,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disable Legion Zone and its service without uninstalling it.
-        ///Restart is recommended after changing this option..
+        ///   Looks up a localized string similar to Disable Legion Zone and its service without uninstalling it..
         /// </summary>
         public static string SettingsPage_DisableLegionZone_Message {
             get {
@@ -6892,8 +6917,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to Disable Lenovo Hotkeys and its service without uninstalling it.
-        ///If disabled, this app will handle Fn shortcuts.
-        ///Restart is recommended after changing this option..
+        ///If disabled, this app will handle Fn shortcuts..
         /// </summary>
         public static string SettingsPage_DisableLenovoHotkeys_Message {
             get {
@@ -6929,8 +6953,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disable Lenovo Vantage and ImController without uninstalling them.
-        ///Restart is recommended after changing this option..
+        ///   Looks up a localized string similar to Disable Lenovo Vantage and ImController without uninstalling them..
         /// </summary>
         public static string SettingsPage_DisableVantage_Message {
             get {
@@ -7101,11 +7124,20 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Share fan speed, battery temperature etc. with HWiNFO64. You may need to restart HWiNFO64 after changing this option..
+        ///   Looks up a localized string similar to Share fan speed, battery temperature etc. with HWiNFO64..
         /// </summary>
         public static string SettingsPage_HWiNFO_Message {
             get {
                 return ResourceManager.GetString("SettingsPage_HWiNFO_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You may need to restart HWiNFO64 after changing this option..
+        /// </summary>
+        public static string SettingsPage_HWiNFO_RestartInfo {
+            get {
+                return ResourceManager.GetString("SettingsPage_HWiNFO_RestartInfo", resourceCulture);
             }
         }
         
