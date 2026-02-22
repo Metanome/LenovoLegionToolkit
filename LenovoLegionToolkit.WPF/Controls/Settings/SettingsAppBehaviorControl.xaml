@@ -191,24 +191,13 @@
                         Visibility="Hidden" />
                 </StackPanel>
             </custom:CardControl>
-            <custom:CardControl Margin="0,0,0,8" Icon="Window24">
-                <custom:CardControl.Header>
-                    <controls:CardHeaderControl Title="{x:Static resources:Resource.ArgumentWindow_Edit_Title}" Subtitle="{x:Static resources:Resource.ArgumentWindow_Edit_Message}" />
-                </custom:CardControl.Header>
-                <StackPanel Orientation="Horizontal">
-                    <Button
-                        x:Name="_argumentWindow"
-                        Width="130"
-                        Height="35"
-                        Margin="5,0,8,0"
-                        VerticalAlignment="Center"
-                        Click="ArgumentWindowButton_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{x:Static resources:Resource.ArgumentWindow_Edit_Title}" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </custom:CardControl>
+            <custom:CardAction
+                x:Name="_argumentWindow"
+                Margin="0,0,0,8"
+                Click="ArgumentWindowButton_Click"
+                Icon="Window24">
+                <controls:CardHeaderControl Title="{x:Static resources:Resource.ArgumentWindow_Edit_Title}" Subtitle="{x:Static resources:Resource.ArgumentWindow_Edit_Message}" />
+            </custom:CardAction>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
