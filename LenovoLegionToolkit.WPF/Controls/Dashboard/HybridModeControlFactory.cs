@@ -120,16 +120,21 @@ public static class HybridModeControlFactory
             if (e)
             {
                 SnackbarHelper.Show(Resource.DGPU_Connected_Title, type: SnackbarType.Info);
-                var feature = IoCContainer.Resolve<ApplicationSettings>();
-                if (feature.Store.UseNewSensorDashboard)
-                {
-                    var controller = IoCContainer.Resolve<SensorsGroupController>();
-                    controller.NeedRefreshHardware("NvidiaGPU");
-                }
             }
             else
             {
                 SnackbarHelper.Show(Resource.DGPU_Disconnected_Title, type: SnackbarType.Info);
+            }
+
+            var feature = IoCContainer.Resolve<ApplicationSettings>();
+            if (feature.Store.UseNewSensorDashboard)
+            {
+                var controller = IoCContainer.Resolve<SensorsGroupController>();
+                controller.IsDgpuConnected = e;
+                if (e)
+                {
+                    controller.NeedRefreshHardware("NvidiaGPU");
+                }
             }
         });
 

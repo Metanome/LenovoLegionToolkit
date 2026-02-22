@@ -116,6 +116,28 @@ public class SensorsGroupController : IDisposable
         }
     }
 
+    private bool _isDgpuConnected = true;
+    public bool IsDgpuConnected
+    {
+        get => _isDgpuConnected;
+        set
+        {
+            lock (_dataLock)
+            {
+                if (_isDgpuConnected != value)
+                {
+                    _isDgpuConnected = value;
+                    _cachedGpuName = string.Empty;
+                    if (!_isDgpuConnected)
+                    {
+                        _gpuHardware = null;
+                        _amdGpuHardware = null;
+                    }
+                }
+            }
+        }
+    }
+
     private string _cachedCpuName = string.Empty;
     private string _cachedGpuName = string.Empty;
 
@@ -391,7 +413,9 @@ public class SensorsGroupController : IDisposable
             if (!string.IsNullOrEmpty(_cachedGpuName) && !_needRefreshGpuHardware)
                 return Task.FromResult(_cachedGpuName);
 
-            var gpu = SelectedGpuIsIgpu ? _iGpuHardware : (_gpuHardware ?? _amdGpuHardware);
+            var dGpu = _gpuHardware ?? _amdGpuHardware;
+            var forceIgpu = !SelectedGpuIsIgpu && (dGpu == null || !_isDgpuConnected);
+            var gpu = (SelectedGpuIsIgpu || forceIgpu) ? _iGpuHardware : dGpu;
             _cachedGpuName = gpu != null ? StripName(gpu.Name) : UNKNOWN_NAME;
             _needRefreshGpuHardware = false;
             return Task.FromResult(_cachedGpuName);
@@ -556,7 +580,10 @@ public class SensorsGroupController : IDisposable
                             }
                         }
 
-                        if (SelectedGpuIsIgpu)
+                        var dGpu = _gpuHardware ?? _amdGpuHardware;
+                        var forceIgpu = !SelectedGpuIsIgpu && (dGpu == null || !_isDgpuConnected);
+
+                        if (SelectedGpuIsIgpu || forceIgpu)
                         {
                             float gPower = _iGpuPowerSensor?.Value ?? INVALID_VALUE_FLOAT;
                             _snapshotGpuPower = gPower;
