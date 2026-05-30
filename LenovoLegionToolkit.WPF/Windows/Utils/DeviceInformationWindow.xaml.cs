@@ -80,7 +80,7 @@ public partial class DeviceInformationWindow
 
         if (mi.Generation > 0)
         {
-            _generationLabel.Text = $"Gen {mi.Generation}";
+            _generationLabel.Text = $"{Resource.Generation} {mi.Generation}";
             _generationRow.Visibility = Visibility.Visible;
         }
         else

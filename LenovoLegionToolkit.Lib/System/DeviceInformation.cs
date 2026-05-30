@@ -204,7 +204,7 @@ public static class DeviceInformation
                 string? speed = obj["Speed"]?.ToString();
 
                 uint typeCode = Convert.ToUInt32(obj["SMBIOSMemoryType"] ?? obj["MemoryType"] ?? 0u);
-                string generation = GetMemoryGeneration(typeCode);
+                string? generation = GetMemoryGeneration(typeCode);
 
                 string? rawManufacturer = obj["Manufacturer"]?.ToString()?.Trim() ?? "";
 
