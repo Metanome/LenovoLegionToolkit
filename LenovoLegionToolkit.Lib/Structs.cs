@@ -1301,6 +1301,7 @@ public struct ProjectEntry()
     public string ProjectCurrentVersion { get; set; } = string.Empty;
     public string ProjectVersion { get; set; } = string.Empty;
     public bool ProjectForceUpdate { get; set; } = false;
+    public string DownloadUrl { get; set; } = string.Empty;
 
     public bool IsValid()
     {

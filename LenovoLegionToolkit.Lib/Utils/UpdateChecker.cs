@@ -13,7 +13,9 @@ using NeoSmart.AsyncLock;
 using Newtonsoft.Json;
 using Octokit;
 using Octokit.Internal;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using LenovoLegionToolkit.Lib.Resources;
 
 namespace LenovoLegionToolkit.Lib.Utils;
@@ -25,7 +27,9 @@ public class UpdateChecker
     private readonly AsyncLock _updateSemaphore = new();
 
     private static readonly Dictionary<string, ProjectEntry> ProjectEntries = new();
-    private const string SERVER_URL = "http://kaguya.net.cn:9999";
+    private const string UrlObfuscatedHex = "0e8bbf50ba83e10b709f8cff655bed580e7b88658f3bfb7c94";
+    private static string? _serverUrl;
+
     private const string TRUSTED_SIGNATURE_THUMBPRINT = "5A6C3448B4D2FECBAA7EE1BB592E4A7EEE6FB7A8";
     private const int MAX_RETRY_COUNT = 3;
 
@@ -43,6 +47,21 @@ public class UpdateChecker
 
         UpdateMinimumTimeSpanForRefresh();
         _lastUpdate = _updateSettings.Store.LastUpdateCheckDateTime ?? DateTime.MinValue;
+    }
+
+    private static string GetServerUrl()
+    {
+        if (_serverUrl is not null) return _serverUrl;
+
+        var thumbBytes = Encoding.ASCII.GetBytes(TRUSTED_SIGNATURE_THUMBPRINT);
+        var keyHash = SHA256.HashData(thumbBytes);
+        var obfuscated = Convert.FromHexString(UrlObfuscatedHex);
+
+        for (var i = 0; i < obfuscated.Length; i++)
+            obfuscated[i] ^= keyHash[i];
+
+        _serverUrl = Encoding.UTF8.GetString(obfuscated);
+        return _serverUrl;
     }
 
     public async Task<Version?> CheckAsync(bool forceCheck)
@@ -67,6 +86,8 @@ public class UpdateChecker
                         return _updates.Length != 0 ? _updates.First().Version : null;
 
                     Log.Instance.Trace($"Checking GitHub for updates...");
+
+                    _updates = [];
 
                     var adapter = new HttpClientAdapter(_httpClientFactory.CreateHandler);
                     var productInformation = new ProductHeaderValue("LenovoLegionToolkit-UpdateChecker");
@@ -126,15 +147,18 @@ public class UpdateChecker
             {
                 try
                 {
-                    if (!forceCheck && !shouldCheck && UpdateFromServer?.Url != null)
+                    if (!forceCheck && !shouldCheck && UpdateFromServer is not null)
                     {
                         var entry = ProjectEntries.Values
-                            .FirstOrDefault(entry => entry.ProjectName == $"LenovoLegionToolkit{_updateSettings.Store.UpdateChannel}");
+                            .FirstOrDefault(entry => entry.ProjectName == $"LenovoLegionToolkit{GetChannelSuffix(_updateSettings.Store.UpdateChannel)}");
                         var versionString = entry.ProjectVersion ?? "0.0.0.0";
                         return Version.TryParse(versionString, out var parsedVersion) ? parsedVersion : null;
                     }
 
                     Log.Instance.Trace($"Checking Server for updates...");
+
+                    UpdateFromServer = null;
+
                     var (currentVersion, newVersion, statusCode, projectInfo, patchNote) = await TryGetUpdateFromServer(_updateSettings.Store.UpdateChannel).ConfigureAwait(false);
 
                     if (statusCode == StatusCode.Null)
@@ -146,50 +170,35 @@ public class UpdateChecker
 
                     if (currentVersion == newVersion && statusCode != StatusCode.ForceUpdate)
                     {
-                        Log.Instance.Trace($"You are already using the latest version.");
-
+                        Log.Instance.Trace($"Already using the latest version.");
                         Status = UpdateCheckStatus.Success;
                         return null;
                     }
 
                     if (currentVersion > newVersion && statusCode != StatusCode.ForceUpdate)
                     {
-                        Log.Instance.Trace($"You are using a private version.");
-
+                        Log.Instance.Trace($"Using a private version.");
                         Status = UpdateCheckStatus.Success;
                         return null;
                     }
 
-                    switch (statusCode)
+                    if (statusCode is StatusCode.Update or StatusCode.ForceUpdate)
                     {
-                        case StatusCode.ForceUpdate when currentVersion != newVersion:
-                            Log.Instance.Trace($"Force update branch");
-
-                            Status = UpdateCheckStatus.Success;
-                            UpdateFromServer = new UpdateFromServer(projectInfo, patchNote);
-                            return newVersion;
-
-                        case StatusCode.Update when currentVersion != newVersion:
-                            Log.Instance.Trace($"Normal update branch");
-
-                            Status = UpdateCheckStatus.Success;
-                            UpdateFromServer = new UpdateFromServer(projectInfo, patchNote);
-                            return newVersion;
-
-                        case StatusCode.NoUpdate:
-                        case StatusCode.ForceUpdate when newVersion == currentVersion:
-                            Log.Instance.Trace($"No updates are available.");
-                            Status = UpdateCheckStatus.Success;
-                            return null;
-
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        Log.Instance.Trace($"{(statusCode == StatusCode.ForceUpdate ? "Force update" : "Normal update")} available.");
+                        Status = UpdateCheckStatus.Success;
+                        UpdateFromServer = new UpdateFromServer(projectInfo, patchNote);
+                        return newVersion;
                     }
+
+                    Log.Instance.Trace($"No updates available.");
+                    Status = UpdateCheckStatus.Success;
+                    return null;
                 }
                 catch (Exception ex)
                 {
                     Log.Instance.Trace($"Error checking for updates via Server.", ex);
 
+                    UpdateFromServer = null;
                     Status = UpdateCheckStatus.Error;
                     return null;
                 }
@@ -228,17 +237,17 @@ public class UpdateChecker
             }
             else
             {
-                if (UpdateFromServer == null)
-                    throw new InvalidOperationException("No Server updates available");
-
-                if (UpdateFromServer?.Url is null)
+                if (UpdateFromServer is not { Url: not null })
                     throw new InvalidOperationException("Setup file URL could not be found");
 
-                using var httpClient = _httpClientFactory.Create();
-                using var fileStream = File.Create(tempPath);
+                var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0";
 
-                await httpClient.DownloadAsync(UpdateFromServer?.Url!, fileStream, progress, cancellationToken, true).ConfigureAwait(false);
-                fileStream.Dispose();
+                using var httpClient = _httpClientFactory.Create();
+
+                {
+                    await using var fileStream = File.OpenWrite(tempPath);
+                    await httpClient.DownloadAsync(UpdateFromServer.Value.Url, fileStream, progress, cancellationToken, version).ConfigureAwait(false);
+                }
 
                 VerifySignature(tempPath);
             }
@@ -347,26 +356,25 @@ public class UpdateChecker
         _ => ""
     };
 
-    private static bool IsServerUnderMaintenanceMode()
+    private static string GetApiChannelName(UpdateChannel channel) => channel switch
     {
-        return ProjectEntries.ContainsKey("MaintenanceMode") && ProjectEntries["MaintenanceMode"].MaintenanceMode;
-    }
+        UpdateChannel.Beta => "beta",
+        UpdateChannel.Dev => "dev",
+        _ => "stable"
+    };
 
     private async Task<(StatusCode, string)> GetLatestVersionWithRetryAsync(ProjectInfo projectInfo, UpdateChannel channel)
     {
         var (status, version) = await RetryAsync(() => GetLatestVersionFromServer(projectInfo, channel)).ConfigureAwait(false);
 
-        Log.Instance.Trace($"Project {projectInfo.ProjectName}");
-        Log.Instance.Trace($"Status code: {status.ToString()}");
-        Log.Instance.Trace($"Current version is {projectInfo.ProjectCurrentVersion}");
-        Log.Instance.Trace($"Latest version is {version}");
+        Log.Instance.Trace($"Project: {projectInfo.ProjectName}, Status: {status}, Current: {projectInfo.ProjectCurrentVersion}, Latest: {version}");
 
         return !string.IsNullOrEmpty(version) ? (status, version) : throw new Exception("Failed to get the latest version.");
     }
 
     private static async Task<(StatusCode, string)> RetryAsync(Func<Task<(StatusCode, string)>> operation)
     {
-        for (int i = 0; i < MAX_RETRY_COUNT; i++)
+        for (var i = 0; i < MAX_RETRY_COUNT; i++)
         {
             try
             {
@@ -386,199 +394,223 @@ public class UpdateChecker
 
     private async Task<(StatusCode, string)> GetLatestVersionFromServer(ProjectInfo projectInfo, UpdateChannel channel)
     {
-        try
+        using var httpClient = _httpClientFactory.Create();
+        var url = $"{GetServerUrl()}/api/v1/projects";
+
+        var userAgent = $"CommonUpdater-LenovoLegionToolkit-{projectInfo.ProjectCurrentVersion ?? "Null"}";
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+
+        var response = await httpClient.GetAsync(url).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        var jsonResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        var projectConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonResponse);
+        if (projectConfig is null)
         {
-            using HttpClient httpClient = new HttpClient();
-
-            var url = $"{SERVER_URL}/Projects.json";
-
-            string userAgent = $"CommonUpdater-LenovoLegionToolkit-{(string.IsNullOrEmpty(projectInfo.ProjectCurrentVersion) ? "Null" : projectInfo.ProjectCurrentVersion)}";
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
-
-            HttpResponseMessage response = await httpClient.GetAsync(url).ConfigureAwait(false);
-
-            response.EnsureSuccessStatusCode();
-
-            string jsonResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var projectConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonResponse);
-            if (projectConfig == null)
-            {
-                Log.Instance.Trace($"Project configuration is empty or invalid.");
-                return (StatusCode.Null, string.Empty);
-            }
-
-            ProjectEntries.Clear();
-
-            var maintenanceEntry = new ProjectEntry();
-
-            if (projectConfig.TryGetValue("MaintenanceMode", out var maintenanceObj))
-            {
-                try
-                {
-                    maintenanceEntry.MaintenanceMode = Convert.ToBoolean(maintenanceObj);
-                }
-                catch
-                {
-                    maintenanceEntry.MaintenanceMode = false;
-                }
-
-                ProjectEntries["MaintenanceMode"] = maintenanceEntry;
-            }
-
-            foreach (var project in projectConfig)
-            {
-                if (project.Key == "MaintenanceMode")
-                {
-                    continue;
-                }
-
-                var projectDetails = project.Value?.ToString() ?? string.Empty;
-                if (string.IsNullOrEmpty(projectDetails))
-                    continue;
-
-                var details = JsonConvert.DeserializeObject<Dictionary<string, object>>(projectDetails);
-                if (details == null)
-                    continue;
-
-                if (!details.TryGetValue("Version", out var versionObj))
-                    continue;
-
-                string version = versionObj?.ToString() ?? string.Empty;
-                bool forceUpdate = false;
-                if (details.TryGetValue("ForceUpdate", out var forceObj))
-                {
-                    try
-                    {
-                        forceUpdate = Convert.ToBoolean(forceObj);
-                    }
-                    catch
-                    {
-                        forceUpdate = false;
-                    }
-                }
-
-                ProjectEntries[project.Key] = new ProjectEntry
-                {
-                    ProjectName = project.Key,
-                    ProjectCurrentVersion = projectInfo.ProjectCurrentVersion ?? string.Empty,
-                    ProjectVersion = version,
-                    ProjectForceUpdate = forceUpdate
-                };
-            }
-
-            foreach (var kvp in ProjectEntries)
-            {
-                Log.Instance.Trace(kvp.Key == "MaintenanceMode"
-                    ? (FormattableString)$"MaintenanceMode: {kvp.Value.MaintenanceMode}"
-                    : (FormattableString)
-                    $"Project: {kvp.Value.ProjectName}, Version: {kvp.Value.ProjectVersion}, Force Update: {kvp.Value.ProjectForceUpdate}");
-            }
-
-            string projectName = $"{projectInfo.ProjectName}{GetChannelSuffix(channel)}";
-
-            if (!ProjectEntries.TryGetValue(projectName, out var entry))
-            {
-                Log.Instance.Trace($"Project entry '{projectName}' not found in configuration.");
-                return (StatusCode.Null, string.Empty);
-            }
-
-            if (!entry.IsValid())
-            {
-                return (StatusCode.Null, string.Empty);
-            }
-
-            if (!Version.TryParse(ProjectEntries[projectName].ProjectCurrentVersion, out var currentVersion))
-                currentVersion = new Version(0, 0, 0, 0);
-            
-            if (!Version.TryParse(ProjectEntries[projectName].ProjectVersion, out var projectVersion))
-                projectVersion = new Version(0, 0, 0, 0);
-
-            if (projectVersion != currentVersion && ProjectEntries[projectName].ProjectForceUpdate)
-            {
-                return (StatusCode.ForceUpdate, ProjectEntries[projectName].ProjectVersion);
-            }
-            if (projectVersion != currentVersion)
-            {
-                return (StatusCode.Update, ProjectEntries[projectName].ProjectVersion);
-            }
-
-            return projectVersion == currentVersion ? (StatusCode.NoUpdate, ProjectEntries[projectName].ProjectVersion) : (StatusCode.Null, string.Empty);
-        }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Error fetching version from server: {ex.Message}");
+            Log.Instance.Trace($"Project configuration is empty or invalid.");
             return (StatusCode.Null, string.Empty);
         }
+
+        ProjectEntries.Clear();
+
+        if (projectConfig.TryGetValue("maintenanceMode", out var mmObj))
+        {
+            bool.TryParse(mmObj?.ToString(), out var mm);
+            ProjectEntries["MaintenanceMode"] = new ProjectEntry { MaintenanceMode = mm };
+        }
+
+        if (!projectConfig.TryGetValue("channels", out var channelsObj))
+        {
+            Log.Instance.Trace($"Missing 'channels' in response.");
+            return (StatusCode.Null, string.Empty);
+        }
+
+        var channelsJson = channelsObj?.ToString();
+        if (string.IsNullOrEmpty(channelsJson))
+        {
+            Log.Instance.Trace($"Empty 'channels' in response.");
+            return (StatusCode.Null, string.Empty);
+        }
+
+        var channels = JsonConvert.DeserializeObject<Dictionary<string, object>>(channelsJson);
+        if (channels is null)
+        {
+            Log.Instance.Trace($"Failed to parse 'channels'.");
+            return (StatusCode.Null, string.Empty);
+        }
+
+        var channelMapping = new (string ApiKey, string ProjectKey)[]
+        {
+            ("stable", "LenovoLegionToolkit"),
+            ("beta",   "LenovoLegionToolkitBeta"),
+            ("dev",    "LenovoLegionToolkitDev"),
+        };
+
+        foreach (var (apiKey, projectKey) in channelMapping)
+        {
+            if (!channels.TryGetValue(apiKey, out var chObj))
+                continue;
+
+            var chJson = chObj?.ToString();
+            if (string.IsNullOrEmpty(chJson))
+                continue;
+
+            var details = JsonConvert.DeserializeObject<Dictionary<string, object>>(chJson);
+            if (details is null)
+                continue;
+
+            if (!details.TryGetValue("version", out var vObj))
+                continue;
+
+            var version = vObj?.ToString() ?? string.Empty;
+            if (string.IsNullOrEmpty(version))
+                continue;
+
+            var forceUpdate = false;
+            if (details.TryGetValue("forceUpdate", out var fObj))
+                bool.TryParse(fObj?.ToString(), out forceUpdate);
+
+            var downloadUrl = string.Empty;
+            if (details.TryGetValue("downloadUrl", out var dObj))
+                downloadUrl = dObj?.ToString() ?? string.Empty;
+
+            ProjectEntries[projectKey] = new ProjectEntry
+            {
+                ProjectName = projectKey,
+                ProjectCurrentVersion = projectInfo.ProjectCurrentVersion ?? string.Empty,
+                ProjectVersion = version,
+                ProjectForceUpdate = forceUpdate,
+                DownloadUrl = downloadUrl
+            };
+        }
+
+        foreach (var kvp in ProjectEntries)
+        {
+            if (kvp.Key == "MaintenanceMode")
+                Log.Instance.Trace($"MaintenanceMode: {kvp.Value.MaintenanceMode}");
+            else
+                Log.Instance.Trace($"Project: {kvp.Key}, Version: {kvp.Value.ProjectVersion}, Force Update: {kvp.Value.ProjectForceUpdate}");
+        }
+
+        var projectName = $"{projectInfo.ProjectName}{GetChannelSuffix(channel)}";
+
+        if (!ProjectEntries.TryGetValue(projectName, out var entry) || !entry.IsValid())
+        {
+            Log.Instance.Trace($"Project entry '{projectName}' not found or invalid.");
+            return (StatusCode.Null, string.Empty);
+        }
+
+        if (!Version.TryParse(entry.ProjectCurrentVersion, out var curVer))
+            curVer = new Version(0, 0, 0, 0);
+
+        if (!Version.TryParse(entry.ProjectVersion, out var projVer))
+            projVer = new Version(0, 0, 0, 0);
+
+        if (projVer == curVer && !entry.ProjectForceUpdate)
+            return (StatusCode.NoUpdate, entry.ProjectVersion);
+
+        return entry.ProjectForceUpdate
+            ? (StatusCode.ForceUpdate, entry.ProjectVersion)
+            : (StatusCode.Update, entry.ProjectVersion);
     }
 
     private async Task<(Version?, Version?, StatusCode, ProjectInfo, string)> TryGetUpdateFromServer(UpdateChannel channel)
     {
-        var thisReleaseVersion = Assembly.GetEntryAssembly()?.GetName().Version;
-        string folderName = $"LenovoLegionToolkit{GetChannelSuffix(channel)}";
+        var currentVersionString = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0";
+        var apiChannel = GetApiChannelName(channel);
 
-        ProjectInfo projectInfo = new ProjectInfo
+        var projectInfo = new ProjectInfo
         {
             ProjectName = "LenovoLegionToolkit",
             ProjectExeName = "LenovoLegionToolkitSetup.exe",
             ProjectAuthor = "LenovoLegionToolkit-Team",
-            ProjectCurrentVersion = thisReleaseVersion?.ToString() ?? "0.0.0.0",
+            ProjectCurrentVersion = currentVersionString,
             ProjectCurrentExePath = "NULL",
-            ProjectNewExePath = $"{SERVER_URL}/{folderName}/LenovoLegionToolkitSetup.exe"
+            ProjectNewExePath = $"{GetServerUrl()}/api/v1/download/{apiChannel}/latest"
         };
 
         var (statusCode, newestVersion) = await GetLatestVersionWithRetryAsync(projectInfo, channel).ConfigureAwait(false);
 
-        if (IsServerUnderMaintenanceMode())
+        if (ProjectEntries.TryGetValue("MaintenanceMode", out var mm) && mm.MaintenanceMode)
         {
-            Log.Instance.Trace($"Update Server is currently under maintenance mode.");
-            Log.Instance.Trace($"Current channel is {channel}");
-            Log.Instance.Trace($"Now exiting...");
-
+            Log.Instance.Trace($"Server is under maintenance mode, channel: {channel}");
             Status = UpdateCheckStatus.Success;
-            return (null, null, StatusCode.Null, new ProjectInfo(), "");
+            return (null, null, StatusCode.Null, new ProjectInfo(), string.Empty);
+        }
+
+        // Override download URL from API response if available
+        var projectKey = $"LenovoLegionToolkit{GetChannelSuffix(channel)}";
+        if (ProjectEntries.TryGetValue(projectKey, out var pe) && !string.IsNullOrEmpty(pe.DownloadUrl))
+        {
+            projectInfo.ProjectNewExePath = new Uri(new Uri(GetServerUrl()), pe.DownloadUrl).ToString();
         }
 
         projectInfo.ProjectNewVersion = newestVersion;
-        if (!Version.TryParse(projectInfo.ProjectCurrentVersion, out var currentVersion))
-            currentVersion = new Version(0, 0, 0, 0);
 
-        if (!Version.TryParse(newestVersion, out var newVersion))
-            newVersion = new Version(0, 0, 0, 0);
-        string patchNote = string.Empty;
+        if (!Version.TryParse(currentVersionString, out var curVer))
+            curVer = new Version(0, 0, 0, 0);
 
-        if ((statusCode != StatusCode.Update && statusCode != StatusCode.ForceUpdate) ||
-            string.IsNullOrEmpty(newestVersion)) return (currentVersion, newVersion, statusCode, projectInfo, patchNote);
+        if (!Version.TryParse(newestVersion, out var newVer))
+            newVer = new Version(0, 0, 0, 0);
 
+        if (statusCode is not (StatusCode.Update or StatusCode.ForceUpdate) || string.IsNullOrEmpty(newestVersion))
+            return (curVer, newVer, statusCode, projectInfo, string.Empty);
+
+        var patchNote = await FetchPatchNoteAsync(apiChannel, newestVersion, currentVersionString).ConfigureAwait(false);
+
+        return (curVer, newVer, statusCode, projectInfo, patchNote);
+    }
+
+    private async Task<string> FetchPatchNoteAsync(string apiChannel, string version, string currentVersionString)
+    {
         try
         {
             var langData = "en-US";
-            if (File.Exists(Path.Combine(Folders.AppData, "lang")))
-            {
-                langData = await File.ReadAllTextAsync(Path.Combine(Folders.AppData, "lang")).ConfigureAwait(false);
-            }
+            var langPath = Path.Combine(Folders.AppData, "lang");
+            if (File.Exists(langPath))
+                langData = await File.ReadAllTextAsync(langPath).ConfigureAwait(false);
 
-            var cultureInfo = new CultureInfo(langData);
-            var patchNoteUrl = cultureInfo.IetfLanguageTag == "zh-Hans" ? $"{SERVER_URL}/{folderName}/PatchNote-{newestVersion}-zh.txt" : $"{SERVER_URL}/{folderName}/PatchNote-{newestVersion}.txt";
+            var isZh = new CultureInfo(langData).IetfLanguageTag == "zh-Hans";
 
-            Log.Instance.Trace($"Fetching patch note from: {patchNoteUrl}");
+            var url = $"{GetServerUrl()}/api/v1/projects/{apiChannel}";
 
             using var httpClient = _httpClientFactory.Create();
-            string userAgent = $"CommonUpdater-LenovoLegionToolkit-{(string.IsNullOrEmpty(projectInfo.ProjectCurrentVersion) ? "Null" : projectInfo.ProjectCurrentVersion)}";
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"CommonUpdater-LenovoLegionToolkit-{currentVersionString}");
 
-            string patchNoteContent = await httpClient.GetStringAsync(patchNoteUrl).ConfigureAwait(false);
+            var response = await httpClient.GetAsync(url).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
 
-            patchNote = patchNoteContent.Replace("\r\n", "\n").Trim();
-            Log.Instance.Trace($"Patch note fetched successfully.");
+            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var info = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            if (info is null)
+                return "No patch notes available.";
+
+            if (!info.TryGetValue("patchNotes", out var notesObj))
+                return "No patch notes available.";
+
+            var notesJson = notesObj?.ToString();
+            if (string.IsNullOrEmpty(notesJson))
+                return "No patch notes available.";
+
+            var notes = JsonConvert.DeserializeObject<Dictionary<string, object>>(notesJson);
+            if (notes is null)
+                return "No patch notes available.";
+
+            var key = isZh ? "zhHans" : "en";
+            if (notes.TryGetValue(key, out var content) && content is string s && !string.IsNullOrWhiteSpace(s))
+            {
+                Log.Instance.Trace($"Patch note fetched.");
+                return s.Trim();
+            }
+
+            return "No patch notes available.";
         }
         catch (Exception ex)
         {
-            Log.Instance.Trace($"Failed to fetch patch note or no patch note available: {ex.Message}");
-            patchNote = "No patch notes available.";
+            Log.Instance.Trace($"Failed to fetch patch note: {ex.Message}");
+            return "No patch notes available.";
         }
-
-        return (currentVersion, newVersion, statusCode, projectInfo, patchNote);
     }
     #endregion
 }
