@@ -1,3 +1,4 @@
+using LenovoLegionToolkit.Lib.Resources;
 using LenovoLegionToolkit.Lib.Utils;
 using System;
 using System.Collections.Generic;
@@ -102,26 +103,49 @@ public static class DeviceInformation
         try
         {
             using var searcher = new ManagementObjectSearcher("SELECT Name, AdapterRAM FROM Win32_VideoController");
+
             using var collection = searcher.Get();
 
             foreach (var obj in collection)
             {
                 string name = obj["Name"]?.ToString()?.Trim() ?? "";
+
                 if (string.IsNullOrEmpty(name) ||
-                   (!name.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase) &&
-                    !name.Contains("AMD", StringComparison.OrdinalIgnoreCase) &&
-                    !name.Contains("INTEL", StringComparison.OrdinalIgnoreCase)))
+                    (!name.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase) &&
+                     !name.Contains("AMD", StringComparison.OrdinalIgnoreCase) &&
+                     !name.Contains("INTEL", StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }
 
+                bool isIntegratedGpu =
+                    (
+                        name.Contains("Intel", StringComparison.OrdinalIgnoreCase) &&
+                        !name.Contains("Arc", StringComparison.OrdinalIgnoreCase)
+                    )
+                    || name.Contains("Iris", StringComparison.OrdinalIgnoreCase)
+                    || name.Contains("Xe", StringComparison.OrdinalIgnoreCase)
+                    || name.StartsWith("AMD Radeon Graphics", StringComparison.OrdinalIgnoreCase)
+                    || name.StartsWith("AMD Radeon(TM) Graphics", StringComparison.OrdinalIgnoreCase)
+                    || name.Contains("Vega", StringComparison.OrdinalIgnoreCase)
+                    || (
+                        name.Contains("AMD Radeon", StringComparison.OrdinalIgnoreCase)
+                        && !name.Contains("RX", StringComparison.OrdinalIgnoreCase)
+                        && (
+                            name.EndsWith("M", StringComparison.OrdinalIgnoreCase)
+                            || name.EndsWith("S", StringComparison.OrdinalIgnoreCase)
+                        )
+                    );
+
                 ulong ramBytes = obj["AdapterRAM"] != null ? Convert.ToUInt64(obj["AdapterRAM"]) : 0;
-                string vramStr = "Shared/Dynamic";
+
+                string vramStr = "";
 
                 if (ramBytes > 0 && ramBytes < 4294967295)
                 {
                     double ramGigabytes = ramBytes / 1_073_741_824.0;
-                    vramStr = ramGigabytes <= 0.1 ? "Shared/Dynamic" : ramGigabytes.ToString("F1");
+
+                    vramStr = isIntegratedGpu ? Resource.DeviceInformation_SharedMemory : ramGigabytes.ToString("F1");
                 }
 
                 gpus.Add(new GpuHardwareInfo(name, vramStr));
@@ -135,15 +159,21 @@ public static class DeviceInformation
         try
         {
             NVIDIA.Initialize();
+
             var physicalGPUs = PhysicalGPU.GetPhysicalGPUs();
 
             foreach (var nvGpu in physicalGPUs)
             {
                 string nvName = nvGpu.FullName;
+
                 double vramGb = nvGpu.MemoryInformation.DedicatedVideoMemoryInkB / (1024.0 * 1024.0);
+
                 string trueVramStr = vramGb.ToString("F1");
 
-                var existingIndex = gpus.FindIndex(g => g.Name != null && g.Name.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase) && (g.Name.Contains(nvName) || nvName.Contains(g.Name)));
+                var existingIndex = gpus.FindIndex(g =>
+                    g.Name != null &&
+                    g.Name.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase) &&
+                    (g.Name.Contains(nvName) || nvName.Contains(g.Name)));
 
                 if (existingIndex >= 0)
                 {
@@ -392,6 +422,21 @@ public static class DeviceInformation
     private static List<NetworkHardwareInfo> FetchNetworkAdapters()
     {
         var adapters = new List<NetworkHardwareInfo>();
+
+        var blacklist = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "TAP-Windows",
+            "QMTAP",
+            "Virtual",
+            "VMware",
+            "VirtualBox",
+            "Hyper-V",
+            "VPN",
+            "Pseudo-Interface",
+            "Loopback",
+            "PnpGeneric"
+        };
+
         try
         {
             using var searcher = new ManagementObjectSearcher("SELECT Name, MACAddress FROM Win32_NetworkAdapter WHERE PhysicalAdapter = True AND MACAddress IS NOT NULL");
@@ -401,6 +446,17 @@ public static class DeviceInformation
             {
                 string? name = obj["Name"]?.ToString()?.Trim();
                 string? mac = obj["MACAddress"]?.ToString()?.Trim();
+
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(mac))
+                    continue;
+
+                bool isBlacklisted = blacklist.Any(keyword => name.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+                if (isBlacklisted)
+                {
+                    continue;
+                }
+
                 adapters.Add(new NetworkHardwareInfo(name, mac));
             }
         }

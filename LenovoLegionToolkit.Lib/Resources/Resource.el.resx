@@ -192,6 +192,9 @@
   <data name="CustomSpecialKey_Default" xml:space="preserve">
     <value>Default</value>
   </data>
+  <data name="DeviceInformation_SharedMemory" xml:space="preserve">
+    <value>Shared / Dynamic</value>
+  </data>
   <data name="FlipToStartState_Off" xml:space="preserve">
     <value>Ανενεργό</value>
     <comment>Informs the user that Flip to Start is or will be turned off.</comment>
