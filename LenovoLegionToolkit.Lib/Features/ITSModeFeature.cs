@@ -269,11 +269,17 @@ public partial class ITSModeFeature : IFeature<ITSMode>
                     {
                         return ITSMode.ItsAuto;
                     }
-                    else if (autoSetting == 1)
+                    else if (autoSetting == 1 && currentSetting == 1)
                     {
-                        if (currentSetting == 1) return ITSMode.MmcCool;
-                        if (currentSetting == 3) return ITSMode.MmcPerformance;
-                        if (currentSetting == 4) return ITSMode.MmcGeek;
+                        return ITSMode.MmcCool;
+                    }
+                    else if (autoSetting == 1 && currentSetting == 3)
+                    {
+                        return ITSMode.MmcPerformance;
+                    }
+                    else if (autoSetting == 1 && currentSetting == 4)
+                    {
+                        return ITSMode.MmcGeek;
                     }
                 }
             }
@@ -312,7 +318,7 @@ public partial class ITSModeFeature : IFeature<ITSMode>
                 targetServiceName = ITS_SERVICE_NAME;
                 targetMessage = mode switch
                 {
-                    ITSMode.ItsAuto => ITSModeServiceControlMessage.IntelligentCoolingIntelligent,
+                    ITSMode.ItsAuto => ITSModeServiceControlMessage.IntelligentCoolingEnable,
                     ITSMode.MmcCool => ITSModeServiceControlMessage.IntelligentCoolingCool,
                     ITSMode.MmcPerformance => ITSModeServiceControlMessage.IntelligentCoolingHighPerformance,
                     ITSMode.MmcGeek => ITSModeServiceControlMessage.IntelligentCoolingGeek,
