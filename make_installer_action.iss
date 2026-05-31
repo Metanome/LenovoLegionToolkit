@@ -20,6 +20,7 @@ UsePreviousAppDir=no
 UsedUserAreasWarning=false
 AppId={{0C37B9AC-9C3D-4302-8ABB-125C7C7D83D5}
 AppMutex=LenovoLegionToolkit_Mutex_6efcc882-924c-4cbc-8fec-f45c25696f98
+CloseApplications=force
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppCopyright={#MyAppCopyright}
