@@ -877,6 +877,11 @@
                                                         FontSize="12"
                                                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                                         Text="{Binding Label}" />
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                        Text="{Binding DiskModel, TargetNullValue={x:Static resources:Resource.Unknown}}"
+                                                        TextTrimming="CharacterEllipsis" />
                                                 </StackPanel>
                                                 <TextBlock
                                                     Grid.Column="1"

@@ -408,7 +408,8 @@ public static class DeviceInformation
                 {
                     double sizeGb = drive.TotalSize / 1_073_741_824.0;
                     double freeGb = drive.AvailableFreeSpace / 1_073_741_824.0;
-                    drives.Add(new LogicalDriveInfo(drive.Name, drive.VolumeLabel, sizeGb, freeGb));
+                    string? diskModel = GetDiskModelForLogicalDrive(drive.Name);
+                    drives.Add(new LogicalDriveInfo(drive.Name, drive.VolumeLabel, sizeGb, freeGb, diskModel));
                 }
             }
         }
@@ -417,6 +418,35 @@ public static class DeviceInformation
             Log.Instance.Trace($"Unable to get logical drives. Reason: {ex}");
         }
         return drives;
+    }
+
+    private static string? GetDiskModelForLogicalDrive(string driveName)
+    {
+        try
+        {
+            var driveLetter = driveName.TrimEnd('\\', ':');
+
+            using var partitionSearcher = new ManagementObjectSearcher(
+                $"ASSOCIATORS OF {{Win32_LogicalDisk.DeviceID='{driveLetter}:'}} WHERE AssocClass=Win32_LogicalDiskToPartition");
+            foreach (var partition in partitionSearcher.Get())
+            {
+                var partitionId = partition["DeviceID"]?.ToString();
+                if (partitionId is null)
+                    continue;
+
+                using var diskSearcher = new ManagementObjectSearcher(
+                    $"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{partitionId.Replace("\\", "\\\\")}'}} WHERE AssocClass=Win32_DiskDriveToDiskPartition");
+                foreach (var disk in diskSearcher.Get())
+                {
+                    return disk["Model"]?.ToString()?.Trim();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Unable to resolve disk model for {driveName}. Reason: {ex}");
+        }
+        return null;
     }
 
     private static List<NetworkHardwareInfo> FetchNetworkAdapters()
@@ -547,7 +577,7 @@ public record MotherboardHardwareInfo(string? Manufacturer, string? Product)
     };
 }
 
-public record LogicalDriveInfo(string Name, string Label, double SizeGb, double FreeGb)
+public record LogicalDriveInfo(string Name, string Label, double SizeGb, double FreeGb, string? DiskModel)
 {
     public double UsedGb => SizeGb - FreeGb;
 
@@ -557,6 +587,7 @@ public record LogicalDriveInfo(string Name, string Label, double SizeGb, double 
         1 => Label,
         2 => SizeGb.ToString("F2"),
         3 => FreeGb.ToString("F2"),
+        4 => DiskModel ?? "",
         _ => throw new ArgumentOutOfRangeException(nameof(index))
     };
 }
