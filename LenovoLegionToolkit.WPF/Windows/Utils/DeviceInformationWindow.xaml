@@ -560,7 +560,7 @@
                                         Margin="0,0,0,4"
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                        <Run Text="{x:Static resources:Resource.PowerModes}" /><Run Text=":" />
+                                        <Run x:Name="_powerModesTitle" Text="{x:Static resources:Resource.PowerModes}" /><Run Text=":" />
                                     </TextBlock>
                                     <TextBlock
                                         x:Name="_powerModesLabel"
@@ -860,44 +860,23 @@
                             <ItemsControl x:Name="_diskList">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Margin="0,0,0,12">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0">
-                                                    <TextBlock
-                                                        FontSize="14"
-                                                        FontWeight="Bold"
-                                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                        Text="{Binding Name, TargetNullValue={x:Static resources:Resource.Unknown}}"
-                                                        TextWrapping="Wrap" />
-                                                    <TextBlock
-                                                        FontSize="12"
-                                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                        Text="{Binding Label}" />
-                                                    <TextBlock
-                                                        FontSize="12"
-                                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                        Text="{Binding DiskModel, TargetNullValue={x:Static resources:Resource.Unknown}}"
-                                                        TextTrimming="CharacterEllipsis" />
-                                                </StackPanel>
+                                        <StackPanel Margin="0,0,0,6">
+                                            <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
                                                 <TextBlock
-                                                    Grid.Column="1"
-                                                    VerticalAlignment="Center"
-                                                    FontSize="12"
-                                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                                    <Run Text="{Binding UsedGb, StringFormat=\{0:F1\}, Mode=OneWay}" />
-                                                    <Run Text="{x:Static resources:Resource.GB}" />
-                                                    <Run Text="/" />
-                                                    <Run Text="{Binding SizeGb, StringFormat=\{0:F1\}, Mode=OneWay}" />
-                                                    <Run Text="{x:Static resources:Resource.GB}" />
-                                                </TextBlock>
-                                            </Grid>
+                                                    FontSize="14"
+                                                    FontWeight="Bold"
+                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                    Text="{Binding Name, TargetNullValue={x:Static resources:Resource.Unknown}}" />
+                                                <TextBlock
+                                                    Margin="6,0,0,0"
+                                                    FontSize="14"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                    Text="{Binding Label}" />
+                                            </StackPanel>
                                             <Border
                                                 Height="6"
-                                                Margin="0,8,0,0"
+                                                Margin="0,0,0,4"
                                                 Background="{DynamicResource ControlStrokeColorDefaultBrush}"
                                                 ClipToBounds="True"
                                                 CornerRadius="3">
@@ -915,6 +894,22 @@
                                                     </ProgressBar.Foreground>
                                                 </ProgressBar>
                                             </Border>
+                                            <TextBlock
+                                                Margin="0"
+                                                FontSize="12"
+                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                                <Run Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontWeight="SemiBold" Text="{Binding UsedGb, StringFormat=\{0:F1\}, Mode=OneWay}" />
+                                                <Run Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontWeight="SemiBold" Text="{x:Static resources:Resource.GB}" />
+                                                <Run Text="{x:Static resources:Resource.Used}" />
+                                                <Run Text="/" />
+                                                <Run Text="{Binding SizeGb, StringFormat=\{0:F1\}, Mode=OneWay}" />
+                                                <Run Text="{x:Static resources:Resource.GB}" />
+                                            </TextBlock>
+                                            <TextBlock
+                                                FontSize="11"
+                                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                                Text="{Binding DiskModel, TargetNullValue={x:Static resources:Resource.Unknown}}"
+                                                TextTrimming="CharacterEllipsis" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

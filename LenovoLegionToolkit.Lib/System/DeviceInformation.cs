@@ -141,14 +141,13 @@ public static class DeviceInformation
 
                 string vramStr = "";
 
-                if (ramBytes > 0 && ramBytes < 4294967295)
+                if (!isIntegratedGpu && ramBytes > 0 && ramBytes < 4294967295)
                 {
                     double ramGigabytes = ramBytes / 1_073_741_824.0;
-
-                    vramStr = isIntegratedGpu ? Resource.DeviceInformation_SharedMemory : ramGigabytes.ToString("F1");
+                    vramStr = ramGigabytes.ToString("F1");
                 }
 
-                gpus.Add(new GpuHardwareInfo(name, vramStr));
+                gpus.Add(new GpuHardwareInfo(name, vramStr, isIntegratedGpu));
             }
         }
         catch (Exception ex)
@@ -177,11 +176,11 @@ public static class DeviceInformation
 
                 if (existingIndex >= 0)
                 {
-                    gpus[existingIndex] = new GpuHardwareInfo(nvName, trueVramStr);
+                    gpus[existingIndex] = new GpuHardwareInfo(nvName, trueVramStr, false);
                 }
                 else
                 {
-                    gpus.Add(new GpuHardwareInfo(nvName, trueVramStr));
+                    gpus.Add(new GpuHardwareInfo(nvName, trueVramStr, false));
                 }
             }
         }
@@ -511,7 +510,7 @@ public record CpuHardwareInfo(string? Name, uint CoreCount, uint ThreadCount)
     };
 }
 
-public record GpuHardwareInfo(string? Name, string? Vram)
+public record GpuHardwareInfo(string? Name, string? Vram, bool IsShared)
 {
     public string this[int index] => index switch
     {
@@ -524,10 +523,10 @@ public record GpuHardwareInfo(string? Name, string? Vram)
     {
         get
         {
-            if (string.IsNullOrEmpty(Vram) || Vram == Resource.DeviceInformation_SharedMemory)
-                return Resource.DeviceInformation_SharedMemory;
+            if (IsShared || string.IsNullOrEmpty(Vram))
+                return Resource.SharedMemory;
 
-            return $"{Vram} GB";
+            return $"{Vram} {Resource.GB}";
         }
     }
 }

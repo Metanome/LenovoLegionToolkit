@@ -90,7 +90,17 @@ public partial class DeviceInformationWindow
 
         if (mi.SupportedPowerModes != null && mi.SupportedPowerModes.Length > 0)
         {
+            _powerModesTitle.Text = Resource.PowerModes;
             _powerModesLabel.Text = string.Join(", ", mi.SupportedPowerModes.Select(m => m.GetDisplayName()));
+            _modesRow.Visibility = Visibility.Visible;
+        }
+        else if (mi.Properties.SupportsITSMode)
+        {
+            _powerModesTitle.Text = Resource.PowerModes;
+            var itsModes = mi.LegionSeries == LegionSeries.ThinkBook
+                ? new[] { ITSMode.MmcCool, ITSMode.ItsAuto, ITSMode.MmcPerformance, ITSMode.MmcGeek }
+                : new[] { ITSMode.MmcCool, ITSMode.ItsAuto, ITSMode.MmcPerformance };
+            _powerModesLabel.Text = string.Join(", ", itsModes.Select(m => m.GetDisplayName()));
             _modesRow.Visibility = Visibility.Visible;
         }
         else
@@ -106,7 +116,6 @@ public partial class DeviceInformationWindow
         if (mi.Properties.SupportsExtremeMode) caps.Add("Extreme Mode");
         if (mi.Properties.SupportsGodMode) caps.Add("Custom Mode (God Mode)");
         if (mi.Properties.SupportsBootLogoChange) caps.Add("Boot Logo Customization");
-        if (mi.Properties.SupportsITSMode) caps.Add("ITS Mode");
         if (mi.LegionZoneVersion > 0) caps.Add($"Legion Zone v{mi.LegionZoneVersion}");
 
         if (mi.Features.Source != MachineInformation.FeatureData.SourceType.Unknown)
@@ -294,7 +303,7 @@ public partial class DeviceInformationWindow
                     if (daysRemaining > 0)
                     {
                         _warrantyDaysRemainingLabel.Text = daysRemaining.ToString();
-                        _warrantyStatusLabel.Text = Resource.DeviceInformationWindow_Warranty_Valid;
+                        _warrantyStatusLabel.Text = Resource.Valid;
                         _warrantyStatusLabel.Foreground = (System.Windows.Media.Brush)FindResource("PaletteGreenBrush");
                         _warrantyStatusIcon.Foreground = (System.Windows.Media.Brush)FindResource("PaletteGreenBrush");
 
