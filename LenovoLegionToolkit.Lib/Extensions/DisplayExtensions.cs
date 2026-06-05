@@ -4,6 +4,7 @@ using Windows.Win32;
 using Windows.Win32.Devices.Display;
 using WindowsDisplayAPI;
 using WindowsDisplayAPI.DisplayConfig;
+using Windows.Win32.Graphics.Gdi;
 
 namespace LenovoLegionToolkit.Lib.Extensions;
 
@@ -53,38 +54,41 @@ public static class DisplayExtensions
         if (pathDisplayTarget is null || pathDisplayAdapter is null)
             return default;
 
-        var getAdvancedColorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_24H2();
+        var getAdvancedColorInfo2 = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_2();
+        getAdvancedColorInfo2.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO_2;
+        getAdvancedColorInfo2.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_2));
+        getAdvancedColorInfo2.header.adapterId.HighPart = pathDisplayAdapter.AdapterId.HighPart;
+        getAdvancedColorInfo2.header.adapterId.LowPart = pathDisplayAdapter.AdapterId.LowPart;
+        getAdvancedColorInfo2.header.id = pathDisplayTarget.TargetId;
+
+        if (PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo2.header) == 0)
+        {
+            bool hdrSupported = getAdvancedColorInfo2.Anonymous.Anonymous.highDynamicRangeSupported;
+            bool advancedColorSupported = getAdvancedColorInfo2.Anonymous.Anonymous.advancedColorSupported;
+            bool wideColorEnforced = getAdvancedColorInfo2.Anonymous.Anonymous.advancedColorLimitedByPolicy;
+            bool advancedColorForceDisabled = false;
+            bool advancedColorEnabled = hdrSupported && getAdvancedColorInfo2.activeColorMode == DISPLAYCONFIG_ADVANCED_COLOR_MODE.DISPLAYCONFIG_ADVANCED_COLOR_MODE_HDR;
+
+            return new(advancedColorSupported,
+                advancedColorEnabled,
+                wideColorEnforced,
+                advancedColorForceDisabled);
+        }
+
+        var getAdvancedColorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO();
         getAdvancedColorInfo.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO;
-        getAdvancedColorInfo.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_24H2));
+        getAdvancedColorInfo.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO));
         getAdvancedColorInfo.header.adapterId.HighPart = pathDisplayAdapter.AdapterId.HighPart;
         getAdvancedColorInfo.header.adapterId.LowPart = pathDisplayAdapter.AdapterId.LowPart;
         getAdvancedColorInfo.header.id = pathDisplayTarget.TargetId;
 
-        int res = PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo.header);
-        bool usedNewSize = true;
-
-        if (res == 87 || res == 50) // ERROR_INVALID_PARAMETER or ERROR_NOT_SUPPORTED
-        {
-            getAdvancedColorInfo.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO));
-            res = PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo.header);
-            usedNewSize = false;
-        }
-
-        if (res != 0)
+        if (PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo.header) != 0)
             PInvokeExtensions.ThrowIfWin32Error("GetAdvancedColorInfo");
 
-        bool advancedColorSupported = getAdvancedColorInfo.value.GetNthBit(0);
-        bool advancedColorEnabled = getAdvancedColorInfo.value.GetNthBit(1);
-        bool wideColorEnforced = getAdvancedColorInfo.value.GetNthBit(2);
-        bool advancedColorForceDisabled = getAdvancedColorInfo.value.GetNthBit(3);
-
-        if (usedNewSize)
-            advancedColorEnabled = advancedColorEnabled && getAdvancedColorInfo.advancedColorKind == DISPLAYCONFIG_ADVANCED_COLOR_KIND.HDR;
-
-        return new(advancedColorSupported,
-            advancedColorEnabled,
-            wideColorEnforced,
-            advancedColorForceDisabled);
+        return new(getAdvancedColorInfo.Anonymous.value.GetNthBit(0),
+            getAdvancedColorInfo.Anonymous.value.GetNthBit(1),
+            getAdvancedColorInfo.Anonymous.value.GetNthBit(2),
+            getAdvancedColorInfo.Anonymous.value.GetNthBit(3));
     }
 
     public static void SetAdvancedColorState(this Display display, bool state)
@@ -93,6 +97,17 @@ public static class DisplayExtensions
         var pathDisplayTarget = display.ToPathDisplayTarget();
 
         if (pathDisplayTarget is null || pathDisplayAdapter is null)
+            return;
+
+        var setHdrState = new DISPLAYCONFIG_SET_HDR_STATE();
+        setHdrState.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_SET_HDR_STATE;
+        setHdrState.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_SET_HDR_STATE));
+        setHdrState.header.adapterId.HighPart = pathDisplayAdapter.AdapterId.HighPart;
+        setHdrState.header.adapterId.LowPart = pathDisplayAdapter.AdapterId.LowPart;
+        setHdrState.header.id = pathDisplayTarget.TargetId;
+        setHdrState.Anonymous.Anonymous.enableHdr = state;
+
+        if (PInvoke.DisplayConfigSetDeviceInfo(setHdrState.header) == 0)
             return;
 
         var setAdvancedColorState = new DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE();
