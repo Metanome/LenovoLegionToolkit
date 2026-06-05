@@ -146,6 +146,23 @@ internal struct CIntelligentCooling
     private long value;
 }
 
+public enum DISPLAYCONFIG_ADVANCED_COLOR_KIND : uint
+{
+    SDR = 0,
+    WCG = 1,
+    HDR = 2
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_24H2
+{
+    public Windows.Win32.Devices.Display.DISPLAYCONFIG_DEVICE_INFO_HEADER header;
+    public uint value;
+    public uint colorEncoding;
+    public uint bitsPerColorChannel;
+    public DISPLAYCONFIG_ADVANCED_COLOR_KIND advancedColorKind;
+}
+
 public readonly struct DiscreteCapability(CapabilityID id, int value)
 {
     public CapabilityID Id { get; } = id;

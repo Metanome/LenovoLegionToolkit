@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Devices.Display;
@@ -53,20 +53,38 @@ public static class DisplayExtensions
         if (pathDisplayTarget is null || pathDisplayAdapter is null)
             return default;
 
-        var getAdvancedColorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO();
+        var getAdvancedColorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_24H2();
         getAdvancedColorInfo.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO;
-        getAdvancedColorInfo.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO));
+        getAdvancedColorInfo.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO_24H2));
         getAdvancedColorInfo.header.adapterId.HighPart = pathDisplayAdapter.AdapterId.HighPart;
         getAdvancedColorInfo.header.adapterId.LowPart = pathDisplayAdapter.AdapterId.LowPart;
         getAdvancedColorInfo.header.id = pathDisplayTarget.TargetId;
 
-        if (PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo.header) != 0)
+        int res = PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo.header);
+        bool usedNewSize = true;
+
+        if (res == 87 || res == 50) // ERROR_INVALID_PARAMETER or ERROR_NOT_SUPPORTED
+        {
+            getAdvancedColorInfo.header.size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO));
+            res = PInvoke.DisplayConfigGetDeviceInfo(ref getAdvancedColorInfo.header);
+            usedNewSize = false;
+        }
+
+        if (res != 0)
             PInvokeExtensions.ThrowIfWin32Error("GetAdvancedColorInfo");
 
-        return new(getAdvancedColorInfo.Anonymous.value.GetNthBit(0),
-            getAdvancedColorInfo.Anonymous.value.GetNthBit(1),
-            getAdvancedColorInfo.Anonymous.value.GetNthBit(2),
-            getAdvancedColorInfo.Anonymous.value.GetNthBit(3));
+        bool advancedColorSupported = getAdvancedColorInfo.value.GetNthBit(0);
+        bool advancedColorEnabled = getAdvancedColorInfo.value.GetNthBit(1);
+        bool wideColorEnforced = getAdvancedColorInfo.value.GetNthBit(2);
+        bool advancedColorForceDisabled = getAdvancedColorInfo.value.GetNthBit(3);
+
+        if (usedNewSize)
+            advancedColorEnabled = advancedColorEnabled && getAdvancedColorInfo.advancedColorKind == DISPLAYCONFIG_ADVANCED_COLOR_KIND.HDR;
+
+        return new(advancedColorSupported,
+            advancedColorEnabled,
+            wideColorEnforced,
+            advancedColorForceDisabled);
     }
 
     public static void SetAdvancedColorState(this Display display, bool state)
