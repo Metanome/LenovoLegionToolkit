@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -209,8 +209,7 @@ public class NotifyIcon : NativeWindow, IDisposable
                 cbSize = (uint)Marshal.SizeOf<NOTIFYICONDATAW>(),
                 uID = _id,
                 uCallbackMessage = TRAY_MESSAGE_ID,
-                uFlags = NOTIFY_ICON_DATA_FLAGS.NIF_MESSAGE | NOTIFY_ICON_DATA_FLAGS.NIF_TIP,
-                szTip = ""
+                uFlags = NOTIFY_ICON_DATA_FLAGS.NIF_MESSAGE
             };
 
             if (_visible && Handle == IntPtr.Zero)
@@ -226,7 +225,7 @@ public class NotifyIcon : NativeWindow, IDisposable
 
             if (_text is not null && _toolTipWindow is null)
             {
-                data.uFlags |= NOTIFY_ICON_DATA_FLAGS.NIF_SHOWTIP;
+                data.uFlags |= NOTIFY_ICON_DATA_FLAGS.NIF_TIP | NOTIFY_ICON_DATA_FLAGS.NIF_SHOWTIP;
                 data.szTip = _text;
             }
 
