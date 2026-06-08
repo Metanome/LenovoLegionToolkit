@@ -1,22 +1,23 @@
 using LenovoLegionToolkit.Lib.Extensions;
+using LenovoLegionToolkit.Lib.Listeners;
 using LenovoLegionToolkit.Lib.Messaging;
 using LenovoLegionToolkit.Lib.Messaging.Messages;
+using LenovoLegionToolkit.Lib.Settings;
+using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.Utils;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Storage.FileSystem;
-using LenovoLegionToolkit.Lib.Settings;
-using System.Threading;
-using LenovoLegionToolkit.Lib.System;
-using LenovoLegionToolkit.Lib.Listeners;
 using Registry = Microsoft.Win32.Registry;
 
 namespace LenovoLegionToolkit.Lib.Features;
@@ -159,18 +160,15 @@ public partial class ITSModeFeature : IFeature<ITSMode>
         {
             var currentState = await GetStateAsync().ConfigureAwait(false);
 
-            var desiredSequence = new[]
-            {
-                ITSMode.MmcCool,
-                ITSMode.ItsAuto,
-                ITSMode.MmcPerformance,
-                ITSMode.MmcGeek
-            };
+            var supportedStates = await GetAllStatesAsync().ConfigureAwait(false);
+            var supportedSet = new HashSet<ITSMode>(supportedStates);
+
+            var toggleOrder = new[] { ITSMode.MmcCool, ITSMode.ItsAuto, ITSMode.MmcPerformance, ITSMode.MmcGeek };
 
             var isConnected = await Power.IsPowerAdapterConnectedAsync().ConfigureAwait(false) == PowerAdapterStatus.Connected;
 
-            var availableStates = desiredSequence
-                .Where(state => isConnected || state != ITSMode.MmcGeek)
+            var availableStates = toggleOrder
+                .Where(s => supportedSet.Contains(s) && (isConnected || s != ITSMode.MmcGeek))
                 .ToArray();
 
             if (availableStates.Length == 0) return ITSMode.None;
