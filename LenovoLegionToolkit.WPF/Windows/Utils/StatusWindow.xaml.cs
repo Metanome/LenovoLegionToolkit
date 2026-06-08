@@ -55,6 +55,11 @@ public partial class StatusWindow
 
     private bool IsSpecialModel => _isSpecialModel;
 
+    private double _anchorX;
+    private double _anchorY;
+    private bool _anchorRight;
+    private bool _anchorBottom;
+
     private void SetMachineInformation(MachineInformation info)
     {
         _machineInfo = info;
@@ -119,11 +124,10 @@ public partial class StatusWindow
     {
         InitializeComponent();
         Loaded += StatusWindow_Loaded;
+        SizeChanged += StatusWindow_SizeChanged;
         IsVisibleChanged += StatusWindow_IsVisibleChanged;
         WindowStyle = WindowStyle.None;
         WindowStartupLocation = WindowStartupLocation.Manual;
-        Left = -10000;
-        Top = -10000;
         ResizeMode = ResizeMode.NoResize;
         SizeToContent = SizeToContent.WidthAndHeight;
         Focusable = false;
@@ -183,11 +187,24 @@ public partial class StatusWindow
 
     private async void StatusWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        MoveBottomRightEdgeOfWindowToMousePosition();
+        ComputeAnchorAndPosition();
         if (!_machineInfo.HasValue)
         {
             SetMachineInformation(await Compatibility.GetMachineInformationAsync().ConfigureAwait(false));
         }
+    }
+
+    private void StatusWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (_anchorRight)
+            Left = _anchorX - ActualWidth;
+        else
+            Left = _anchorX;
+
+        if (_anchorBottom)
+            Top = _anchorY - ActualHeight;
+        else
+            Top = _anchorY;
     }
 
     private void StatusWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -414,7 +431,7 @@ public partial class StatusWindow
     private static void UpdatePowerOnly(Label l, double p) => l.Content = p < 0 ? "-" : $"{p:0}{Resource.Watt}";
     private static void UpdateSystemFan(Label l, double f) => l.Content = f < 0 ? "-" : $"{f:0}{Resource.RPM}";
 
-    private void MoveBottomRightEdgeOfWindowToMousePosition()
+    private void ComputeAnchorAndPosition()
     {
         UpdateLayout();
 
@@ -440,16 +457,32 @@ public partial class StatusWindow
         const double offset = 8;
 
         if (mouseLogical.X + offset + ActualWidth > screenRightBottom.X)
-            Left = mouseLogical.X - ActualWidth - offset;
+        {
+            _anchorRight = true;
+            _anchorX = mouseLogical.X - offset;
+            Left = _anchorX - ActualWidth;
+        }
         else
-            Left = mouseLogical.X + offset;
+        {
+            _anchorRight = false;
+            _anchorX = mouseLogical.X + offset;
+            Left = _anchorX;
+        }
 
         if (mouseLogical.Y + offset + ActualHeight > screenRightBottom.Y)
-            Top = mouseLogical.Y - ActualHeight - offset;
+        {
+            _anchorBottom = true;
+            _anchorY = mouseLogical.Y - offset;
+            Top = _anchorY - ActualHeight;
+        }
         else
-            Top = mouseLogical.Y + offset;
+        {
+            _anchorBottom = false;
+            _anchorY = mouseLogical.Y + offset;
+            Top = _anchorY;
+        }
 
-        if (Left < screenLeftTop.X) Left = screenLeftTop.X;
-        if (Top < screenLeftTop.Y) Top = screenLeftTop.Y;
+        if (Left < screenLeftTop.X) { Left = screenLeftTop.X; _anchorX = _anchorRight ? Left + ActualWidth : Left; }
+        if (Top < screenLeftTop.Y) { Top = screenLeftTop.Y; _anchorY = _anchorBottom ? Top + ActualHeight : Top; }
     }
 }
