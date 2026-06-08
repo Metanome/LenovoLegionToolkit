@@ -1,7 +1,9 @@
+using LenovoLegionToolkit.Lib;
+using LenovoLegionToolkit.Lib.Utils;
+using LenovoLegionToolkit.WPF.Extensions;
+using LenovoLegionToolkit.WPF.Resources;
 using System.Windows;
 using System.Windows.Controls;
-using LenovoLegionToolkit.Lib;
-using LenovoLegionToolkit.WPF.Resources;
 using System.Windows.Media;
 
 namespace LenovoLegionToolkit.WPF.Windows.Osd;

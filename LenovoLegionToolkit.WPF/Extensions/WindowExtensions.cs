@@ -1,4 +1,7 @@
+using LenovoLegionToolkit.Lib;
+using LenovoLegionToolkit.Lib.Settings;
 using LenovoLegionToolkit.Lib.Utils;
+using LenovoLegionToolkit.WPF.Windows.Osd;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -11,6 +14,42 @@ namespace LenovoLegionToolkit.WPF.Extensions;
 
 public static class WindowExtensions
 {
+    #region TaskbarList COM
+
+    [ComImport]
+    [Guid("56FDF342-FD6D-11d0-958A-006097C9A090")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface ITaskbarList
+    {
+        void HrInit();
+        void AddTab(IntPtr hwnd);
+        void DeleteTab(IntPtr hwnd);
+        void ActivateTab(IntPtr hwnd);
+        void SetActiveAlt(IntPtr hwnd);
+    }
+
+    [ComImport]
+    [Guid("56FDF344-FD6D-11d0-958A-006097C9A090")]
+    private class TaskbarList { }
+
+    private static readonly Lazy<ITaskbarList> _taskbarList = new(() =>
+    {
+        var list = (ITaskbarList)new TaskbarList();
+        list.HrInit();
+        return list;
+    });
+
+    private static void HideFromTaskbar(IntPtr hwnd)
+    {
+        try 
+        {
+            _taskbarList.Value.DeleteTab(hwnd);
+        }
+        catch { /* Ignore */ }
+    }
+
+    #endregion
+
     #region Constants
 
     private static readonly HWND HWND_TOPMOST = new HWND(-1);
@@ -29,6 +68,9 @@ public static class WindowExtensions
     [DllImport("user32.dll", EntryPoint = "GetWindowBand")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool GetWindowBand(IntPtr hWnd, out uint pdwBand);
+
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern uint RegisterWindowMessage(string lpString);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct STYLESTRUCT
@@ -128,6 +170,15 @@ public static class WindowExtensions
             wp.flags |= SWP_NOACTIVATE;
             Marshal.StructureToPtr(wp, lParam, false);
             handled = true;
+        }
+        else if (msg == OsdWindowBase.TaskbarCreatedMsg)
+        {
+            if (HwndSource.FromHwnd(hwnd)?.RootVisual is Window window)
+            {
+                var osdSettings = IoCContainer.Resolve<OsdSettings>();
+                window.SetClickThrough(osdSettings.Store.IsLocked);
+                HideFromTaskbar(hwnd);
+            }
         }
 
         return IntPtr.Zero;

@@ -27,6 +27,8 @@ namespace LenovoLegionToolkit.WPF.Windows.Osd;
 
 public abstract class OsdWindowBase : Window
 {
+    public static readonly uint TaskbarCreatedMsg = WindowExtensions.RegisterWindowMessage("TaskbarCreated");
+
     #region Threshold Constants
 
     protected int _uiUpdateThrottleMs = 0;
