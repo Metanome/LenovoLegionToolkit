@@ -161,6 +161,7 @@ public static class WindowExtensions
                 var styleStruct = Marshal.PtrToStructure<STYLESTRUCT>(lParam);
                 styleStruct.styleNew |= unchecked((int)(WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE));
                 Marshal.StructureToPtr(styleStruct, lParam, false);
+                HideFromTaskbar(hwnd);
                 handled = true;
             }
         }
@@ -169,6 +170,7 @@ public static class WindowExtensions
             var wp = Marshal.PtrToStructure<WINDOWPOS>(lParam);
             wp.flags |= SWP_NOACTIVATE;
             Marshal.StructureToPtr(wp, lParam, false);
+            HideFromTaskbar(hwnd);
             handled = true;
         }
         else if (msg == OsdWindowBase.TaskbarCreatedMsg)
@@ -178,6 +180,7 @@ public static class WindowExtensions
                 var osdSettings = IoCContainer.Resolve<OsdSettings>();
                 window.SetClickThrough(osdSettings.Store.IsLocked);
                 HideFromTaskbar(hwnd);
+                handled = true;
             }
         }
 
