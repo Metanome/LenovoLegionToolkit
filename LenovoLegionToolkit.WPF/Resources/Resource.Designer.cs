@@ -5932,11 +5932,29 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Push the GPU core to run faster than factory speeds..
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_CoreDesc {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_CoreDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Core Frequency Offset.
         /// </summary>
         public static string OverclockDiscreteGPUSettingsWindow_CoreFrequencyOffset_Title {
             get {
                 return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_CoreFrequencyOffset_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increase VRAM speed to improve memory bandwidth..
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_MemoryDesc {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_MemoryDesc", resourceCulture);
             }
         }
         
@@ -5950,11 +5968,65 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Overclocking.
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_Overclocking {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_Overclocking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Overclock GPU Settings.
         /// </summary>
         public static string OverclockDiscreteGPUSettingsWindow_Title {
             get {
                 return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Undervolting.
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_Undervolting {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_Undervolting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum Voltage Lock.
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_VoltageLock {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_VoltageLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Place a hard ceiling on the maximum voltage the GPU is allowed to use..
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_VoltageLockDesc {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_VoltageLockDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Voltage Offset.
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_VoltageOffset {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_VoltageOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift the entire voltage curve to improve efficiency..
+        /// </summary>
+        public static string OverclockDiscreteGPUSettingsWindow_VoltageOffsetDesc {
+            get {
+                return ResourceManager.GetString("OverclockDiscreteGPUSettingsWindow_VoltageOffsetDesc", resourceCulture);
             }
         }
         

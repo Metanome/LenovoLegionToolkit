@@ -336,24 +336,29 @@ public readonly struct FanSpeedTable(int cpuFanSpeed, int gpuFanSpeed, int pchFa
     public int PchFanSpeed { get; } = pchFanSpeed;
 }
 
-public readonly struct GPUOverclockInfo(int coreDeltaMhz, int memoryDeltaMhz)
+public readonly struct GPUOverclockInfo(int coreDeltaMhz, int memoryDeltaMhz, int voltageOffsetMv = 0, int voltageLockMv = 0)
 {
     public static readonly GPUOverclockInfo Zero = new();
 
     public int CoreDeltaMhz { get; } = coreDeltaMhz;
     public int MemoryDeltaMhz { get; } = memoryDeltaMhz;
+    public int VoltageOffsetMv { get; } = voltageOffsetMv;
+    public int VoltageLockMv { get; } = voltageLockMv;
 
     #region Equality
 
     public override bool Equals(object? obj)
     {
-        return obj is GPUOverclockInfo other && CoreDeltaMhz == other.CoreDeltaMhz &&
-               MemoryDeltaMhz == other.MemoryDeltaMhz;
+        return obj is GPUOverclockInfo other && 
+               CoreDeltaMhz == other.CoreDeltaMhz &&
+               MemoryDeltaMhz == other.MemoryDeltaMhz &&
+               VoltageOffsetMv == other.VoltageOffsetMv &&
+               VoltageLockMv == other.VoltageLockMv;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(CoreDeltaMhz, MemoryDeltaMhz);
+        return HashCode.Combine(CoreDeltaMhz, MemoryDeltaMhz, VoltageOffsetMv, VoltageLockMv);
     }
 
     public static bool operator ==(GPUOverclockInfo left, GPUOverclockInfo right)
