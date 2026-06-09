@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace LenovoLegionToolkit.WPF.Extensions;
@@ -15,18 +16,6 @@ namespace LenovoLegionToolkit.WPF.Extensions;
 public static class WindowExtensions
 {
     #region TaskbarList COM
-
-    [ComImport]
-    [Guid("56FDF342-FD6D-11d0-958A-006097C9A090")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    private interface ITaskbarList
-    {
-        void HrInit();
-        void AddTab(IntPtr hwnd);
-        void DeleteTab(IntPtr hwnd);
-        void ActivateTab(IntPtr hwnd);
-        void SetActiveAlt(IntPtr hwnd);
-    }
 
     [ComImport]
     [Guid("56FDF344-FD6D-11d0-958A-006097C9A090")]
@@ -41,9 +30,9 @@ public static class WindowExtensions
 
     private static void HideFromTaskbar(IntPtr hwnd)
     {
-        try 
+        try
         {
-            _taskbarList.Value.DeleteTab(hwnd);
+            _taskbarList.Value.DeleteTab(new HWND(hwnd));
         }
         catch { /* Ignore */ }
     }
