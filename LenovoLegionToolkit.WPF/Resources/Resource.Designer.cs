@@ -2144,6 +2144,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manage active processes by changing their graphics preferences, right-click to forcefully terminate them, or configure advanced settings..
+        /// </summary>
+        public static string DiscreteGPUControl_FooterMessage {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_FooterMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Force Kill Process.
         /// </summary>
         public static string DiscreteGPUControl_ForceKillProcessMenu {
@@ -2162,6 +2171,33 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maintains an active connection to the discrete GPU to prevent stuttering..
+        /// </summary>
+        public static string DiscreteGPUControl_KeepDgpuAwakeDescription {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_KeepDgpuAwakeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This increases power consumption and reduces battery life..
+        /// </summary>
+        public static string DiscreteGPUControl_KeepDgpuAwakeInfo {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_KeepDgpuAwakeInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep dGPU awake.
+        /// </summary>
+        public static string DiscreteGPUControl_KeepDgpuAwakeTitle {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_KeepDgpuAwakeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Kill apps.
         /// </summary>
         public static string DiscreteGPUControl_KillApps {
@@ -2171,7 +2207,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Wait time before refreshing the active processes list after a forced termination..
+        ///   Looks up a localized string similar to Wait time before refreshing the apps list after terminating a process..
         /// </summary>
         public static string DiscreteGPUControl_KillProcessDelayDescription {
             get {
@@ -2252,7 +2288,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adjust how often the app checks for GPU activity..
+        ///   Looks up a localized string similar to How often to check the discrete GPU for active processes..
         /// </summary>
         public static string DiscreteGPUControl_PollingIntervalDescription {
             get {
@@ -2315,7 +2351,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Delay before initializing the dGPU monitoring service..
+        ///   Looks up a localized string similar to Wait time before starting the discrete GPU monitoring service..
         /// </summary>
         public static string DiscreteGPUControl_StartupDelayDescription {
             get {

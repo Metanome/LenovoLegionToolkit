@@ -50,8 +50,8 @@ public class ApplicationSettings : AbstractSettings<ApplicationSettingsStore>
         public int GPUMonitoringStartupDelay { get; set; } = 1000;
         public int GPUKillProcessDelay { get; set; } = 500;
         public WindowBackdropType BackdropType { get; set; } = WindowBackdropType.Mica;
+        public bool KeepDgpuAwake { get; set; }
     }
-
     public class GameDetectionSettings
     {
         public bool UseDiscreteGPU { get; set; } = true;

@@ -37,6 +37,8 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
     {
         InitializeComponent();
 
+        _keepDgpuAwakeToggle.IsChecked = _settings.Store.KeepDgpuAwake;
+
         _intervalSlider.Value = _settings.Store.GPUMonitoringInterval / 1000.0;
         _intervalText.Text = string.Format(Resource.Seconds, (int)_intervalSlider.Value);
 
@@ -108,8 +110,12 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
                 return new { processInfos, hasMultipleGpus, allPaths };
             });
 
+            var currentProcessPath = Process.GetCurrentProcess().MainModule?.FileName;
+
             foreach (var path in data.allPaths)
             {
+                var isLLT = currentProcessPath != null && path.Equals(currentProcessPath, StringComparison.OrdinalIgnoreCase);
+
                 var processIds = data.processInfos.Where(p => p!.Path!.Equals(path, StringComparison.OrdinalIgnoreCase))
                     .Select(p => p!.Id).ToList();
                 var isActive = processIds.Count > 0;
@@ -122,6 +128,8 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
                     existing.ProcessIds = processIds;
                     existing.IsActive = isActive;
                     existing.Preference = preference;
+                    existing.IsLLT = isLLT;
+                    existing.IsPreferenceEnabled = data.hasMultipleGpus && !isLLT;
                 }
                 else
                 {
@@ -133,7 +141,8 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
                         IsActive = isActive,
                         ProcessIds = processIds,
                         Preference = preference,
-                        IsPreferenceEnabled = data.hasMultipleGpus,
+                        IsPreferenceEnabled = data.hasMultipleGpus && !isLLT,
+                        IsLLT = isLLT,
                         Icon = icon
                     });
                 }
@@ -180,6 +189,16 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
         _killDelayText.Text = string.Format(Resource.Seconds, Math.Round(e.NewValue, 1));
         _settings.Store.GPUKillProcessDelay = (int)(e.NewValue * 1000);
         _settings.SynchronizeStore();
+    }
+
+    private void KeepDgpuAwakeToggle_CheckedChanged(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializing) return;
+
+        _settings.Store.KeepDgpuAwake = _keepDgpuAwakeToggle.IsChecked == true;
+        _settings.SynchronizeStore();
+        
+        _ = IoCContainer.Resolve<DgpuAwakeManager>().UpdateStateAsync();
     }
 
     private void PreferenceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -248,7 +267,10 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
                     var process = Process.GetProcessById(pid);
                     process.Kill(true);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    Log.Instance.Trace($"Failed to kill process {pid}.", ex);
+                }
             }
             Task.Run(async () =>
             {
@@ -263,7 +285,31 @@ public class DiscreteGPUAppViewModel : INotifyPropertyChanged
 {
     public string Name { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
-    public bool IsPreferenceEnabled { get; set; }
+    
+    private bool _isPreferenceEnabled;
+    public bool IsPreferenceEnabled
+    {
+        get => _isPreferenceEnabled;
+        set
+        {
+            if (_isPreferenceEnabled == value) return;
+            _isPreferenceEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _isLLT;
+    public bool IsLLT
+    {
+        get => _isLLT;
+        set
+        {
+            if (_isLLT == value) return;
+            _isLLT = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(CanKill));
+        }
+    }
 
     private List<int> _processIds = [];
     public List<int> ProcessIds
@@ -277,7 +323,7 @@ public class DiscreteGPUAppViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(CanKill));
         }
     }
-    public bool CanKill => IsActive && ProcessIds.Count > 0;
+    public bool CanKill => IsActive && ProcessIds.Count > 0 && !IsLLT;
 
     private bool _isActive;
     public bool IsActive

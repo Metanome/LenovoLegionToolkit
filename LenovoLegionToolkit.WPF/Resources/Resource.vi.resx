@@ -60,45 +60,45 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string"/>
-              <xsd:attribute name="type" type="xsd:string"/>
-              <xsd:attribute name="mimetype" type="xsd:string"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string"/>
-              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -815,17 +815,29 @@ Chuyển đổi giữa các chế độ có thể cần phải khởi động l�
   <data name="DiscreteGPUControl_Deactivate" xml:space="preserve">
     <value>Ngắt kích hoạt</value>
   </data>
+  <data name="DiscreteGPUControl_FooterMessage" xml:space="preserve">
+    <value>Manage active processes by changing their graphics preferences, right-click to forcefully terminate them, or configure advanced settings.</value>
+  </data>
   <data name="DiscreteGPUControl_ForceKillProcessMenu" xml:space="preserve">
     <value>Buộc đóng tiến trình</value>
   </data>
   <data name="DiscreteGPUControl_GraphicsPreferencesTabLabel" xml:space="preserve">
     <value>Tuỳ chọn đồ hoạ</value>
   </data>
+  <data name="DiscreteGPUControl_KeepDgpuAwakeDescription" xml:space="preserve">
+    <value>Maintains an active connection to the discrete GPU to prevent stuttering.</value>
+  </data>
+  <data name="DiscreteGPUControl_KeepDgpuAwakeInfo" xml:space="preserve">
+    <value>This increases power consumption and reduces battery life.</value>
+  </data>
+  <data name="DiscreteGPUControl_KeepDgpuAwakeTitle" xml:space="preserve">
+    <value>Keep dGPU awake</value>
+  </data>
   <data name="DiscreteGPUControl_KillApps" xml:space="preserve">
     <value>Tắt app dùng GPU rời</value>
   </data>
   <data name="DiscreteGPUControl_KillProcessDelayDescription" xml:space="preserve">
-    <value>Thời gian chờ để làm mới danh sách tiến trình sau khi buộc dừng.</value>
+    <value>Wait time before refreshing the apps list after terminating a process.</value>
   </data>
   <data name="DiscreteGPUControl_KillProcessDelayTitle" xml:space="preserve">
     <value>Độ trễ làm mới sau khi buộc dừng</value>
@@ -852,7 +864,7 @@ Chuyển đổi giữa các chế độ có thể cần phải khởi động l�
     <value>Không biết</value>
   </data>
   <data name="DiscreteGPUControl_PollingIntervalDescription" xml:space="preserve">
-    <value>Điều chỉnh tần suất ứng dụng kiểm tra hoạt động GPU.</value>
+    <value>How often to check the discrete GPU for active processes.</value>
   </data>
   <data name="DiscreteGPUControl_PollingIntervalTitle" xml:space="preserve">
     <value>Chu kỳ quét</value>
@@ -873,7 +885,7 @@ Chuyển đổi giữa các chế độ có thể cần phải khởi động l�
     <value>Khởi động lại GPU</value>
   </data>
   <data name="DiscreteGPUControl_StartupDelayDescription" xml:space="preserve">
-    <value>Trì hoãn trước khi khởi tạo dịch vụ giám sát dGPU.</value>
+    <value>Wait time before starting the discrete GPU monitoring service.</value>
   </data>
   <data name="DiscreteGPUControl_StartupDelayTitle" xml:space="preserve">
     <value>Delay khởi động</value>
