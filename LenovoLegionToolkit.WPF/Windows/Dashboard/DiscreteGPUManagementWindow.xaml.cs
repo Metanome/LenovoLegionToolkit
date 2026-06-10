@@ -48,6 +48,9 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
         _killDelaySlider.Value = Math.Round(_settings.Store.GPUKillProcessDelay / 1000.0, 1);
         _killDelayText.Text = string.Format(Resource.Seconds, _killDelaySlider.Value);
 
+        _fpsLimitSlider.Value = _settings.Store.MaxFrameRateLimit <= 0 ? 19 : _settings.Store.MaxFrameRateLimit;
+        _fpsLimitText.Text = _fpsLimitSlider.Value <= 19 ? Resource.Off : $"{_fpsLimitSlider.Value} {Resource.DiscreteGPUControl_FPS}";
+
         _processListView.ItemsSource = _apps;
 
         Loaded += DiscreteGPUManagementWindow_Loaded;
@@ -199,6 +202,26 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
         _settings.SynchronizeStore();
         
         _ = IoCContainer.Resolve<DgpuAwakeManager>().UpdateStateAsync();
+    }
+
+    private void FpsLimitSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_isInitializing) return;
+
+        int fps = (int)e.NewValue;
+        if (fps <= 19)
+        {
+            _fpsLimitText.Text = Resource.Off;
+            _settings.Store.MaxFrameRateLimit = 0;
+            _gpuController.SetMaxFrameRateLimit(0);
+        }
+        else
+        {
+            _fpsLimitText.Text = $"{fps} {Resource.DiscreteGPUControl_FPS}";
+            _settings.Store.MaxFrameRateLimit = fps;
+            _gpuController.SetMaxFrameRateLimit(fps);
+        }
+        _settings.SynchronizeStore();
     }
 
     private void PreferenceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

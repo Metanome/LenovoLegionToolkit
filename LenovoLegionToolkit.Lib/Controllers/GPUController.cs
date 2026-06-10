@@ -15,6 +15,7 @@ using NeoSmart.AsyncLock;
 using NvAPIWrapper;
 using NvAPIWrapper.GPU;
 using NvAPIWrapper.Native.Exceptions;
+using NvAPIWrapper.DRS;
 using Resource = LenovoLegionToolkit.Lib.Resources.Resource;
 
 namespace LenovoLegionToolkit.Lib.Controllers;
@@ -335,5 +336,48 @@ public class GPUController
         {
             return null;
         }
+    }
+
+    private const uint FpsLimiterSettingId = 0x2770AAC4;
+
+    public void SetMaxFrameRateLimit(int fps) 
+    {
+        try
+        {
+            using var session = DriverSettingsSession.CreateAndLoad();
+            var globalProfile = session.CurrentGlobalProfile; 
+
+            if (fps > 0) 
+            {
+                globalProfile.SetSetting(FpsLimiterSettingId, (uint)fps);
+            } 
+            else 
+            {
+                try { globalProfile.DeleteSetting(FpsLimiterSettingId); } catch { }
+            }
+            session.Save();
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Failed to set max frame rate limit.", ex);
+        }
+    }
+
+    public int GetMaxFrameRateLimit() 
+    {
+        try
+        {
+            using var session = DriverSettingsSession.CreateAndLoad();
+            var setting = session.CurrentGlobalProfile.GetSetting(FpsLimiterSettingId);
+            
+            if (setting != null && setting.SettingType == NvAPIWrapper.Native.DRS.DRSSettingType.Integer)
+            {
+                return Convert.ToInt32(setting.CurrentValue);
+            }
+        }
+        catch
+        {
+        }
+        return 0;
     }
 }

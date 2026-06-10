@@ -2162,6 +2162,33 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FPS.
+        /// </summary>
+        public static string DiscreteGPUControl_FPS {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_FPS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limit the maximum frame rate globally across all NVIDIA rendered applications..
+        /// </summary>
+        public static string DiscreteGPUControl_GlobalFrameRateLimitDescription {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_GlobalFrameRateLimitDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global Frame Rate Limit.
+        /// </summary>
+        public static string DiscreteGPUControl_GlobalFrameRateLimitTitle {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_GlobalFrameRateLimitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Graphics Preferences.
         /// </summary>
         public static string DiscreteGPUControl_GraphicsPreferencesTabLabel {
@@ -4756,6 +4783,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string MultipleTriggersAutomationPipelineTrigger_Logic_Title {
             get {
                 return ResourceManager.GetString("MultipleTriggersAutomationPipelineTrigger_Logic_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to mV.
+        /// </summary>
+        public static string mV {
+            get {
+                return ResourceManager.GetString("mV", resourceCulture);
             }
         }
         

@@ -109,18 +109,13 @@ public sealed class DgpuAwakeManager : IDisposable
         var factory = (IDXGIFactory6)factoryObj;
 
         IDXGIAdapter1? dgpuAdapter = null;
-        for (uint i = 0; ; i++)
+        try
         {
-            try
-            {
-                factory.EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE.DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, typeof(IDXGIAdapter1).GUID, out object adapterObj);
-                dgpuAdapter = (IDXGIAdapter1)adapterObj;
-                break;
-            }
-            catch
-            {
-                break;
-            }
+            factory.EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE.DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, typeof(IDXGIAdapter1).GUID, out object adapterObj);
+            dgpuAdapter = (IDXGIAdapter1)adapterObj;
+        }
+        catch
+        {
         }
 
         if (dgpuAdapter == null)
