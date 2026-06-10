@@ -363,21 +363,56 @@ public class GPUController
         }
     }
 
-    public int GetMaxFrameRateLimit() 
+
+
+    private const uint WhisperModeSettingId = 0x10115C8D;
+    private const uint BatteryBoostSettingId = 0x10115C8C;
+
+    public void SetWhisperModeState(bool enabled) 
     {
         try
         {
             using var session = DriverSettingsSession.CreateAndLoad();
-            var setting = session.CurrentGlobalProfile.GetSetting(FpsLimiterSettingId);
-            
-            if (setting != null && setting.SettingType == NvAPIWrapper.Native.DRS.DRSSettingType.Integer)
+            var globalProfile = session.CurrentGlobalProfile; 
+
+            if (enabled) 
             {
-                return Convert.ToInt32(setting.CurrentValue);
+                globalProfile.SetSetting(WhisperModeSettingId, 1u);
+            } 
+            else 
+            {
+                try { globalProfile.DeleteSetting(WhisperModeSettingId); } catch { }
             }
+            session.Save();
         }
-        catch
+        catch (Exception ex)
         {
+            Log.Instance.Trace($"Failed to set WhisperMode.", ex);
         }
-        return 0;
     }
+
+
+    public void SetBatteryBoostMaxFps(int fps) 
+    {
+        try
+        {
+            using var session = DriverSettingsSession.CreateAndLoad();
+            var globalProfile = session.CurrentGlobalProfile; 
+
+            if (fps > 0) 
+            {
+                globalProfile.SetSetting(BatteryBoostSettingId, (uint)fps);
+            } 
+            else 
+            {
+                try { globalProfile.DeleteSetting(BatteryBoostSettingId); } catch { }
+            }
+            session.Save();
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Failed to set BatteryBoost.", ex);
+        }
+    }
+
 }

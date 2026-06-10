@@ -2135,6 +2135,24 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paces frame rates to extend battery life when unplugged..
+        /// </summary>
+        public static string DiscreteGPUControl_BatteryBoostDescription {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_BatteryBoostDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BatteryBoost.
+        /// </summary>
+        public static string DiscreteGPUControl_BatteryBoostTitle {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_BatteryBoostTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deactivate.
         /// </summary>
         public static string DiscreteGPUControl_Deactivate {
@@ -2401,6 +2419,24 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string DiscreteGPUControl_Title {
             get {
                 return ResourceManager.GetString("DiscreteGPUControl_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paces frame rates and optimizes graphics settings to reduce fan noise..
+        /// </summary>
+        public static string DiscreteGPUControl_WhisperModeDescription {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_WhisperModeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WhisperMode.
+        /// </summary>
+        public static string DiscreteGPUControl_WhisperModeTitle {
+            get {
+                return ResourceManager.GetString("DiscreteGPUControl_WhisperModeTitle", resourceCulture);
             }
         }
         

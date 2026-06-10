@@ -52,6 +52,8 @@ public class ApplicationSettings : AbstractSettings<ApplicationSettingsStore>
         public WindowBackdropType BackdropType { get; set; } = WindowBackdropType.Mica;
         public bool KeepDgpuAwake { get; set; }
         public int MaxFrameRateLimit { get; set; } = 0;
+        public bool IsWhisperModeEnabled { get; set; } = false;
+        public int BatteryBoostMaxFps { get; set; } = 0;
     }
     public class GameDetectionSettings
     {

@@ -51,6 +51,11 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
         _fpsLimitSlider.Value = _settings.Store.MaxFrameRateLimit <= 0 ? 19 : _settings.Store.MaxFrameRateLimit;
         _fpsLimitText.Text = _fpsLimitSlider.Value <= 19 ? Resource.Off : $"{_fpsLimitSlider.Value} {Resource.DiscreteGPUControl_FPS}";
 
+        _whisperModeToggle.IsChecked = _settings.Store.IsWhisperModeEnabled;
+
+        _batteryBoostSlider.Value = _settings.Store.BatteryBoostMaxFps <= 0 ? 19 : _settings.Store.BatteryBoostMaxFps;
+        _batteryBoostText.Text = _batteryBoostSlider.Value <= 19 ? Resource.Off : $"{_batteryBoostSlider.Value} {Resource.DiscreteGPUControl_FPS}";
+
         _processListView.ItemsSource = _apps;
 
         Loaded += DiscreteGPUManagementWindow_Loaded;
@@ -220,6 +225,35 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
             _fpsLimitText.Text = $"{fps} {Resource.DiscreteGPUControl_FPS}";
             _settings.Store.MaxFrameRateLimit = fps;
             _gpuController.SetMaxFrameRateLimit(fps);
+        }
+        _settings.SynchronizeStore();
+    }
+
+    private void WhisperModeToggle_CheckedChanged(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializing) return;
+
+        _settings.Store.IsWhisperModeEnabled = _whisperModeToggle.IsChecked == true;
+        _gpuController.SetWhisperModeState(_settings.Store.IsWhisperModeEnabled);
+        _settings.SynchronizeStore();
+    }
+
+    private void BatteryBoostSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_isInitializing) return;
+
+        int fps = (int)e.NewValue;
+        if (fps <= 19)
+        {
+            _batteryBoostText.Text = Resource.Off;
+            _settings.Store.BatteryBoostMaxFps = 0;
+            _gpuController.SetBatteryBoostMaxFps(0);
+        }
+        else
+        {
+            _batteryBoostText.Text = $"{fps} {Resource.DiscreteGPUControl_FPS}";
+            _settings.Store.BatteryBoostMaxFps = fps;
+            _gpuController.SetBatteryBoostMaxFps(fps);
         }
         _settings.SynchronizeStore();
     }
