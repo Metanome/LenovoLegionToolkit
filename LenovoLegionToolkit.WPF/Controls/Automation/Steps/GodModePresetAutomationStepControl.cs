@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,21 +21,19 @@ public class GodModePresetAutomationStepControl : AbstractAutomationStepControl<
         Margin = new(8, 0, 0, 0)
     };
 
+    private Guid _presetId = Guid.Empty;
+
     public GodModePresetAutomationStepControl(GodModePresetAutomationStep step) : base(step)
     {
         Icon = SymbolRegular.Gauge24;
         Title = Resource.GodModePresetAutomationStepControl_Title;
         Subtitle = Resource.GodModePresetAutomationStepControl_Message;
+        _presetId = step.PresetId;
     }
 
     public override IAutomationStep CreateAutomationStep()
     {
-        var presetId = Guid.Empty;
-
-        if (_comboBox.TryGetSelectedItem(out KeyValuePair<Guid, GodModePreset> value))
-            presetId = value.Key;
-
-        return new GodModePresetAutomationStep(presetId);
+        return new GodModePresetAutomationStep(_presetId);
     }
 
     protected override UIElement GetCustomControl()
@@ -44,13 +42,25 @@ public class GodModePresetAutomationStepControl : AbstractAutomationStepControl<
         return _comboBox;
     }
 
-    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => RaiseChanged();
+    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var newValue = e.GetNewValue<KeyValuePair<Guid, GodModePreset>>();
+        if (newValue is not null)
+        {
+            var newId = newValue.Value.Key;
+            if (_presetId != newId)
+            {
+                _presetId = newId;
+                RaiseChanged();
+            }
+        }
+    }
 
     protected override async Task RefreshAsync()
     {
         var state = await AutomationStep.GetStateAsync();
         var presets = state.Presets;
-        var selectedPreset = presets.FirstOrDefault(kv => kv.Key == AutomationStep.PresetId);
+        var selectedPreset = presets.FirstOrDefault(kv => kv.Key == _presetId);
 
         _comboBox.SetItems(presets, selectedPreset, kv => kv.Value.Name);
         _comboBox.IsEnabled = presets.Count != 0;
