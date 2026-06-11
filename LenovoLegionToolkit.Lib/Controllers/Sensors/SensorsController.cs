@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 namespace LenovoLegionToolkit.Lib.Controllers.Sensors;
 
 public class SensorsController(
+    SensorsControllerV0 controllerV0,
     SensorsControllerV1 controllerV1,
     SensorsControllerV2 controllerV2,
     SensorsControllerV3 controllerV3,
@@ -61,6 +62,12 @@ public class SensorsController(
         if (await controllerV1.IsSupportedAsync().ConfigureAwait(false))
         {
             return _controller = controllerV1;
+        }
+
+        // SensorsControllerV0 mainly designed for non-gaming series. But also work for other laptops.
+        if (await controllerV0.IsSupportedAsync().ConfigureAwait(false))
+        {
+            return _controller = controllerV0;
         }
 
         return null;
