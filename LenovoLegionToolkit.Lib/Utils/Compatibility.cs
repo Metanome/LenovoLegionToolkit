@@ -558,15 +558,16 @@ public static partial class Compatibility
     private static bool GetSupportITSMode(string model)
     {
         var lower = model.ToLowerInvariant();
-        if (lower.Contains("IdeaPad Gaming".ToLowerInvariant()))
+        if (lower.Contains("IdeaPad Gaming", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
-        return lower.Contains("IdeaPad".ToLowerInvariant())
-            || lower.Contains("ThinkBook".ToLowerInvariant()) 
-            || lower.Contains("Lenovo Slim".ToLowerInvariant())
-            || lower.Contains("Motobook".ToLowerInvariant())
-            || lower.Contains("YOGA".ToLowerInvariant());
+        return lower.Contains("IdeaPad", StringComparison.OrdinalIgnoreCase)
+            || lower.Contains("ThinkBook", StringComparison.OrdinalIgnoreCase) 
+            || lower.Contains("Lenovo Slim", StringComparison.OrdinalIgnoreCase)
+            || lower.Contains("Motobook", StringComparison.OrdinalIgnoreCase)
+            || lower.Contains("XiaoXin", StringComparison.OrdinalIgnoreCase)
+            || lower.Contains("YOGA", StringComparison.OrdinalIgnoreCase);
     }
 
     private static int GetMachineGeneration(string model)
