@@ -48,7 +48,7 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
         _killDelaySlider.Value = Math.Round(_settings.Store.GPUKillProcessDelay / 1000.0, 1);
         _killDelayText.Text = string.Format(Resource.Seconds, _killDelaySlider.Value);
 
-        _whisperModeToggle.IsChecked = _settings.Store.IsWhisperModeEnabled;
+
         _processListView.ItemsSource = _apps;
 
         Loaded += DiscreteGPUManagementWindow_Loaded;
@@ -202,14 +202,7 @@ public partial class DiscreteGPUManagementWindow : BaseWindow
         _ = IoCContainer.Resolve<DgpuAwakeManager>().UpdateStateAsync();
     }
 
-    private void WhisperModeToggle_CheckedChanged(object sender, RoutedEventArgs e)
-    {
-        if (_isInitializing) return;
 
-        _settings.Store.IsWhisperModeEnabled = _whisperModeToggle.IsChecked == true;
-        _gpuController.SetWhisperModeState(_settings.Store.IsWhisperModeEnabled);
-        _settings.SynchronizeStore();
-    }
     private void PreferenceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isInitializing || _isRefreshing || sender is not ComboBox comboBox || comboBox.DataContext is not DiscreteGPUAppViewModel vm)

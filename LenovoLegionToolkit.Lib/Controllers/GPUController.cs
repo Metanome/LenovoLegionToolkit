@@ -338,28 +338,5 @@ public class GPUController
         }
     }
 
-    private const uint WhisperModeSettingId = 0x10115C8D;
 
-    public void SetWhisperModeState(bool enabled) 
-    {
-        try
-        {
-            using var session = DriverSettingsSession.CreateAndLoad();
-            var globalProfile = session.CurrentGlobalProfile; 
-
-            if (enabled) 
-            {
-                globalProfile.SetSetting(WhisperModeSettingId, 1u);
-            } 
-            else 
-            {
-                try { globalProfile.DeleteSetting(WhisperModeSettingId); } catch { }
-            }
-            session.Save();
-        }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Failed to set WhisperMode.", ex);
-        }
-    }
 }

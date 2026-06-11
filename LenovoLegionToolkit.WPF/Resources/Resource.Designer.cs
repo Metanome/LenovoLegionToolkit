@@ -2378,24 +2378,6 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Paces frame rates and optimizes graphics settings to reduce fan noise..
-        /// </summary>
-        public static string DiscreteGPUControl_WhisperModeDescription {
-            get {
-                return ResourceManager.GetString("DiscreteGPUControl_WhisperModeDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to WhisperMode.
-        /// </summary>
-        public static string DiscreteGPUControl_WhisperModeTitle {
-            get {
-                return ResourceManager.GetString("DiscreteGPUControl_WhisperModeTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Change display brightness of the built-in display..
         /// </summary>
         public static string DisplayBrightnessAutomationStepControl_Message {

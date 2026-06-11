@@ -191,16 +191,6 @@
                             <wpfui:ToggleSwitch x:Name="_keepDgpuAwakeToggle" VerticalAlignment="Center" Checked="KeepDgpuAwakeToggle_CheckedChanged" Unchecked="KeepDgpuAwakeToggle_CheckedChanged" />
                         </custom:CardControl>
 
-                        <custom:CardControl Margin="0,0,0,8" Icon="PersonVoice24">
-                            <custom:CardControl.Header>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Static resources:Resource.DiscreteGPUControl_WhisperModeTitle}" FontWeight="Medium" />
-                                    <TextBlock Text="{x:Static resources:Resource.DiscreteGPUControl_WhisperModeDescription}" FontSize="11" TextWrapping="WrapWithOverflow" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                </StackPanel>
-                            </custom:CardControl.Header>
-                            <wpfui:ToggleSwitch x:Name="_whisperModeToggle" Checked="WhisperModeToggle_CheckedChanged" Unchecked="WhisperModeToggle_CheckedChanged" />
-                        </custom:CardControl>
-
 
                         <custom:CardControl Margin="0,0,0,8" Icon="Timer24">
                             <custom:CardControl.Header>

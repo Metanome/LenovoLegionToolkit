@@ -51,7 +51,7 @@ public class ApplicationSettings : AbstractSettings<ApplicationSettingsStore>
         public int GPUKillProcessDelay { get; set; } = 500;
         public WindowBackdropType BackdropType { get; set; } = WindowBackdropType.Mica;
         public bool KeepDgpuAwake { get; set; }
-        public bool IsWhisperModeEnabled { get; set; } = false;
+
     }
     public class GameDetectionSettings
     {
