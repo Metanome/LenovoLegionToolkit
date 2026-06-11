@@ -44,6 +44,7 @@ public partial class ITSModeFeature : IFeature<ITSMode>
     #endregion
 
     private readonly ITSModeListener _listener;
+    private bool? _supportsGeekMode;
 
     public ITSMode LastItsMode { get; set; } = ITSMode.None;
 
@@ -89,24 +90,14 @@ public partial class ITSModeFeature : IFeature<ITSMode>
         return machineInfo.Properties.SupportsITSMode;
     }
 
-    public async Task<ITSMode[]> GetAllStatesAsync()
+    public Task<ITSMode[]> GetAllStatesAsync()
     {
-        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
+        var modes = Enum.GetValues<ITSMode>().Cast<ITSMode>();
 
-        if (mi.LegionSeries == LegionSeries.ThinkBook)
-        {
-            return Enum.GetValues<ITSMode>()
-                .Cast<ITSMode>()
-                .Where(mode => mode != ITSMode.None)
-                .ToArray();
-        }
-        else
-        {
-            return Enum.GetValues<ITSMode>()
-                       .Cast<ITSMode>()
-                       .Where(mode => mode != ITSMode.MmcGeek && mode != ITSMode.None)
-                       .ToArray();
-        }
+        if (!SupportsGeekMode())
+            modes = modes.Where(mode => mode != ITSMode.MmcGeek);
+
+        return Task.FromResult(modes.Where(mode => mode != ITSMode.None).ToArray());
     }
 
     public async Task<ITSMode> GetStateAsync()
@@ -210,6 +201,12 @@ public partial class ITSModeFeature : IFeature<ITSMode>
         }
     }
 
+    private bool SupportsGeekMode()
+    {
+        _supportsGeekMode ??= GetDispatcherVersionEx() >= DISPATCHER_VERSION_3;
+        return _supportsGeekMode.Value;
+    }
+
     public async Task<ITSMode> GetITSModeEx()
     {
         try
@@ -275,10 +272,6 @@ public partial class ITSModeFeature : IFeature<ITSMode>
                     {
                         return ITSMode.MmcPerformance;
                     }
-                    else if (autoSetting == 1 && currentSetting == 4)
-                    {
-                        return ITSMode.MmcGeek;
-                    }
                 }
             }
         }
@@ -319,7 +312,6 @@ public partial class ITSModeFeature : IFeature<ITSMode>
                     ITSMode.ItsAuto => ITSModeServiceControlMessage.IntelligentCoolingEnable,
                     ITSMode.MmcCool => ITSModeServiceControlMessage.IntelligentCoolingCool,
                     ITSMode.MmcPerformance => ITSModeServiceControlMessage.IntelligentCoolingHighPerformance,
-                    ITSMode.MmcGeek => ITSModeServiceControlMessage.IntelligentCoolingGeek,
                     _ => throw new ArgumentOutOfRangeException(nameof(mode))
                 };
             }
