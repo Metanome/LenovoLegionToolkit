@@ -13,8 +13,18 @@ public static partial class WMI
 {
     public static class LenovoFanTestData
     {
-        public static Task<bool> ExistsAsync(int fanId) =>
-            WMI.ExistsAsync("root\\WMI", $"SELECT * FROM LENOVO_FAN_TEST_DATA WHERE FanId = {fanId}");
+        public static async Task<bool> ExistsAsync(int fanId)
+        {
+            var results = await WMI.ReadAsync("root\\WMI",
+                $"SELECT * FROM LENOVO_FAN_TEST_DATA",
+                pdc =>
+                {
+                    var fanIds = (uint[]?)pdc["FanId"].Value ?? [];
+                    return fanIds.Contains((uint)fanId);
+                }).ConfigureAwait(false);
+
+            return results.Any(exists => exists);
+        }
 
         public static async Task<int> GetFanMinSpeedAsync(int fanId)
         {

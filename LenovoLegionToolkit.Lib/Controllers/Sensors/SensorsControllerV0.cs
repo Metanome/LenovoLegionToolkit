@@ -15,8 +15,7 @@ public class SensorsControllerV0(GPUController gpuController) : AbstractSensorsC
     {
         try
         {
-            var cpuFanExists = await WMI.LenovoFanTestData.ExistsAsync(CPU_FAN_ID).ConfigureAwait(false)
-                || await WMI.LenovoFanTestData.ExistsAsync(GPU_FAN_ID).ConfigureAwait(false);
+            var cpuFanExists = await WMI.LenovoFanTestData.ExistsAsync(CPU_FAN_ID).ConfigureAwait(false) || await WMI.LenovoFanTestData.ExistsAsync(GPU_FAN_ID).ConfigureAwait(false);
             if (!cpuFanExists)
             {
                 return false;
