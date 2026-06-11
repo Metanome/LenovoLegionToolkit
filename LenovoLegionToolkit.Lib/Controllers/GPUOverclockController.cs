@@ -185,7 +185,7 @@ public class GPUOverclockController
 
     private async void NativeWindowsMessageListenerOnChanged(object? sender, NativeWindowsMessageListener.ChangedEventArgs e)
     {
-        if (e.Message != NativeWindowsMessage.OnDisplayDeviceArrival)
+        if (e.Message is not NativeWindowsMessage.OnDisplayDeviceArrival and not NativeWindowsMessage.MonitorOn)
             return;
 
         if (await IsSupportedAsync().ConfigureAwait(false))

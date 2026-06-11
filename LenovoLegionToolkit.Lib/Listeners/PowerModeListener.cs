@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.Controllers;
 using LenovoLegionToolkit.Lib.Controllers.GodMode;
@@ -54,6 +54,12 @@ public class PowerModeListener(
 
         await windowsPowerModeController.SetPowerModeAsync(value).ConfigureAwait(false);
         await windowsPowerPlanController.SetPowerPlanAsync(value).ConfigureAwait(false);
+
+        var gpuOverclockController = IoCContainer.Resolve<GPUOverclockController>();
+        if (await gpuOverclockController.IsSupportedAsync().ConfigureAwait(false))
+        {
+            await gpuOverclockController.EnsureOverclockIsAppliedAsync().ConfigureAwait(false);
+        }
     }
 
     private static void PublishNotification(PowerModeState value)

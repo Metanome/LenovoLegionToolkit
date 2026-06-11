@@ -239,6 +239,12 @@ public sealed class PowerStateListener : IListener<PowerStateListener.ChangedEve
             }
         }
 
+        var gpuOverclockController = IoCContainer.Resolve<GPUOverclockController>();
+        if (await gpuOverclockController.IsSupportedAsync().ConfigureAwait(false))
+        {
+            await gpuOverclockController.EnsureOverclockIsAppliedAsync().ConfigureAwait(false);
+        }
+
         if (await _powerModeFeature.IsSupportedAsync().ConfigureAwait(false))
         {
             if (_powerModeFeature.LastPowerModeState == PowerModeState.GodMode)
