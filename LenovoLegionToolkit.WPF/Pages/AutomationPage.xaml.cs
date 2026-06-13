@@ -30,7 +30,7 @@ public partial class AutomationPage
     private readonly ApplicationSettings _settings = IoCContainer.Resolve<ApplicationSettings>();
 
     private IAutomationStep[] _supportedAutomationSteps = [];
-    private static int _totalAutomationStepsCount = 0;
+    private int _totalAutomationStepsCount = 0;
 
     public AutomationPage()
     {
@@ -163,7 +163,7 @@ public partial class AutomationPage
         _loaderManual.IsLoading = false;
     }
 
-    private static async Task<IAutomationStep[]> GetSupportedAutomationStepsAsync()
+    private async Task<IAutomationStep[]> GetSupportedAutomationStepsAsync()
     {
         var steps = new List<IAutomationStep>
         {
