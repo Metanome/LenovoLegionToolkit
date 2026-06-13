@@ -14,6 +14,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Controllers.Sensors;
+using LenovoLegionToolkit.Lib.Listeners;
 using LenovoLegionToolkit.Lib.Messaging;
 using LenovoLegionToolkit.Lib.Messaging.Messages;
 using LenovoLegionToolkit.Lib.Settings;
@@ -51,6 +52,7 @@ public abstract class OsdWindowBase : Window
     protected readonly FpsSensorController _fpsController = IoCContainer.Resolve<FpsSensorController>();
     protected readonly HardwareSensorSettings _hardwareSensorSettings = IoCContainer.Resolve<HardwareSensorSettings>();
     protected readonly ApplicationSettings _applicationSettings = IoCContainer.Resolve<ApplicationSettings>();
+    protected readonly SessionLockUnlockListener _sessionListener = IoCContainer.Resolve<SessionLockUnlockListener>();
 
     #endregion
 
@@ -67,6 +69,7 @@ public abstract class OsdWindowBase : Window
     protected bool _positionSet;
     private bool _fpsMonitoringStarted;
     private bool _hasLenovoController;
+    private bool _wasVisibleBeforeLock;
 
     protected HashSet<OsdItem> _activeItems = [];
     protected Dictionary<OsdItem, FrameworkElement> _itemsMap = [];
@@ -90,6 +93,7 @@ public abstract class OsdWindowBase : Window
         SizeChanged += OnSizeChanged;
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+        _sessionListener.Changed += OnSessionLockStateChanged;
 
         InitializeComponentSpecifics();
         SubscribeEvents();
@@ -301,6 +305,29 @@ public abstract class OsdWindowBase : Window
         });
     }
 
+    private void OnSessionLockStateChanged(object? sender, SessionLockUnlockListener.ChangedEventArgs e)
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (e.Locked)
+            {
+                if (IsVisible)
+                {
+                    _wasVisibleBeforeLock = true;
+                    Hide();
+                }
+            }
+            else
+            {
+                if (_wasVisibleBeforeLock)
+                {
+                    _wasVisibleBeforeLock = false;
+                    Show();
+                }
+            }
+        });
+    }
+
     private async void OnVisibilityChanged(object? sender, DependencyPropertyChangedEventArgs e)
     {
         if (IsVisible)
@@ -333,6 +360,7 @@ public abstract class OsdWindowBase : Window
         _OsdSettings.SynchronizeStore();
 
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
+        _sessionListener.Changed -= OnSessionLockStateChanged;
 
         _cts?.Cancel();
         _cts?.Dispose();
