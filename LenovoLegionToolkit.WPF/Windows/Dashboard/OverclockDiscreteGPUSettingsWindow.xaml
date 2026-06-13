@@ -121,7 +121,7 @@
                                 Width="180"
                                 AutomationProperties.Name="{x:Static resources:Resource.OverclockDiscreteGPUSettingsWindow_VoltageLock}"
                                 IsSnapToTickEnabled="True"
-                                TickFrequency="5"
+                                TickFrequency="1"
                                 ValueChanged="VoltageLockSlider_OnValueChanged" />
                             <Label
                                 x:Name="_voltageLockLabel"

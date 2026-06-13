@@ -196,9 +196,9 @@ public class GPUOverclockController
 
     public static int GetMaxCoreDeltaMhz() => 500;
 
-    public static int GetMinMemoryDeltaMhz() => -2000;
+    public static int GetMinMemoryDeltaMhz() => -3000;
 
-    public static int GetMaxMemoryDeltaMhz() => 2000;
+    public static int GetMaxMemoryDeltaMhz() => 3000;
 
     public static int GetMinVoltageLockMv() => 700;
     
