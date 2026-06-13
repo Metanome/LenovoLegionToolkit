@@ -22,6 +22,7 @@ using LenovoLegionToolkit.Lib.SoftwareDisabler;
 using LenovoLegionToolkit.Lib.Utils;
 using LenovoLegionToolkit.Lib.Utils.Warranty;
 
+using LenovoLegionToolkit.Lib.Scripting;
 using LenovoLegionToolkit.Lib.System;
 
 namespace LenovoLegionToolkit.Lib;
@@ -162,5 +163,7 @@ public class IoCModule : Module
         builder.Register<DgpuAwakeManager>().SingleInstance().AutoActivate();
 
         builder.Register<AmdOverclockingController>();
+
+        builder.Register<ScriptEngine>().SingleInstance();
     }
 }

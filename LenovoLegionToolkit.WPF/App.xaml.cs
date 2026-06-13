@@ -1,16 +1,3 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Management;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Automation;
 using LenovoLegionToolkit.Lib.Controllers;
@@ -27,22 +14,36 @@ using LenovoLegionToolkit.Lib.Macro;
 using LenovoLegionToolkit.Lib.Messaging;
 using LenovoLegionToolkit.Lib.Messaging.Messages;
 using LenovoLegionToolkit.Lib.Overclocking.Amd;
+using LenovoLegionToolkit.Lib.Scripting;
 using LenovoLegionToolkit.Lib.Services;
 using LenovoLegionToolkit.Lib.Settings;
 using LenovoLegionToolkit.Lib.SoftwareDisabler;
+using LenovoLegionToolkit.Lib.Station.Core;
 using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.Utils;
-using LenovoLegionToolkit.Lib.Station.Core;
 using LenovoLegionToolkit.WPF.CLI;
-using LenovoLegionToolkit.WPF.Station.Core;
-using LenovoLegionToolkit.WPF.Station.Services;
 using LenovoLegionToolkit.WPF.Controls.Custom;
 using LenovoLegionToolkit.WPF.Extensions;
 using LenovoLegionToolkit.WPF.Resources;
+using LenovoLegionToolkit.WPF.Station.Core;
+using LenovoLegionToolkit.WPF.Station.Services;
 using LenovoLegionToolkit.WPF.Utils;
 using LenovoLegionToolkit.WPF.Windows;
 using LenovoLegionToolkit.WPF.Windows.Osd;
 using LenovoLegionToolkit.WPF.Windows.Utils;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Management;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using WinFormsApp = System.Windows.Forms.Application;
@@ -244,7 +245,6 @@ public partial class App
             SafeInitAsync(InitHybridModeAsync, "Hybrid Mode"),
             SafeInitAsync(InitAutomationLocalization, "Automation Localization"),
             SafeInitAsync(InitAMDOverclocking, "AMD Overclocking"),
-            // SafeInitAsync(InitSetPowerMode, "Set Power Mode"),
         };
 
         await Task.WhenAll(initTasks);
@@ -825,32 +825,6 @@ public partial class App
                 return Resource.ResourceManager.GetString($"{name}Control_Title") ?? name.Replace("AutomationStep", string.Empty);
             });
         };
-    }
-
-    private static async Task InitSetPowerMode()
-    {
-        try
-        {
-            var feature = IoCContainer.Resolve<PowerModeFeature>();
-
-            if (!await feature.IsSupportedAsync().ConfigureAwait(false))
-            {
-                return;
-            }
-
-            var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
-
-            if (await Power.IsPowerAdapterConnectedAsync() == PowerAdapterStatus.Connected && await feature.GetStateAsync().ConfigureAwait(false) == PowerModeState.GodMode && mi.Properties.HasReapplyParameterIssue)
-            {
-                await feature.SetStateAsync(PowerModeState.Balance).ConfigureAwait(false);
-                await Task.Delay(500).ConfigureAwait(false);
-                await feature.SetStateAsync(PowerModeState.GodMode).ConfigureAwait(false);
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Couldn't reapply parameters.", ex);
-        }
     }
 
     private static void InitSetLogIndicator()
