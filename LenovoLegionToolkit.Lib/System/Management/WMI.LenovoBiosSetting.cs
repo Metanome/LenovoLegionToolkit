@@ -12,6 +12,17 @@ public static partial class WMI
 {
     public static class LenovoBiosSetting
     {
+        public static async Task<bool> ExistAsync()
+        {
+            var results = await ReadAsync(
+                    "root\\WMI",
+                    $"SELECT * FROM Lenovo_BiosSetting",
+                    pdc => pdc["CurrentSetting"]?.Value?.ToString()
+                ).ConfigureAwait(false);
+
+            return results.Any();
+        }
+
         public static async Task<List<string>> GetBiosSelectionsAsync(string settingName)
         {
             try

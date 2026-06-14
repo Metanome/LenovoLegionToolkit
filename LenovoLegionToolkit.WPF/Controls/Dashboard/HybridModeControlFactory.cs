@@ -25,7 +25,13 @@ public static class HybridModeControlFactory
 {
     public static async Task<AbstractRefreshingControl> GetControlAsync()
     {
-        var mi = await Compatibility.GetMachineInformationAsync();
+        BiosHybridMode biosHybridMode = IoCContainer.Resolve<BiosHybridMode>();
+        if (await biosHybridMode.IsSupportedAsync().ConfigureAwait(false))
+        {
+            return new ComboBoxHybridModeControl();
+        }
+
+        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
         return mi.Properties.SupportsIGPUMode
             ? new ComboBoxHybridModeControl()
             : new ToggleHybridModeControl();
