@@ -889,9 +889,14 @@ public static partial class Compatibility
         var sensorsControllerTypeName = sensorCtrl?.GetType().Name ?? "Null SensorsController or Result";
         Log.Instance.Trace($"Using {sensorsControllerTypeName}");
 
+        if (!_machineInformation!.Value.Properties.SupportsGodMode)
+        {
+            return;
+        }
+
         GodModeController godModeController = IoCContainer.Resolve<GodModeController>();
 
-        var godModeCtrl = await godModeController.GetControllerAsync().ConfigureAwait(true);
+        var godModeCtrl = await godModeController. GetControllerAsync().ConfigureAwait(true);
         var godModeControllerTypeName = godModeCtrl?.GetType().Name ?? "Null GodModeController or Result";
         Log.Instance.Trace($"Using {godModeControllerTypeName}");
     }
