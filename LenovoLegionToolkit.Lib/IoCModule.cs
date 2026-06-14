@@ -64,9 +64,8 @@ public class IoCModule : Module
         builder.Register<FnLockFeature>();
         builder.Register<GSyncFeature>();
         builder.Register<HDRFeature>();
-        builder.Register<BiosHybridMode>(true);
-        builder.Register<HybridModeFeature>(true);
-        builder.Register<HybridModeRouterFeature>();
+        builder.Register<BiosHybridModeFeature>(true);
+        builder.Register<HybridModeFeature>();
         builder.Register<IGPUModeFeature>();
         builder.Register<IGPUModeCapabilityFeature>(true);
         builder.Register<IGPUModeFeatureFlagsFeature>(true);

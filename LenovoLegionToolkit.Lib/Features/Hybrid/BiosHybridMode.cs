@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.System.Management;
@@ -6,7 +6,7 @@ using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.Lib.Features.Hybrid;
 
-public class BiosHybridMode : IFeature<HybridModeState>
+public class BiosHybridModeFeature
 {
     private const string GRAPHICS_DEVICE = "GraphicsDevice";
     private const string UMA_GRAPHICS = "UMA Graphics";
@@ -15,37 +15,12 @@ public class BiosHybridMode : IFeature<HybridModeState>
 
     public async Task<bool> IsSupportedAsync()
     {
-        if (AppFlags.Instance.Debug)
-        {
-            return true;
-        }
-
-        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
-        return mi.Properties.SupportsGSync && await WMI.LenovoBiosSetting.ExistAsync().ConfigureAwait(false);
-    }
-
-    public async Task<HybridModeState[]> GetAllStatesAsync()
-    {
-        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
-
-        if (mi.Properties.SupportsGSync && await IsUMASupportedAsync().ConfigureAwait(false))
-        {
-            return [HybridModeState.On, HybridModeState.Off, HybridModeState.UMA];
-        }
-
-        return (mi.Properties.SupportsGSync, mi.Properties.SupportsIGPUMode) switch
-        {
-            (true, true) => [HybridModeState.On, HybridModeState.OnIGPUOnly, HybridModeState.OnAuto, HybridModeState.Off],
-            (false, true) => [HybridModeState.On, HybridModeState.OnIGPUOnly, HybridModeState.OnAuto],
-            (true, false) => [HybridModeState.On, HybridModeState.Off],
-            _ => []
-        };
-    }
-
-    private async Task<bool> IsUMASupportedAsync()
-    {
         try
         {
+            var exist = await WMI.LenovoBiosSetting.ExistAsync().ConfigureAwait(false);
+            if (!exist)
+                return false;
+
             var selections = await WMI.LenovoBiosSetting.GetBiosSelectionsAsync(GRAPHICS_DEVICE).ConfigureAwait(false);
             return selections.Any(item => item.Contains("UMA", StringComparison.OrdinalIgnoreCase));
         }
@@ -56,23 +31,56 @@ public class BiosHybridMode : IFeature<HybridModeState>
         }
     }
 
-    public async Task<HybridModeState> GetStateAsync()
+    public async Task<bool> IsUMAEnabledAsync()
     {
         try
         {
             var setting = await WMI.LenovoBiosSetting.GetBiosSettingAsync(GRAPHICS_DEVICE).ConfigureAwait(false);
-            return GetStateFromBiosValue(setting);
+            return !string.IsNullOrEmpty(setting) && setting.Contains("UMA", StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception ex)
         {
-            Log.Instance.Trace($"Failed to get Hybrid Mode", ex);
-            return HybridModeState.Off;
+            Log.Instance.Trace($"Failed to read GraphicsDevice", ex);
+            return false;
         }
     }
 
+    public Task SetUMAAsync() => SetGraphicsDeviceAsync(UMA_GRAPHICS);
+
+    public Task SetSwitchableAsync() => SetGraphicsDeviceAsync(SWITCHABLE_GRAPHICS);
+
+    public Task SetDiscreteAsync() => SetGraphicsDeviceAsync(DISCRETE_GRAPHICS);
+
     public async Task SetStateAsync(HybridModeState state)
     {
-        await WMI.LenovoBiosSetting.SetBiosSettingAsync(GRAPHICS_DEVICE, GetBiosValueForState(state)).ConfigureAwait(false);
+        await SetGraphicsDeviceAsync(GetBiosValueForState(state)).ConfigureAwait(false);
+    }
+
+    public async Task<HybridModeState> GetStateAsync()
+    {
+        var setting = await WMI.LenovoBiosSetting.GetBiosSettingAsync(GRAPHICS_DEVICE).ConfigureAwait(false);
+        return GetStateFromBiosValue(setting);
+    }
+
+    public async Task<HybridModeState[]> GetAllStatesAsync()
+    {
+        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
+
+        if (mi.Properties.SupportsGSync && await IsSupportedAsync().ConfigureAwait(false))
+        {
+            return (mi.Properties.SupportsIGPUMode) switch
+            {
+                true => [HybridModeState.On, HybridModeState.OnIGPUOnly, HybridModeState.OnAuto, HybridModeState.Off, HybridModeState.UMA],
+                false => [HybridModeState.On, HybridModeState.Off, HybridModeState.UMA]
+            };
+        }
+
+        return [];
+    }
+
+    private async Task SetGraphicsDeviceAsync(string value)
+    {
+        await WMI.LenovoBiosSetting.SetBiosSettingAsync(GRAPHICS_DEVICE, value).ConfigureAwait(false);
         await WMI.LenovoBiosSetting.SaveBiosSettingAsync().ConfigureAwait(false);
     }
 

@@ -10,12 +10,17 @@ using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.Lib.Features.Hybrid;
 
-public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuModeFeature, DGPUNotify dgpuNotify) : IFeature<HybridModeState>
+public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuModeFeature, DGPUNotify dgpuNotify, BiosHybridModeFeature biosHybridMode) : IFeature<HybridModeState>
 {
     private readonly CancellationTokenSource _ensureDGPUEjectedIfNeededCancellationTokenSource = new();
     private bool _isEnsuringEjected;
 
     private HybridModeState? _lastState;
+
+    private static bool IsHybridMode(HybridModeState s) => s
+        is HybridModeState.On
+        or HybridModeState.OnIGPUOnly
+        or HybridModeState.OnAuto;
 
     public async Task<bool> IsSupportedAsync()
     {
@@ -32,18 +37,30 @@ public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuMo
     {
         var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
 
-        return (mi.Properties.SupportsGSync, mi.Properties.SupportsIGPUMode) switch
+        HybridModeState[] hybridModeStates = [HybridModeState.On, HybridModeState.Off];
+        var states = (mi.Properties.SupportsGSync, mi.Properties.SupportsIGPUMode) switch
         {
             (true, true) => [HybridModeState.On, HybridModeState.OnIGPUOnly, HybridModeState.OnAuto, HybridModeState.Off],
             (false, true) => [HybridModeState.On, HybridModeState.OnIGPUOnly, HybridModeState.OnAuto],
-            (true, false) => [HybridModeState.On, HybridModeState.Off],
+            (true, false) => hybridModeStates,
             _ => []
         };
+
+        if (states.Length > 0 && await biosHybridMode.IsSupportedAsync().ConfigureAwait(false))
+            states = [.. states, HybridModeState.UMA];
+
+        return states;
     }
 
     public async Task<HybridModeState> GetStateAsync()
     {
         Log.Instance.Trace($"Getting state...");
+
+        if (await biosHybridMode.IsSupportedAsync().ConfigureAwait(false) && await biosHybridMode.IsUMAEnabledAsync().ConfigureAwait(false))
+        {
+            Log.Instance.Trace($"State is {HybridModeState.UMA}");
+            return HybridModeState.UMA;
+        }
 
         var gSyncSupported = await gSyncFeature.IsSupportedAsync().ConfigureAwait(false);
         var igpuModeSupported = await igpuModeFeature.IsSupportedAsync().ConfigureAwait(false);
@@ -66,6 +83,21 @@ public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuMo
 
     public async Task SetStateAsync(HybridModeState state)
     {
+        if (state == HybridModeState.UMA)
+        {
+            await biosHybridMode.SetUMAAsync().ConfigureAwait(false);
+            _lastState = state;
+            return;
+        }
+
+        if (await NeedsGraphicsDeviceSwitchAsync(state).ConfigureAwait(false))
+        {
+            if (state == HybridModeState.Off)
+                await biosHybridMode.SetDiscreteAsync().ConfigureAwait(false);
+            else
+                await biosHybridMode.SetSwitchableAsync().ConfigureAwait(false);
+        }
+
         await _ensureDGPUEjectedIfNeededCancellationTokenSource.CancelAsync().ConfigureAwait(false);
 
         var (gSync, igpuMode) = Unpack(state);
@@ -176,6 +208,18 @@ public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuMo
                 _isEnsuringEjected = false;
             }
         });
+    }
+
+    private async Task<bool> NeedsGraphicsDeviceSwitchAsync(HybridModeState target)
+    {
+        if (_lastState.HasValue && IsHybridMode(_lastState.Value) && IsHybridMode(target))
+            return false;
+
+        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
+        if (mi.LegionSeries != LegionSeries.ThinkBook)
+            return false;
+
+        return await biosHybridMode.IsUMAEnabledAsync().ConfigureAwait(false);
     }
 
     private static (GSyncState, IGPUModeState) Unpack(HybridModeState state) => state switch
