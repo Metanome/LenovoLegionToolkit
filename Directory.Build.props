@@ -12,5 +12,13 @@
     <NuGetAudit>false</NuGetAudit>
     <BaseOutputPath>$(MSBuildThisFileDirectory)BuildLLT\bin\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)BuildLLT\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <AllowedReferenceRelatedFileExtensions>none</AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
+
+  <Target Name="RemoveRoslynSatellitesAfterPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <RoslynSatelliteFiles Include="$(PublishDir)\**\Microsoft.CodeAnalysis*.resources.dll" />
+    </ItemGroup>
+    <Delete Files="@(RoslynSatelliteFiles)" />
+  </Target>
 </Project>
