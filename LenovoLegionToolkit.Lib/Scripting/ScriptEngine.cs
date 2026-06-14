@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -53,7 +54,7 @@ public class ScriptEngine
     {
         if (!AppFlags.Instance.Debug)
         {
-            return new ScriptResult("Null", "Null", null, TimeSpan.FromSeconds(0));
+            return new ScriptResult(null, null, null, TimeSpan.Zero);
         }
 
         var validationResult = Validate(code);
@@ -62,7 +63,7 @@ public class ScriptEngine
             return validationResult;
         }
 
-        var sw = global::System.Diagnostics.Stopwatch.StartNew();
+        var sw = Stopwatch.StartNew();
 
         var originalOut = Console.Out;
         using var writer = new StringWriter();
@@ -105,7 +106,7 @@ public class ScriptEngine
 
     private static ScriptResult? Validate(string code)
     {
-        if (code.Contains("#r", StringComparison.OrdinalIgnoreCase))
+        if (code.Contains("#r", StringComparison.Ordinal))
         {
             return new ScriptResult(null, null, "Security check failed: #r directives are not allowed.", TimeSpan.Zero);
         }

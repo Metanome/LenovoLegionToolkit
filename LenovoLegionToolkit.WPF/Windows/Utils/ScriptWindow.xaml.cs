@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Scripting;
+using LenovoLegionToolkit.WPF.Resources;
 
 namespace LenovoLegionToolkit.WPF.Windows.Utils;
 
@@ -100,11 +101,11 @@ public partial class ScriptWindow
 
     private async void Execute_Click(object sender, RoutedEventArgs e) => await ExecuteAsync();
 
-    private async void Reset_Click(object sender, RoutedEventArgs e)
+    private void Reset_Click(object sender, RoutedEventArgs e)
     {
         _engine.Reset();
         _outputBox.Text = "";
-        SetStatus("Ready — state reset", StatusColor.Default);
+        SetStatus(Resource.ScriptConsole_Status_Ready, StatusColor.Default);
     }
 
     private async Task ExecuteAsync()
@@ -114,7 +115,7 @@ public partial class ScriptWindow
             return;
 
         _executeButton.IsEnabled = false;
-        SetStatus("Running...", StatusColor.Default);
+        SetStatus(Resource.ScriptConsole_Status_Running, StatusColor.Default);
         _outputBox.Text = "";
 
         try
@@ -124,14 +125,14 @@ public partial class ScriptWindow
             _outputBox.Text = FormatResult(result);
 
             if (result.Error is not null)
-                SetStatus($"Error — {result.Elapsed.TotalMilliseconds:F0} ms", StatusColor.Error);
+                SetStatus(string.Format(Resource.ScriptConsole_Status_Error, $"{result.Elapsed.TotalMilliseconds:F0}"), StatusColor.Error);
             else
-                SetStatus($"OK — {result.Elapsed.TotalMilliseconds:F0} ms", StatusColor.Success);
+                SetStatus(string.Format(Resource.ScriptConsole_Status_Ok, $"{result.Elapsed.TotalMilliseconds:F0}"), StatusColor.Success);
         }
         catch (Exception ex)
         {
-            _outputBox.Text = $"┌─ Unexpected Error ──────────────────────────\n│\n│  {ex.Message}\n│\n└──────────────────────────────────────────────";
-            SetStatus("Unexpected error", StatusColor.Error);
+            _outputBox.Text = string.Format(Resource.ScriptConsole_UnexpectedError_Detail, ex.Message);
+            SetStatus(Resource.ScriptConsole_Status_UnexpectedError, StatusColor.Error);
         }
         finally
         {
@@ -175,11 +176,11 @@ public partial class ScriptWindow
             sb.AppendLine();
         }
 
-        AppendSection("Output", result.Output);
-        AppendSection("Return Value", result.ReturnValue?.ToString());
-        AppendSection("Error", result.Error);
+        AppendSection(Resource.ScriptConsole_Output_Title, result.Output);
+        AppendSection(Resource.ScriptConsole_Section_ReturnValue, result.ReturnValue?.ToString());
+        AppendSection(Resource.ScriptConsole_Section_Error, result.Error);
 
-        sb.Append($"--- Elapsed: {result.Elapsed.TotalMilliseconds:F0} ms ---");
+        sb.Append(string.Format(Resource.ScriptConsole_Section_Elapsed, $"{result.Elapsed.TotalMilliseconds:F0}"));
         return sb.ToString().TrimEnd();
     }
 }
