@@ -737,17 +737,17 @@ public abstract class OsdWindowBase : Window
 
             var snapshot = new SensorSnapshot
             {
-                CpuUsage = mainData.CPU.Utilization,
+                CpuUsage = gs.CpuUsage,
                 CpuFrequency = _sensorsGroupControllers.ShowAverageCpuFrequency ? gs.CpuAvgClock : gs.CpuMaxClock,
                 CpuPClock = _sensorsGroupControllers.ShowAverageCpuFrequency ? gs.CpuPAvgClock : gs.CpuPClock,
                 CpuEClock = _sensorsGroupControllers.ShowAverageCpuFrequency ? gs.CpuEAvgClock : gs.CpuEClock,
-                CpuTemp = mainData.CPU.Temperature,
+                CpuTemp = gs.CpuTemp,
                 CpuPower = gs.CpuPower,
                 CpuFanSpeed = mainData.CPU.FanSpeed,
 
-                GpuUsage = mainData.GPU.Utilization,
-                GpuFrequency = mainData.GPU.CoreClock,
-                GpuTemp = mainData.GPU.Temperature,
+                GpuUsage = gs.GpuUsage,
+                GpuFrequency = gs.GpuClock,
+                GpuTemp = gs.GpuTemp,
                 GpuVramUsage = gs.GpuVramUtilization,
                 GpuVramUsed = gs.GpuVramUsed,
                 GpuVramTotal = gs.GpuVramTotal,
