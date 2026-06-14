@@ -33,7 +33,7 @@ public static partial class WMI
                 pdc =>
                 {
                     var fanIds = (uint[]?)pdc["FanId"].Value ?? [];
-                    var fanMaxSpeeds = (uint[]?)pdc["FanMin"].Value ?? [];
+                    var fanMaxSpeeds = (uint[]?)pdc["FanMinSpeed"].Value ?? [];
 
                     var index = Array.IndexOf(fanIds, (uint)fanId);
 

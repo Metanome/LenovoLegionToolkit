@@ -5,7 +5,7 @@ namespace LenovoLegionToolkit.Lib.Scripting;
 
 public class ScriptGlobals
 {
-    public void Log(FormattableString message)
+    public void Print(FormattableString message)
     {
         if (Utils.Log.Instance.IsTraceEnabled)
         {

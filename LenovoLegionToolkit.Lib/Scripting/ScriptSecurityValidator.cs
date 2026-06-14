@@ -60,6 +60,7 @@ public class ScriptSecurityValidator : CSharpSyntaxWalker
     private static readonly HashSet<string> DangerousMethodNames = new(StringComparer.Ordinal)
     {
         "GetAssemblies",
+        "GetType",
         "GetMethod",
         "GetMethods",
         "GetField",
@@ -80,6 +81,7 @@ public class ScriptSecurityValidator : CSharpSyntaxWalker
         "LoadWithPartialName",
         "CreateInstance",
         "InvokeMember",
+        "Invoke",
         "Compile",
         "MakeGenericType",
         "MakeGenericMethod",
