@@ -311,6 +311,7 @@ public partial class App
             }
         }
 
+        DebugModeApplicator.Start();
         await Task.CompletedTask;
     }
 

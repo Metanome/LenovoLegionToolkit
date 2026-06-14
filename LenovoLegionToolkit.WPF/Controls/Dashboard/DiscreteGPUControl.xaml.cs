@@ -78,8 +78,7 @@ public partial class DiscreteGPUControl
             _discreteGPUStatusDescription.Text = "-";
             _gpuInfoButton.ToolTip = null;
             _gpuInfoButton.IsEnabled = false;
-            if (!AppFlags.Instance.Debug)
-                Visibility = Visibility.Collapsed;
+            Visibility = Visibility.Collapsed;
             return;
         }
 

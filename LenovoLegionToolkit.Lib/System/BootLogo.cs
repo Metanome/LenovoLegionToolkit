@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -37,10 +37,7 @@ public static class BootLogo
     {
         try
         {
-            if (AppFlags.Instance.Debug)
-            {
-                return true;
-            }
+
 
             var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
             if (!mi.Properties.SupportsBootLogoChange)

@@ -188,11 +188,6 @@ public class SensorsGroupController : IDisposable
             return result;
         }
 
-        if (AppFlags.Instance.Debug)
-        {
-            return LibreHardwareMonitorInitialState.Success;
-        }
-
         return LibreHardwareMonitorInitialState.Fail;
     }
 

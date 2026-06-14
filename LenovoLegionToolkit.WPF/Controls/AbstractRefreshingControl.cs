@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -65,10 +65,22 @@ public abstract class AbstractRefreshingControl : UserControl
         {
             _refreshTask = null;
 
-            if (exceptions && !AppFlags.Instance.Debug)
-                Visibility = Visibility.Collapsed;
+            if (exceptions)
+            {
+                if (AppFlags.Instance.Debug)
+                {
+                    Visibility = Visibility.Visible;
+                    IsEnabled = true;
+                }
+                else
+                {
+                    Visibility = Visibility.Collapsed;
+                }
+            }
             else
+            {
                 IsEnabled = true;
+            }
         }
     }
 

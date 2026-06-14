@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,10 +18,7 @@ public class SpeakerFeature : IFeature<SpeakerState>
     {
         try
         {
-            if (AppFlags.Instance.Debug)
-            {
-                return Task.FromResult(true);
-            }
+
 
             var isSupported = AudioEndpointVolumes.Any();
             return Task.FromResult(isSupported);

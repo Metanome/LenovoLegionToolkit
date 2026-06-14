@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -315,7 +315,15 @@ public partial class SpectrumKeyboardBacklightControl
     protected override async Task OnRefreshAsync()
     {
         if (!await _controller.IsSupportedAsync())
-            throw new InvalidOperationException("Spectrum Keyboard does not seem to be supported");
+        {
+            if (!AppFlags.Instance.Debug)
+                throw new InvalidOperationException("Spectrum Keyboard does not seem to be supported");
+
+            _layoutSwitchButton.Visibility = Visibility.Visible;
+            _device.SetLayout(SpectrumLayout.KeyboardOnly, KeyboardLayout.Ansi, []);
+            _content.IsEnabled = true;
+            return;
+        }
 
         var (spectrumLayout, keyboardLayout, keys) = await _controller.GetKeyboardLayoutAsync();
         var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
@@ -324,7 +332,8 @@ public partial class SpectrumKeyboardBacklightControl
         if (isBuggy)
         {
             Log.Instance.Trace($"Forcing 24-zone keyboard layout for HasSpectrumProfileSwitchingBug during refresh.");
-            _layoutSwitchButton.Visibility = Visibility.Collapsed;
+            if (!AppFlags.Instance.Debug)
+                _layoutSwitchButton.Visibility = Visibility.Collapsed;
             spectrumLayout = SpectrumLayout.KeyboardOnly;
             keyboardLayout = KeyboardLayout.Keyboard24Zone;
             _settings.Store.KeyboardLayout = KeyboardLayout.Keyboard24Zone;
@@ -344,9 +353,12 @@ public partial class SpectrumKeyboardBacklightControl
         {
             _vantageWarningInfoBar.IsOpen = true;
             _device.SetLayout(spectrumLayout, keyboardLayout, keys);
-            _content.IsEnabled = false;
-            _noEffectsText.Visibility = Visibility.Collapsed;
-            return;
+            if (!AppFlags.Instance.Debug)
+            {
+                _content.IsEnabled = false;
+                _noEffectsText.Visibility = Visibility.Collapsed;
+                return;
+            }
         }
 
         _vantageWarningInfoBar.IsOpen = false;

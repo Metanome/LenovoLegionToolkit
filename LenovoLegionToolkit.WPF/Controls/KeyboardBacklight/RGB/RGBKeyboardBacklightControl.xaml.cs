@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,6 +10,7 @@ using LenovoLegionToolkit.Lib.Listeners;
 using LenovoLegionToolkit.Lib.Messaging;
 using LenovoLegionToolkit.Lib.Messaging.Messages;
 using LenovoLegionToolkit.Lib.SoftwareDisabler;
+using LenovoLegionToolkit.Lib.Utils;
 using LenovoLegionToolkit.WPF.Extensions;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
@@ -179,7 +180,10 @@ public partial class RGBKeyboardBacklightControl
     protected override async Task OnRefreshAsync()
     {
         if (!await _controller.IsSupportedAsync())
-            throw new InvalidOperationException("RGB Keyboard does not seem to be supported");
+        {
+            if (!AppFlags.Instance.Debug)
+                throw new InvalidOperationException("RGB Keyboard does not seem to be supported");
+        }
 
 
 
@@ -188,31 +192,40 @@ public partial class RGBKeyboardBacklightControl
         {
             _vantageWarningInfoBar.IsOpen = true;
 
-            foreach (var presetButton in PresetButtons)
-                presetButton.IsEnabled = false;
+            if (!AppFlags.Instance.Debug)
+            {
+                foreach (var presetButton in PresetButtons)
+                    presetButton.IsEnabled = false;
 
-            _brightnessControl.IsEnabled = false;
-            _effectControl.IsEnabled = false;
+                _brightnessControl.IsEnabled = false;
+                _effectControl.IsEnabled = false;
 
-            _zone1ColorPicker.Visibility = Visibility.Hidden;
-            _zone2ColorPicker.Visibility = Visibility.Hidden;
-            _zone3ColorPicker.Visibility = Visibility.Hidden;
-            _zone4ColorPicker.Visibility = Visibility.Hidden;
+                _zone1ColorPicker.Visibility = Visibility.Hidden;
+                _zone2ColorPicker.Visibility = Visibility.Hidden;
+                _zone3ColorPicker.Visibility = Visibility.Hidden;
+                _zone4ColorPicker.Visibility = Visibility.Hidden;
 
-            _speedControl.IsEnabled = false;
-            _zone1Control.IsEnabled = false;
-            _zone2Control.IsEnabled = false;
-            _zone3Control.IsEnabled = false;
-            _zone4Control.IsEnabled = false;
+                _speedControl.IsEnabled = false;
+                _zone1Control.IsEnabled = false;
+                _zone2Control.IsEnabled = false;
+                _zone3Control.IsEnabled = false;
+                _zone4Control.IsEnabled = false;
 
-            _applyButton.IsEnabled = false;
+                _applyButton.IsEnabled = false;
 
-            Visibility = Visibility.Visible;
-
-            return;
+                return;
+            }
         }
 
-        var state = await _controller.GetStateAsync();
+        RGBKeyboardBacklightState state;
+        try
+        {
+            state = await _controller.GetStateAsync();
+        }
+        catch (Exception) when (AppFlags.Instance.Debug)
+        {
+            state = new RGBKeyboardBacklightState();
+        }
 
         foreach (var presetButton in PresetButtons)
         {
@@ -228,23 +241,26 @@ public partial class RGBKeyboardBacklightControl
 
         if (state.SelectedPreset == RGBKeyboardBacklightPreset.Off)
         {
-            _effectControl.IsEnabled = false;
-            _speedControl.IsEnabled = false;
-            _brightnessControl.IsEnabled = false;
+            if (!AppFlags.Instance.Debug)
+            {
+                _effectControl.IsEnabled = false;
+                _speedControl.IsEnabled = false;
+                _brightnessControl.IsEnabled = false;
 
-            _zone1ColorPicker.Visibility = Visibility.Hidden;
-            _zone2ColorPicker.Visibility = Visibility.Hidden;
-            _zone3ColorPicker.Visibility = Visibility.Hidden;
-            _zone4ColorPicker.Visibility = Visibility.Hidden;
+                _zone1ColorPicker.Visibility = Visibility.Hidden;
+                _zone2ColorPicker.Visibility = Visibility.Hidden;
+                _zone3ColorPicker.Visibility = Visibility.Hidden;
+                _zone4ColorPicker.Visibility = Visibility.Hidden;
 
-            _zone1Control.IsEnabled = false;
-            _zone2Control.IsEnabled = false;
-            _zone3Control.IsEnabled = false;
-            _zone4Control.IsEnabled = false;
+                _zone1Control.IsEnabled = false;
+                _zone2Control.IsEnabled = false;
+                _zone3Control.IsEnabled = false;
+                _zone4Control.IsEnabled = false;
 
-            _applyButton.IsEnabled = false;
+                _applyButton.IsEnabled = false;
 
-            return;
+                return;
+            }
         }
 
         var preset = state.Presets.GetValueOrDefault(state.SelectedPreset, RGBKeyboardBacklightBacklightPresetDescription.Default);
