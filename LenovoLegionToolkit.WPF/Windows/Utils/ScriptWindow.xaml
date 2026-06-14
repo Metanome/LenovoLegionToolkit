@@ -22,12 +22,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="3*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="*" MinHeight="250" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -41,74 +36,74 @@
 
         <Grid
             Grid.Row="0"
-            Height="28"
-            Margin="16,10,16,0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontSize="13"
-                    FontWeight="SemiBold"
-                    IsHitTestVisible="False"
-                    Text="{x:Static resources:Resource.ScriptConsole_Title}" />
-            </StackPanel>
+            Height="24"
+            Margin="12,8,12,8">
+            <TextBlock
+                VerticalAlignment="Center"
+                FontSize="12"
+                IsHitTestVisible="False"
+                Text="{x:Static resources:Resource.ScriptConsole_Title}" />
         </Grid>
 
-        <Border
-            Grid.Row="1"
-            Margin="16,8,16,0"
-            Padding="10,8"
-            Background="{DynamicResource SubtleFillColorSecondaryBrush}"
-            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="6">
-            <Grid>
+        <Grid Grid.Row="1" Margin="16,0,16,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="200" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="200" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- LEFT: Header -->
+            <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     Grid.Column="0"
-                    Margin="0,0,10,0"
                     VerticalAlignment="Center"
-                    FontSize="14"
-                    Text="&#x26A0;" />
-                <TextBlock
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{x:Static resources:Resource.ScriptConsole_Code_Title}" />
+                    
+                <StackPanel
                     Grid.Column="1"
-                    VerticalAlignment="Center"
-                    FontSize="11"
-                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    Text="{x:Static resources:Resource.ScriptConsole_Warn_Message}"
-                    TextWrapping="Wrap" />
+                    Orientation="Horizontal">
+                    <wpfui:Button
+                        x:Name="_resetButton"
+                        Margin="0,0,8,0"
+                        Padding="8,4"
+                        Appearance="Transparent"
+                        Click="Reset_Click"
+                        Icon="{x:Static wpfui:SymbolRegular.ArrowReset24}"
+                        ToolTip="{x:Static resources:Resource.Reset}" />
+                    <wpfui:Button
+                        x:Name="_executeButton"
+                        Padding="8,4"
+                        Appearance="Primary"
+                        Click="Execute_Click"
+                        Icon="{x:Static wpfui:SymbolRegular.Play24}"
+                        ToolTip="{x:Static resources:Resource.Run}" />
+                </StackPanel>
             </Grid>
-        </Border>
 
-        <Grid Grid.Row="2" Margin="16,16,16,6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
+            <!-- LEFT: Editor -->
+            <Border
+                Grid.Row="1"
                 Grid.Column="0"
-                VerticalAlignment="Center"
-                FontSize="12"
-                FontWeight="SemiBold"
-                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                Text="{x:Static resources:Resource.ScriptConsole_Code_Title}" />
-        </Grid>
-
-        <Border
-            Grid.Row="3"
-            Margin="16,0,16,0"
-            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
-            <Border.Background>
-                <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorSecondary}" />
-            </Border.Background>
-            <Grid>
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorSecondary}" />
+                </Border.Background>
                 <avalonedit:TextEditor
                     x:Name="_codeInput"
-                    MinHeight="200"
+                    WordWrap="True"
                     Padding="12,10"
                     Background="Transparent"
                     BorderThickness="0"
@@ -118,77 +113,100 @@
                     LineNumbersForeground="{DynamicResource TextFillColorTertiaryBrush}"
                     ShowLineNumbers="True"
                     SyntaxHighlighting="C#" />
-            </Grid>
-        </Border>
-
-        <Grid Grid.Row="4" Margin="16,8,16,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Border
-                x:Name="_statusBorder"
-                Grid.Column="0"
-                Padding="10,5"
-                VerticalAlignment="Center"
-                CornerRadius="4">
-                <TextBlock
-                    x:Name="_statusLabel"
-                    FontFamily="Consolas"
-                    FontSize="11"
-                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    Text="{x:Static resources:Resource.Ready}" />
             </Border>
 
-            <wpfui:Button
-                x:Name="_resetButton"
+            <!-- SPLITTER -->
+            <Border
+                Grid.Row="1"
                 Grid.Column="1"
-                Margin="0,0,8,0"
-                Appearance="Secondary"
-                Click="Reset_Click"
-                Content="{x:Static resources:Resource.Reset}" />
+                Width="1"
+                Margin="0,16,0,16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="{DynamicResource DividerStrokeColorDefaultBrush}">
+                <Border.OpacityMask>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Offset="0.0" Color="Transparent" />
+                        <GradientStop Offset="0.2" Color="Black" />
+                        <GradientStop Offset="0.8" Color="Black" />
+                        <GradientStop Offset="1.0" Color="Transparent" />
+                    </LinearGradientBrush>
+                </Border.OpacityMask>
+            </Border>
+            
+            <GridSplitter
+                Grid.Row="1"
+                Grid.Column="1"
+                Width="12"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                ResizeBehavior="PreviousAndNext"
+                ResizeDirection="Columns" />
 
-            <wpfui:Button
-                x:Name="_executeButton"
+            <!-- RIGHT: Header -->
+            <Grid Grid.Row="0" Grid.Column="2" Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{x:Static resources:Resource.ScriptConsole_Output_Title}" />
+                    
+                <wpfui:Button
+                    x:Name="_clearButton"
+                    Grid.Column="1"
+                    Padding="8,4"
+                    Appearance="Transparent"
+                    Click="Clear_Click"
+                    Icon="{x:Static wpfui:SymbolRegular.Broom24}"
+                    ToolTip="{x:Static resources:Resource.Clear}" />
+            </Grid>
+
+            <!-- RIGHT: Output -->
+            <Border
+                Grid.Row="1"
                 Grid.Column="2"
-                Appearance="Primary"
-                Click="Execute_Click"
-                Content="{x:Static resources:Resource.Run}" />
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorSecondary}" />
+                </Border.Background>
+                <avalonedit:TextEditor
+                    x:Name="_outputBox"
+                    WordWrap="True"
+                    Padding="14,10"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontFamily="Consolas"
+                    FontSize="12"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    IsReadOnly="True" />
+            </Border>
         </Grid>
 
-        <TextBlock
-            Grid.Row="5"
-            Margin="16,12,16,6"
-            FontSize="12"
-            FontWeight="SemiBold"
-            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-            Text="{x:Static resources:Resource.ScriptConsole_Output_Title}" />
-
         <Border
-            Grid.Row="6"
-            Margin="16,0,16,0"
-            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
-            <Border.Background>
-                <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorSecondary}" />
-            </Border.Background>
-            <TextBox
-                x:Name="_outputBox"
-                Padding="14,10"
-                Background="Transparent"
-                BorderThickness="0"
-                FontFamily="Consolas"
-                FontSize="12"
-                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                HorizontalScrollBarVisibility="Auto"
-                IsReadOnly="True"
-                TextWrapping="NoWrap"
-                VerticalScrollBarVisibility="Auto" />
+            x:Name="_statusBorder"
+            Grid.Row="2"
+            Padding="8,4,8,6"
+            Visibility="Collapsed"
+            Background="Transparent">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <wpfui:SymbolIcon
+                    x:Name="_statusIcon"
+                    Margin="0,0,4,0"
+                    Symbol="Info24"
+                    Visibility="Collapsed" />
+                <TextBlock
+                    x:Name="_statusLabel"
+                    Focusable="True" />
+            </StackPanel>
         </Border>
-
-        <Border Grid.Row="7" Height="16" />
     </Grid>
 </local:BaseWindow>

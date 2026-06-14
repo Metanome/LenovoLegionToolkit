@@ -7176,7 +7176,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error — {0} ms.
+        ///   Looks up a localized string similar to Execution failed: {0} ms.
         /// </summary>
         public static string ScriptConsole_Status_Error {
             get {
@@ -7185,20 +7185,11 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OK — {0} ms.
+        ///   Looks up a localized string similar to Execution succeeded: {0} ms.
         /// </summary>
         public static string ScriptConsole_Status_Ok {
             get {
                 return ResourceManager.GetString("ScriptConsole_Status_Ok", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ready — state reset.
-        /// </summary>
-        public static string ScriptConsole_Status_Ready {
-            get {
-                return ResourceManager.GetString("ScriptConsole_Status_Ready", resourceCulture);
             }
         }
         
@@ -7230,11 +7221,8 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ┌─ Unexpected Error ──────────────────────
-        ///│
-        ///│  {0}
-        ///│
-        ///└──────────────────────────────────────────────.
+        ///   Looks up a localized string similar to Unexpected Error:
+        ///{0}.
         /// </summary>
         public static string ScriptConsole_UnexpectedError_Detail {
             get {
@@ -7243,7 +7231,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only for Debug, allowing users to execute custom C# script execution and obtain data..
+        ///   Looks up a localized string similar to Intended for advanced debugging. Allows execution of custom C# scripts to interact with the application state..
         /// </summary>
         public static string ScriptConsole_Warn_Message {
             get {

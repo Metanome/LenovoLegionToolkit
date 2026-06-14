@@ -152,3 +152,23 @@ public class ScriptEngine
             .ToArray();
     }
 }
+
+public sealed record ScriptResult(
+    string? Output,
+    object? ReturnValue,
+    string? Error,
+    TimeSpan Elapsed
+);
+
+public class ScriptGlobals
+{
+    public void Print(FormattableString message)
+    {
+        if (Utils.Log.Instance.IsTraceEnabled)
+        {
+            Utils.Log.Instance.Trace(message, file: "ScriptEngine", lineNumber: 0, caller: "ExecuteAsync");
+        }
+
+        Console.WriteLine(message.ToString());
+    }
+}

@@ -228,7 +228,10 @@
                 Margin="0,0,0,8"
                 Click="ScriptConsoleButton_Click"
                 Icon="WindowConsole20">
-                <controls:CardHeaderControl Title="{x:Static resources:Resource.SettingsPage_ScriptConsole_Title}" Subtitle="{x:Static resources:Resource.SettingsPage_ScriptConsole_Message}" />
+                <controls:CardHeaderControl
+                    Title="{x:Static resources:Resource.SettingsPage_ScriptConsole_Title}"
+                    Subtitle="{x:Static resources:Resource.SettingsPage_ScriptConsole_Message}"
+                    Warning="{x:Static resources:Resource.ScriptConsole_Warn_Message}" />
             </custom:CardAction>
         </StackPanel>
     </ScrollViewer>

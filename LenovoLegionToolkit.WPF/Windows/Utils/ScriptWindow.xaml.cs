@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Rendering;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Scripting;
 using LenovoLegionToolkit.WPF.Resources;
@@ -17,16 +19,69 @@ public partial class ScriptWindow
     private readonly ScriptEngine _engine = IoCContainer.Resolve<ScriptEngine>();
     private readonly ThemeManager _themeManager = IoCContainer.Resolve<ThemeManager>();
 
+    private OutputColorizingTransformer? _outputTransformer;
+
+    private class OutputColorizingTransformer : DocumentColorizingTransformer
+    {
+        public Brush HeaderBrush { get; set; } = Brushes.Transparent;
+        public Brush ErrorBrush { get; set; } = Brushes.Transparent;
+        public Brush ElapsedBrush { get; set; } = Brushes.Transparent;
+
+        private readonly string _elapsedPrefix;
+
+        public OutputColorizingTransformer()
+        {
+            var elapsedStr = Resource.ScriptConsole_Section_Elapsed;
+            var idx = elapsedStr.IndexOf("{0}");
+            _elapsedPrefix = idx >= 0 ? elapsedStr.Substring(0, idx) : elapsedStr;
+        }
+
+        protected override void ColorizeLine(DocumentLine line)
+        {
+            int lineStartOffset = line.Offset;
+            string text = CurrentContext.Document.GetText(line);
+
+            if (text.StartsWith("--- ") && text.EndsWith(" ---"))
+            {
+                ChangeLinePart(lineStartOffset, lineStartOffset + text.Length, element =>
+                {
+                    element.TextRunProperties.SetForegroundBrush(HeaderBrush);
+                    var tf = element.TextRunProperties.Typeface;
+                    element.TextRunProperties.SetTypeface(new Typeface(tf.FontFamily, tf.Style, FontWeights.SemiBold, tf.Stretch));
+                });
+            }
+            else if (text.Contains("error CS") || text.Contains("Exception:") || text.Contains("Exception "))
+            {
+                ChangeLinePart(lineStartOffset, lineStartOffset + text.Length, element => element.TextRunProperties.SetForegroundBrush(ErrorBrush));
+            }
+            else if (!string.IsNullOrEmpty(_elapsedPrefix) && text.StartsWith(_elapsedPrefix))
+            {
+                ChangeLinePart(lineStartOffset, lineStartOffset + text.Length, element => element.TextRunProperties.SetForegroundBrush(ElapsedBrush));
+            }
+        }
+    }
+
+    private void OnThemeApplied(object? sender, EventArgs e) => UpdateSyntaxColors();
+
     private ScriptWindow()
     {
         InitializeComponent();
+
+        _codeInput.TextArea.IndentationStrategy = new ICSharpCode.AvalonEdit.Indentation.CSharp.CSharpIndentationStrategy(_codeInput.Options);
+
         Loaded += (_, _) =>
         {
             _codeInput.Focus();
             UpdateSyntaxColors();
         };
         _codeInput.PreviewKeyDown += CodeInput_PreviewKeyDown;
-        _themeManager.ThemeApplied += (_, _) => UpdateSyntaxColors();
+        _themeManager.ThemeApplied += OnThemeApplied;
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _themeManager.ThemeApplied -= OnThemeApplied;
+        base.OnClosed(e);
     }
 
     public static void ShowInstance()
@@ -59,9 +114,15 @@ public partial class ScriptWindow
 
     private void Reset_Click(object sender, RoutedEventArgs e)
     {
+        _outputBox.Text = string.Empty;
         _engine.Reset();
-        _outputBox.Text = "";
-        SetStatus(Resource.ScriptConsole_Status_Ready, StatusColor.Default);
+        SetStatus(null, StatusColor.Default);
+        _codeInput.Focus();
+    }
+
+    private void Clear_Click(object sender, RoutedEventArgs e)
+    {
+        _outputBox.Text = string.Empty;
     }
 
     private async Task ExecuteAsync()
@@ -98,18 +159,43 @@ public partial class ScriptWindow
 
     private enum StatusColor { Default, Success, Error }
 
-    private void SetStatus(string text, StatusColor color)
+    private void SetStatus(string? text, StatusColor color)
     {
-        _statusLabel.Text = text;
-
-        var brush = color switch
+        if (string.IsNullOrEmpty(text))
         {
-            StatusColor.Success => (Brush)FindResource("SystemFillColorSuccessBrush"),
-            StatusColor.Error => (Brush)FindResource("SystemFillColorCriticalBrush"),
-            _ => (Brush)FindResource("TextFillColorSecondaryBrush")
-        };
+            _statusBorder.Visibility = Visibility.Collapsed;
+            return;
+        }
 
-        _statusLabel.Foreground = brush;
+        _statusLabel.Text = text;
+        _statusBorder.Visibility = Visibility.Visible;
+
+        if (color == StatusColor.Default)
+        {
+            _statusBorder.Background = Brushes.Transparent;
+            _statusLabel.Foreground = (Brush)FindResource("TextFillColorSecondaryBrush");
+            _statusIcon.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            _statusBorder.Background = color switch
+            {
+                StatusColor.Success => (Brush)FindResource("SystemFillColorSuccessBackgroundBrush"),
+                StatusColor.Error => (Brush)FindResource("SystemFillColorCriticalBackgroundBrush"),
+                _ => Brushes.Transparent
+            };
+
+            _statusIcon.Foreground = color switch
+            {
+                StatusColor.Success => (Brush)FindResource("SystemFillColorSuccessBrush"),
+                StatusColor.Error => (Brush)FindResource("SystemFillColorCriticalBrush"),
+                _ => Brushes.Transparent
+            };
+            
+            _statusIcon.Symbol = color == StatusColor.Success ? Wpf.Ui.Common.SymbolRegular.Checkmark24 : Wpf.Ui.Common.SymbolRegular.ErrorCircle24;
+            _statusLabel.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+            _statusIcon.Visibility = Visibility.Visible;
+        }
     }
 
     private void UpdateSyntaxColors()
@@ -118,7 +204,10 @@ public partial class ScriptWindow
 
         Color GetColor(string resourceKey)
         {
-            if (Application.Current.TryFindResource(resourceKey) is Color color)
+            var res = Application.Current.TryFindResource(resourceKey);
+            if (res is SolidColorBrush brush)
+                return brush.Color;
+            if (res is Color color)
                 return color;
             return Colors.Gray;
         }
@@ -126,9 +215,10 @@ public partial class ScriptWindow
         var commentColor = GetColor("PaletteGreenColor");
         var stringColor = GetColor("PaletteOrangeColor");
         var keywordColor = GetColor("PaletteLightBlueColor");
-        var textColor = GetColor("TextFillColorPrimary");
+        var textColor = GetColor("TextFillColorPrimaryBrush");
         var numberColor = GetColor("PaletteTealColor");
-        var preprocessorColor = GetColor("TextFillColorSecondary");
+        var preprocessorColor = GetColor("TextFillColorSecondaryBrush");
+        var methodColor = GetColor("PaletteYellowColor");
 
         void SetColor(string name, Color color)
         {
@@ -139,12 +229,13 @@ public partial class ScriptWindow
 
         SetColor("Comment", commentColor);
         SetColor("String", stringColor);
+        SetColor("StringInterpolation", textColor);
         SetColor("Char", stringColor);
         SetColor("Preprocessor", preprocessorColor);
-        SetColor("Punctuation", textColor);
+        SetColor("MethodCall", methodColor);
+        SetColor("SemanticKeywords", keywordColor);
         SetColor("ValueTypeKeywords", keywordColor);
         SetColor("ReferenceTypeKeywords", keywordColor);
-        SetColor("MethodCall", textColor);
         SetColor("NumberLiteral", numberColor);
         SetColor("ThisOrBaseReference", keywordColor);
         SetColor("NullOrValueKeywords", keywordColor);
@@ -163,7 +254,21 @@ public partial class ScriptWindow
         SetColor("TrueFalse", keywordColor);
         SetColor("TypeKeywords", keywordColor);
 
-        _codeInput.TextArea.TextView.Redraw();
+        if (_outputTransformer == null && _outputBox.TextArea?.TextView != null)
+        {
+            _outputTransformer = new OutputColorizingTransformer();
+            _outputBox.TextArea.TextView.LineTransformers.Add(_outputTransformer);
+        }
+
+        if (_outputTransformer != null)
+        {
+            _outputTransformer.HeaderBrush = new SolidColorBrush(GetColor("PaletteLightBlueColor"));
+            _outputTransformer.ErrorBrush = new SolidColorBrush(GetColor("PaletteRedColor"));
+            _outputTransformer.ElapsedBrush = new SolidColorBrush(GetColor("TextFillColorSecondaryBrush"));
+        }
+
+        _codeInput.TextArea?.TextView?.Redraw();
+        _outputBox.TextArea?.TextView?.Redraw();
     }
 
     private static string FormatResult(ScriptResult result)
