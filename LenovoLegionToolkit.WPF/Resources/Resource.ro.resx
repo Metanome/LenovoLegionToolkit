@@ -205,6 +205,12 @@
   <data name="AmdOverclocking_Do_Not_Apply_Message" xml:space="preserve">
     <value>Aplicarea profilului a fost anulată din cauza repornirii anormale.</value>
   </data>
+  <data name="AmdOverclocking_Enable_Message" xml:space="preserve">
+    <value>Enable AMD overclocking features.</value>
+  </data>
+  <data name="AmdOverclocking_Enable_Title" xml:space="preserve">
+    <value>Enable AMD Overclocking</value>
+  </data>
   <data name="AmdOverclocking_FMax_Frequency_Message" xml:space="preserve">
     <value>Suprascriere maximă a frecvenței procesorului (MHz)</value>
   </data>

@@ -205,6 +205,12 @@
   <data name="AmdOverclocking_Do_Not_Apply_Message" xml:space="preserve">
     <value>A inscrição do perfil foi cancelada devido a reinicialização anormal.</value>
   </data>
+  <data name="AmdOverclocking_Enable_Message" xml:space="preserve">
+    <value>Enable AMD overclocking features.</value>
+  </data>
+  <data name="AmdOverclocking_Enable_Title" xml:space="preserve">
+    <value>Enable AMD Overclocking</value>
+  </data>
   <data name="AmdOverclocking_FMax_Frequency_Message" xml:space="preserve">
     <value>Substituição máxima de frequência de otimização de CPU (MHz)</value>
   </data>

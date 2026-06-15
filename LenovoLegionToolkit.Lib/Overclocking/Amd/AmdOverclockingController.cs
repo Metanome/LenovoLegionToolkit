@@ -79,7 +79,11 @@ public sealed class AmdOverclockingController : IDisposable
 
     public bool IsSupported() => _isInitialized && _machineInformation?.Properties.IsAmdDevice == true;
 
-    public bool IsActive() => File.Exists(_internalProfilePath);
+    public bool IsActive()
+    {
+        var profile = LoadProfile();
+        return profile?.Enabled == true;
+    }
 
     public Cpu GetCpu() => _cpu ?? throw new InvalidOperationException(Resource.AmdOverclocking_Not_Initialized_Message);
 
@@ -158,11 +162,6 @@ public sealed class AmdOverclockingController : IDisposable
 
         await Task.Run(() =>
         {
-            if (profile.FMax is { } fmax)
-            {
-                _cpu.SetFMax(fmax);
-            }
-
             if (_cpu.smu.Rsmu.SMU_MSG_SetDldoPsmMargin != 0)
             {
                 for (var i = 0; i < profile.CoreValues.Count && i < 16; i++)
@@ -174,6 +173,12 @@ public sealed class AmdOverclockingController : IDisposable
                 }
             }
         }).ConfigureAwait(false);
+    }
+
+    public async Task ApplyFMaxOverrideAsync(uint fmax)
+    {
+        EnsureInitialized();
+        await Task.Run(() => _cpu.SetFMax(fmax)).ConfigureAwait(false);
     }
 
     public async Task ApplyInternalProfileAsync()
@@ -198,15 +203,6 @@ public sealed class AmdOverclockingController : IDisposable
     public bool IsCoreActive(int coreIndex)
     {
         EnsureInitialized();
-
-        // I have no idea why this was failed on me.
-        // var mapIndex = coreIndex < 8 ? 0 : 1;
-
-        // Bounds check: if the mapIndex is out of range, the core is not active
-        // if (mapIndex >= _cpu.info.topology.coreDisableMap.Length)
-        // return false;
-
-        // return ((~_cpu.info.topology.coreDisableMap[mapIndex] >> (coreIndex % 8)) & 1) == 1;
 
         return _cpu.GetPsmMarginSingleCore(EncodeCoreMarginBitmask(coreIndex)) != null;
     }

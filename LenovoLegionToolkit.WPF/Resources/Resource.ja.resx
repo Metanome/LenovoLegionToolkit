@@ -205,6 +205,12 @@
   <data name="AmdOverclocking_Do_Not_Apply_Message" xml:space="preserve">
     <value>異常な再起動のためプロファイルの適用がキャンセルされました。</value>
   </data>
+  <data name="AmdOverclocking_Enable_Message" xml:space="preserve">
+    <value>Enable AMD overclocking features.</value>
+  </data>
+  <data name="AmdOverclocking_Enable_Title" xml:space="preserve">
+    <value>Enable AMD Overclocking</value>
+  </data>
   <data name="AmdOverclocking_FMax_Frequency_Message" xml:space="preserve">
     <value>最大CPUブースト周波数オーバーライド(MHz)</value>
   </data>

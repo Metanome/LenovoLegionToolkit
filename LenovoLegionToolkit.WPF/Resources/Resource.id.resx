@@ -205,6 +205,12 @@
   <data name="AmdOverclocking_Do_Not_Apply_Message" xml:space="preserve">
     <value>Profile apply has been canceled due to abnormal restart.</value>
   </data>
+  <data name="AmdOverclocking_Enable_Message" xml:space="preserve">
+    <value>Enable AMD overclocking features.</value>
+  </data>
+  <data name="AmdOverclocking_Enable_Title" xml:space="preserve">
+    <value>Enable AMD Overclocking</value>
+  </data>
   <data name="AmdOverclocking_FMax_Frequency_Message" xml:space="preserve">
     <value>Maximum CPU boost frequency override (MHz)</value>
   </data>

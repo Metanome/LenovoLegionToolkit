@@ -1,4 +1,4 @@
-﻿using LenovoLegionToolkit.Lib;
+using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Overclocking.Amd;
 using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.Utils;
@@ -56,27 +56,54 @@ public partial class AmdOverclocking : UiWindow
 
     private async Task InitAndRefreshAsync()
     {
-        if (!_isInitialized)
+        if (_isInitialized)
         {
-            try
-            {
-                await _controller.InitializeAsync();
-                InitializeDynamicUi();
-                _isInitialized = true;
-            }
-            catch (Exception ex)
-            {
-                Log.Instance.Trace($"Init Failed: {ex.Message}");
-                return;
-            }
+            await LoadFromHardwareAsync();
+
+            var profile = _controller.LoadProfile();
+            if (profile != null)
+                UpdateUiFromProfile(profile);
+
+            return;
         }
+
+        var existingProfile = _controller.LoadProfile();
+        var isEnabled = existingProfile?.Enabled == true;
+
+        _isUpdatingUi = true;
+        _enableToggle.IsChecked = isEnabled;
+        _isUpdatingUi = false;
+
+        if (!isEnabled)
+        {
+            SetControlsEnabled(false);
+            return;
+        }
+
+        await InitializeAndLoadAsync(existingProfile);
+    }
+
+    private async Task InitializeAndLoadAsync(OverclockingProfile? existingProfile)
+    {
+        try
+        {
+            await _controller.InitializeAsync();
+            InitializeDynamicUi();
+            _isInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Init Failed: {ex.Message}");
+            return;
+        }
+
+        SetControlsEnabled(true);
 
         await LoadFromHardwareAsync();
 
-        var profile = _controller.LoadProfile();
-        if (profile != null)
+        if (existingProfile != null)
         {
-            UpdateUiFromProfile(profile);
+            UpdateUiFromProfile(existingProfile);
         }
 
         if (!_controller.DoNotApply)
@@ -212,6 +239,10 @@ public partial class AmdOverclocking : UiWindow
     {
         if (profile == null) return;
 
+        _isUpdatingUi = true;
+        _enableToggle.IsChecked = profile.Value.Enabled;
+        _isUpdatingUi = false;
+
         if (profile.Value.FMax.HasValue)
         {
             _fMaxNumberBox.Value = profile.Value.FMax.Value;
@@ -249,6 +280,7 @@ public partial class AmdOverclocking : UiWindow
 
         return new OverclockingProfile
         {
+            Enabled = _enableToggle.IsChecked == true,
             FMax = fmaxVal,
             CoreValues = coreValues
         };
@@ -332,6 +364,54 @@ public partial class AmdOverclocking : UiWindow
                 }
             }
         }
+    }
+
+    private async void EnableToggle_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_isUpdatingUi) return;
+
+        if (_isInitialized)
+        {
+            SaveEnabledState(true);
+            SetControlsEnabled(true);
+            return;
+        }
+
+        SaveEnabledState(true);
+        await InitializeAndLoadAsync(_controller.LoadProfile());
+    }
+
+    private void EnableToggle_Unchecked(object sender, RoutedEventArgs e)
+    {
+        if (_isUpdatingUi) return;
+
+        SaveEnabledState(false);
+        SetControlsEnabled(false);
+    }
+
+    private void SaveEnabledState(bool enabled)
+    {
+        var profile = _controller.LoadProfile() ?? new OverclockingProfile
+        {
+            Enabled = enabled,
+            FMax = null,
+            CoreValues = []
+        };
+
+        var updated = profile with { Enabled = enabled };
+        _controller.SaveProfile(updated);
+    }
+
+    private void SetControlsEnabled(bool enabled)
+    {
+        _fMaxToggle.IsEnabled = enabled;
+        _fMaxNumberBox.IsEnabled = enabled;
+        _x3dGamingToggle.IsEnabled = enabled;
+        _ccdItemsControl.IsEnabled = enabled;
+        _applyButton.IsEnabled = enabled;
+        _loadButton.IsEnabled = enabled;
+        _saveButton.IsEnabled = enabled;
+        _refreshButton.IsEnabled = enabled;
     }
 
     private void ShowStatus(string title, string message, InfoBarSeverity severity, bool showForever = false)

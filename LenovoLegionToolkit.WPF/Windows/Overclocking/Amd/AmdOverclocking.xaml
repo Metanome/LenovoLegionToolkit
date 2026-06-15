@@ -8,7 +8,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="AMD Precision Boost Overclocking"
     Width="1050"
-    Height="870"
+    Height="950"
     ExtendsContentIntoTitleBar="True"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
@@ -198,6 +198,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -224,6 +225,44 @@
 
         <Border
             Grid.Row="2"
+            Margin="24,5,24,10"
+            Padding="16,14"
+            Background="{DynamicResource ControlFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:SymbolIcon
+                    Margin="0,0,12,0"
+                    FontSize="20"
+                    Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                    Symbol="Power20" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Text="{x:Static resources:Resource.AmdOverclocking_Enable_Title}" />
+                    <TextBlock
+                        FontSize="11"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="{x:Static resources:Resource.AmdOverclocking_Enable_Message}" />
+                </StackPanel>
+                <ui:ToggleSwitch
+                    x:Name="_enableToggle"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Checked="EnableToggle_Checked"
+                    Unchecked="EnableToggle_Unchecked" />
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="3"
             Margin="24,5,24,10"
             Padding="20,15"
             Background="{DynamicResource ControlFillColorDefaultBrush}"
@@ -327,7 +366,7 @@
         </Border>
 
         <ScrollViewer
-            Grid.Row="3"
+            Grid.Row="4"
             Padding="24,0,24,20"
             Focusable="False">
             <StackPanel>
@@ -430,7 +469,7 @@
         </ScrollViewer>
 
         <Border
-            Grid.Row="4"
+            Grid.Row="5"
             Padding="24,16"
             Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
             BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
