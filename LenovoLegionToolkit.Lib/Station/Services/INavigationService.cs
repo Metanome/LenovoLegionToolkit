@@ -19,7 +19,8 @@ public interface INavigationService
 public sealed class ExtensionNavigationItem
 {
     public required string Id { get; init; }
-    public required string Title { get; init; }
+    public string Title { get; init; } = "";
+    public Func<string>? TitleGetter { get; init; }
     public required string PageTag { get; init; }
     public required Type PageType { get; init; }
     public ExtensionIcon Icon { get; init; }

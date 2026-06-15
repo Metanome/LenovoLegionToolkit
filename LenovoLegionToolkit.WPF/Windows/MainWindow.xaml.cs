@@ -297,7 +297,7 @@ public partial class MainWindow
 
             _navigationStore.Items.Add(new CustomNavigationItem
             {
-                Content = item.Title,
+                Content = item.TitleGetter != null ? item.TitleGetter() : item.Title,
                 Icon = item.Icon switch
                 {
                     ExtensionIcon.Gauge => SymbolRegular.Gauge24,
