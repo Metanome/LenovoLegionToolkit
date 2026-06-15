@@ -19,14 +19,15 @@ public class BiosHybridModeFeature
         {
             var exist = await WMI.LenovoBiosSetting.ExistAsync().ConfigureAwait(false);
             if (!exist)
+            {
                 return false;
+            }
 
             var selections = await WMI.LenovoBiosSetting.GetBiosSelectionsAsync(GRAPHICS_DEVICE).ConfigureAwait(false);
             return selections.Any(item => item.Contains("UMA", StringComparison.OrdinalIgnoreCase));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Log.Instance.Trace($"Failed to check UMA support", ex);
             return false;
         }
     }
