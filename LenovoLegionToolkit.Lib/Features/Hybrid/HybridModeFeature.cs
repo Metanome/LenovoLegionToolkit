@@ -54,11 +54,15 @@ public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuMo
 
     public async Task<HybridModeState> GetStateAsync()
     {
-        Log.Instance.Trace($"Getting state...");
+        if (_lastState.HasValue)
+        {
+            return _lastState.Value;
+        }
 
         if (await biosHybridMode.IsSupportedAsync().ConfigureAwait(false) && await biosHybridMode.IsUMAEnabledAsync().ConfigureAwait(false))
         {
             Log.Instance.Trace($"State is {HybridModeState.UMA}");
+            _lastState = HybridModeState.UMA;
             return HybridModeState.UMA;
         }
 
@@ -78,6 +82,7 @@ public class HybridModeFeature(GSyncFeature gSyncFeature, IGPUModeFeature igpuMo
 
         Log.Instance.Trace($"State is {state} [gSync={gSync}, igpuMode={igpuMode}]");
 
+        _lastState = state;
         return state;
     }
 
