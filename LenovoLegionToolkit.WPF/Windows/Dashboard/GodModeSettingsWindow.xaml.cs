@@ -29,7 +29,7 @@ public partial class GodModeSettingsWindow
     private readonly LegionSpaceDisabler _legionSpaceDisabler = IoCContainer.Resolve<LegionSpaceDisabler>();
     private readonly LegionZoneDisabler _legionZoneDisabler = IoCContainer.Resolve<LegionZoneDisabler>();
 
-    private Control FanControl;
+    private Control? FanControl;
 
     private GodModeState? _state;
     private Dictionary<PowerModeState, GodModeDefaults>? _defaults;
@@ -41,8 +41,6 @@ public partial class GodModeSettingsWindow
     {
         InitializeComponent();
         IsVisibleChanged += GodModeSettingsWindow_IsVisibleChanged;
-        var mi = Compatibility.GetMachineInformationAsync().GetAwaiter().GetResult();
-        FanControl = InitializeFanControlContainer(mi);
     }
 
     private Control InitializeFanControlContainer(MachineInformation mi)
@@ -77,6 +75,11 @@ public partial class GodModeSettingsWindow
             _loader.IsLoading = true;
             _buttonsStackPanel.Visibility = Visibility.Hidden;
 
+            if (FanControl is null)
+            {
+                var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(true);
+                FanControl = InitializeFanControlContainer(mi);
+            }
             var tasks = new List<Task>
             {
                 Task.Delay(500),

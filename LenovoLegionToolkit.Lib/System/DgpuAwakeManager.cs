@@ -13,7 +13,7 @@ using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.Lib.System;
 
-public sealed class DgpuAwakeManager : IDisposable
+public sealed class DgpuAwakeManager : IAsyncDisposable, IDisposable
 {
     private readonly ApplicationSettings _settings;
     private readonly PowerStateListener _powerStateListener;
@@ -159,6 +159,17 @@ public sealed class DgpuAwakeManager : IDisposable
             Marshal.ReleaseComObject(_d3dDevice);
             _d3dDevice = null;
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_isDisposed) return;
+        _isDisposed = true;
+
+        _powerStateListener.Changed -= PowerStateListener_Changed;
+
+        await StopInternalAsync().ConfigureAwait(false);
+        _lock.Dispose();
     }
 
     public void Dispose()
