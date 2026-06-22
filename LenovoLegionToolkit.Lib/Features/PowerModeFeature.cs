@@ -101,11 +101,8 @@ public class PowerModeFeature(
         await base.SetStateAsync(state).ConfigureAwait(false);
         await powerModeListener.NotifyAsync(state).ConfigureAwait(false);
 
-        // For debug purpose: User reports after set to specific power mode remains White Light.
-        // But GetStateAsync() returns correct power mode.
-        // Try get ThermalMode.
-        var realMode = await WMI.LenovoGameZoneData.GetThermalModeAsync().ConfigureAwait(false);
-        Log.Instance.Trace($"Real Thermal Mode: {(ThermalModeState)realMode}");
+        var thermalMode = await WMI.LenovoGameZoneData.GetThermalModeAsync().ConfigureAwait(false);
+        Log.Instance.Trace($"Thermal Mode: {(ThermalModeState)thermalMode}");
     }
 
     public async Task SuspendMode(PowerModeState state)

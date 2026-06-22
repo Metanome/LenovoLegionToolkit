@@ -1,3 +1,9 @@
+using LenovoLegionToolkit.Lib.Controllers.GodMode;
+using LenovoLegionToolkit.Lib.Features;
+using LenovoLegionToolkit.Lib.Resources;
+using LenovoLegionToolkit.Lib.Settings;
+using LenovoLegionToolkit.Lib.System;
+using LenovoLegionToolkit.Lib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,10 +12,6 @@ using System.Management;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using LenovoLegionToolkit.Lib.Resources;
-using LenovoLegionToolkit.Lib.Settings;
-using LenovoLegionToolkit.Lib.System;
-using LenovoLegionToolkit.Lib.Utils;
 using ZenStates.Core;
 
 namespace LenovoLegionToolkit.Lib.Overclocking.Amd;
@@ -209,11 +211,18 @@ public sealed class AmdOverclockingController : IDisposable
                 }
             }
 
-            if (profile.FMax.HasValue)
-            {
-                _cpu.SetFMax(profile.FMax.Value);
-            }
+            ApplyIfSet(profile.FMax, value => _cpu.SetFMax(value));
+            ApplyIfSet(profile.PowerLimit1, value => _cpu.SetStapmLimit((uint)value));
+            ApplyIfSet(profile.PowerLimit2, value => _cpu.SetFastLimit((uint)value));
+            ApplyIfSet(profile.PowerLimit3, value => _cpu.SetSlowLimit((uint)value));
+            ApplyIfSet(profile.TDCSoc, value => _cpu.SetTDCSOCLimit((uint)value));
+            ApplyIfSet(profile.TDCVdd, value => _cpu.SetTDCVDDLimit((uint)value));
+            ApplyIfSet(profile.EDCSoc, value => _cpu.SetEDCSOCLimit((uint)value));
+            ApplyIfSet(profile.EDCVdd, value => _cpu.SetEDCVDDLimit((uint)value));
         }).ConfigureAwait(false);
+
+        await ForceApplyPowerMappingAsync().ConfigureAwait(false);
+        Log.Instance.Trace($"Overclocking Profile applied.");
     }
 
     public async Task ApplyInternalProfileAsync()
@@ -221,6 +230,30 @@ public sealed class AmdOverclockingController : IDisposable
         if (LoadProfile() is { } profile)
         {
             await ApplyProfileAsync(profile).ConfigureAwait(false);
+        }
+    }
+
+    private static async Task ForceApplyPowerMappingAsync()
+    {
+        try
+        {
+            var powerModeFeature = IoCContainer.Resolve<PowerModeFeature>();
+            var state = await powerModeFeature.GetStateAsync().ConfigureAwait(false);
+
+            if (state == PowerModeState.GodMode)
+            {
+                var godModeController = IoCContainer.Resolve<GodModeController>();
+                var (_, preset) = await godModeController.GetActivePresetAsync().ConfigureAwait(false);
+                await powerModeFeature.EnsureCorrectWindowsPowerSettingsAreSetAsync(preset).ConfigureAwait(false);
+            }
+            else
+            {
+                await powerModeFeature.EnsureCorrectWindowsPowerSettingsAreSetAsync().ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"ForceApplyGodModePowerPlanAsync failed.", ex);
         }
     }
 
@@ -240,6 +273,12 @@ public sealed class AmdOverclockingController : IDisposable
         EnsureInitialized();
 
         return _cpu.GetPsmMarginSingleCore(EncodeCoreMarginBitmask(coreIndex)) != null;
+    }
+
+    private static void ApplyIfSet<T>(T? value, Action<T> setter) where T : struct
+    {
+        if (value.HasValue)
+            setter(value.Value);
     }
 
     public static uint[] MakeCmdArgs(uint arg = 0, uint maxArgs = 6)

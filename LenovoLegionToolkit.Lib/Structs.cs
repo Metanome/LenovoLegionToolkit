@@ -643,6 +643,13 @@ public readonly struct OverclockingProfile
 {
     public uint? FMax { get; init; }
     public List<double?> CoreValues { get; init; }
+    public short? PowerLimit1 { get; init; }
+    public short? PowerLimit2 { get; init; }
+    public short? PowerLimit3 { get; init; }
+    public short? EDCSoc { get; init; }
+    public short? EDCVdd { get; init; }
+    public short? TDCSoc { get; init; }
+    public short? TDCVdd { get; init; }
 }
 
 public struct Package

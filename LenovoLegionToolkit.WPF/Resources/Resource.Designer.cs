@@ -349,11 +349,38 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Current Limits 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurrentLimits {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurrentLimits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Profile apply has been canceled due to abnormal restart. 的本地化字符串。
         /// </summary>
         public static string AmdOverclocking_Do_Not_Apply_Message {
             get {
                 return ResourceManager.GetString("AmdOverclocking_Do_Not_Apply_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 EDC SoC 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_EDC_SoC {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_EDC_SoC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 EDC VDD 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_EDC_VDD {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_EDC_VDD", resourceCulture);
             }
         }
         
@@ -430,6 +457,42 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Power Limit (Long) 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_PowerLimit_Long {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_PowerLimit_Long", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Power Limit (Peak) 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_PowerLimit_Peak {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_PowerLimit_Peak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Power Limit (Short) 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_PowerLimit_Short {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_PowerLimit_Short", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Power Limits 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_PowerLimits {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_PowerLimits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Status 的本地化字符串。
         /// </summary>
         public static string AmdOverclocking_Status_Title {
@@ -480,6 +543,24 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string AmdOverclocking_Tab_Settings {
             get {
                 return ResourceManager.GetString("AmdOverclocking_Tab_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 TDC SoC 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_TDC_SoC {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_TDC_SoC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 TDC VDD 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_TDC_VDD {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_TDC_VDD", resourceCulture);
             }
         }
         

@@ -263,6 +263,14 @@ public partial class AmdOverclocking : UiWindow
             _fMaxToggle.IsChecked = true;
         }
 
+        if (profile.Value.PowerLimit1.HasValue) _powerLimit1Box.Value = profile.Value.PowerLimit1.Value;
+        if (profile.Value.PowerLimit2.HasValue) _powerLimit2Box.Value = profile.Value.PowerLimit2.Value;
+        if (profile.Value.PowerLimit3.HasValue) _powerLimit3Box.Value = profile.Value.PowerLimit3.Value;
+        if (profile.Value.TDCSoc.HasValue) _tdcSocBox.Value = profile.Value.TDCSoc.Value;
+        if (profile.Value.TDCVdd.HasValue) _tdcVddBox.Value = profile.Value.TDCVdd.Value;
+        if (profile.Value.EDCSoc.HasValue) _edcSocBox.Value = profile.Value.EDCSoc.Value;
+        if (profile.Value.EDCVdd.HasValue) _edcVddBox.Value = profile.Value.EDCVdd.Value;
+
         var allCores = CcdList.SelectMany(ccd => ccd.Cores).ToList();
 
         for (int i = 0; i < allCores.Count; i++)
@@ -295,7 +303,14 @@ public partial class AmdOverclocking : UiWindow
         return new OverclockingProfile
         {
             FMax = fmaxVal,
-            CoreValues = coreValues
+            CoreValues = coreValues,
+            PowerLimit1 = (short?)_powerLimit1Box.Value,
+            PowerLimit2 = (short?)_powerLimit2Box.Value,
+            PowerLimit3 = (short?)_powerLimit3Box.Value,
+            TDCSoc = (short?)_tdcSocBox.Value,
+            TDCVdd = (short?)_tdcVddBox.Value,
+            EDCSoc = (short?)_edcSocBox.Value,
+            EDCVdd = (short?)_edcVddBox.Value,
         };
     }
 
@@ -427,6 +442,13 @@ public partial class AmdOverclocking : UiWindow
         _allowInAllPowerModesToggle.IsEnabled = enabled;
         _fMaxToggle.IsEnabled = enabled;
         _fMaxNumberBox.IsEnabled = enabled;
+        _powerLimit1Box.IsEnabled = enabled;
+        _powerLimit2Box.IsEnabled = enabled;
+        _powerLimit3Box.IsEnabled = enabled;
+        _tdcSocBox.IsEnabled = enabled;
+        _tdcVddBox.IsEnabled = enabled;
+        _edcSocBox.IsEnabled = enabled;
+        _edcVddBox.IsEnabled = enabled;
         _x3dGamingToggle.IsEnabled = enabled;
         _ccdItemsControl.IsEnabled = enabled;
         _applyButton.IsEnabled = enabled;

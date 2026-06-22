@@ -14,6 +14,7 @@ using System.Windows.Media;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Automation;
 using LenovoLegionToolkit.Lib.Controllers;
+using LenovoLegionToolkit.Lib.Controllers.GodMode;
 using LenovoLegionToolkit.Lib.Controllers.Sensors;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Features;
@@ -235,6 +236,7 @@ public partial class App
             SafeInitAsync(InitAutomationProcessorAsync, "Automation Processor"),
             SafeInitAsync(InitSensorsGroupControllerFeatureAsync, "Sensors Group"),
             SafeInitAsync(LogSoftwareStatusAsync, "Software Status"),
+            SafeInitAsync(InitAMDOverclocking, "AMD Overclocking"),
             SafeInitAsync(InitPowerModeFeatureAsync, "Power Mode"),
             SafeInitAsync(InitItsModeFeatureAsync, "ITS Mode"),
             SafeInitAsync(InitBatteryFeatureAsync, "Battery Feature"),
@@ -244,7 +246,6 @@ public partial class App
             SafeInitAsync(InitLampArrayControllerAsync, "LampArray"),
             SafeInitAsync(InitHybridModeAsync, "Hybrid Mode"),
             SafeInitAsync(InitAutomationLocalization, "Automation Localization"),
-            SafeInitAsync(InitAMDOverclocking, "AMD Overclocking"),
         };
 
         await Task.WhenAll(initTasks);
