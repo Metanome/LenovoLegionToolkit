@@ -44,6 +44,7 @@ public class IoCModule : Module
         builder.Register<OsdSettings>();
         builder.Register<GodModeSettings>();
         builder.Register<GPUOverclockSettings>();
+        builder.Register<AmdOverclockingSettings>().SingleInstance();
         builder.Register<IntegrationsSettings>();
         builder.Register<PackageDownloaderSettings>();
         builder.Register<RGBKeyboardSettings>();

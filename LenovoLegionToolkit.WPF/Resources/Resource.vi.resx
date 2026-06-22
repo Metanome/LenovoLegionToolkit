@@ -190,6 +190,18 @@
   <data name="AlwaysOnUSBControl_Title" xml:space="preserve">
     <value>Luôn bật cổng USB</value>
   </data>
+  <data name="AmdOverclocking_AllowInAllPowerModes_Message" xml:space="preserve">
+    <value>Apply Curve Optimizer and advanced options over all power mode.</value>
+  </data>
+  <data name="AmdOverclocking_AllowInAllPowerModes_Title" xml:space="preserve">
+    <value>Allow in all power modes</value>
+  </data>
+  <data name="AmdOverclocking_AllowOnBattery_Message" xml:space="preserve">
+    <value>Apply Curve Optimizer and FMax even when running on battery power.</value>
+  </data>
+  <data name="AmdOverclocking_AllowOnBattery_Title" xml:space="preserve">
+    <value>Allow on battery</value>
+  </data>
   <data name="AmdOverclocking_Apply_Changes" xml:space="preserve">
     <value>Áp dụng thay đổi</value>
   </data>
@@ -237,6 +249,12 @@
   </data>
   <data name="AmdOverclocking_Success_Title" xml:space="preserve">
     <value>Thành công</value>
+  </data>
+  <data name="AmdOverclocking_Tab_CurveOptimizer" xml:space="preserve">
+    <value>Curve Optimizer</value>
+  </data>
+  <data name="AmdOverclocking_Tab_Settings" xml:space="preserve">
+    <value>Settings</value>
   </data>
   <data name="AmdOverclocking_X3D_Gaming_Mode_Message" xml:space="preserve">
     <value>Tắt CCD 1 để đạt được sự ổn định về cả FPS và nhiệt độ</value>
@@ -739,6 +757,9 @@ Chuyển đổi giữa các chế độ có thể cần phải khởi động l�
   </data>
   <data name="CycleGodModePresetAutomationStepControl_Title" xml:space="preserve">
     <value>Thiết lập chế độ Tùy Chỉnh có sẵn</value>
+  </data>
+  <data name="AmdOverclocking_Tab_Advanced" xml:space="preserve">
+    <value>Advanced</value>
   </data>
   <data name="DashboardBattery_AcConnected" xml:space="preserve">
     <value>Đang cắm sạc</value>

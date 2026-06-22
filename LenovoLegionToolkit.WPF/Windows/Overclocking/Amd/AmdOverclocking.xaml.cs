@@ -46,6 +46,17 @@ public partial class AmdOverclocking : UiWindow
         {
             await LoadFromHardwareAsync();
 
+            try
+            {
+                _isUpdatingUi = true;
+                _allowOnBatteryToggle.IsChecked = _controller.AllowOnBattery;
+                _allowInAllPowerModesToggle.IsChecked = _controller.AllowInAllPowerModes;
+            }
+            finally
+            {
+                _isUpdatingUi = false;
+            }
+
             var profile = _controller.LoadProfile();
             if (profile != null)
             {
@@ -67,12 +78,19 @@ public partial class AmdOverclocking : UiWindow
             return;
         }
 
-        var existingProfile = _controller.LoadProfile();
-        var isEnabled = existingProfile?.Enabled == true;
+        var isEnabled = _controller.Enabled;
 
-        _isUpdatingUi = true;
-        _enableToggle.IsChecked = isEnabled;
-        _isUpdatingUi = false;
+        try
+        {
+            _isUpdatingUi = true;
+            _enableToggle.IsChecked = isEnabled;
+            _allowOnBatteryToggle.IsChecked = _controller.AllowOnBattery;
+            _allowInAllPowerModesToggle.IsChecked = _controller.AllowInAllPowerModes;
+        }
+        finally
+        {
+            _isUpdatingUi = false;
+        }
 
         if (!isEnabled)
         {
@@ -80,7 +98,7 @@ public partial class AmdOverclocking : UiWindow
             return;
         }
 
-        await InitializeAndLoadAsync(existingProfile);
+        await InitializeAndLoadAsync(_controller.LoadProfile());
     }
 
     private async Task InitializeAndLoadAsync(OverclockingProfile? existingProfile)
@@ -103,7 +121,7 @@ public partial class AmdOverclocking : UiWindow
 
         if (existingProfile != null)
         {
-            UpdateUiFromProfile(existingProfile);
+            UpdateUiFromProfile(existingProfile.Value);
         }
 
         if (!_controller.DoNotApply)
@@ -239,10 +257,6 @@ public partial class AmdOverclocking : UiWindow
     {
         if (profile == null) return;
 
-        _isUpdatingUi = true;
-        _enableToggle.IsChecked = profile.Value.Enabled;
-        _isUpdatingUi = false;
-
         if (profile.Value.FMax.HasValue)
         {
             _fMaxNumberBox.Value = profile.Value.FMax.Value;
@@ -280,7 +294,6 @@ public partial class AmdOverclocking : UiWindow
 
         return new OverclockingProfile
         {
-            Enabled = _enableToggle.IsChecked == true,
             FMax = fmaxVal,
             CoreValues = coreValues
         };
@@ -389,21 +402,29 @@ public partial class AmdOverclocking : UiWindow
         SetControlsEnabled(false);
     }
 
+    private void AllowOnBatteryToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_isUpdatingUi) return;
+
+        _controller.AllowOnBattery = _allowOnBatteryToggle.IsChecked == true;
+    }
+
+    private void AllowInAllPowerModesToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_isUpdatingUi) return;
+
+        _controller.AllowInAllPowerModes = _allowInAllPowerModesToggle.IsChecked == true;
+    }
+
     private void SaveEnabledState(bool enabled)
     {
-        var profile = _controller.LoadProfile() ?? new OverclockingProfile
-        {
-            Enabled = enabled,
-            FMax = null,
-            CoreValues = []
-        };
-
-        var updated = profile with { Enabled = enabled };
-        _controller.SaveProfile(updated);
+        _controller.Enabled = enabled;
     }
 
     private void SetControlsEnabled(bool enabled)
     {
+        _allowOnBatteryToggle.IsEnabled = enabled;
+        _allowInAllPowerModesToggle.IsEnabled = enabled;
         _fMaxToggle.IsEnabled = enabled;
         _fMaxNumberBox.IsEnabled = enabled;
         _x3dGamingToggle.IsEnabled = enabled;

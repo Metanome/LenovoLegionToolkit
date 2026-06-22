@@ -190,6 +190,18 @@
   <data name="AlwaysOnUSBControl_Title" xml:space="preserve">
     <value>Always on USB</value>
   </data>
+  <data name="AmdOverclocking_AllowInAllPowerModes_Message" xml:space="preserve">
+    <value>Apply Curve Optimizer and advanced options over all power mode.</value>
+  </data>
+  <data name="AmdOverclocking_AllowInAllPowerModes_Title" xml:space="preserve">
+    <value>Allow in all power modes</value>
+  </data>
+  <data name="AmdOverclocking_AllowOnBattery_Message" xml:space="preserve">
+    <value>Apply Curve Optimizer and FMax even when running on battery power.</value>
+  </data>
+  <data name="AmdOverclocking_AllowOnBattery_Title" xml:space="preserve">
+    <value>Allow on battery</value>
+  </data>
   <data name="AmdOverclocking_Apply_Changes" xml:space="preserve">
     <value>Änderungen anwenden</value>
   </data>
@@ -237,6 +249,12 @@
   </data>
   <data name="AmdOverclocking_Success_Title" xml:space="preserve">
     <value>Erfolg</value>
+  </data>
+  <data name="AmdOverclocking_Tab_CurveOptimizer" xml:space="preserve">
+    <value>Curve Optimizer</value>
+  </data>
+  <data name="AmdOverclocking_Tab_Settings" xml:space="preserve">
+    <value>Settings</value>
   </data>
   <data name="AmdOverclocking_X3D_Gaming_Mode_Message" xml:space="preserve">
     <value>CCD 1 deaktivieren, um Stabilität sowohl bei FPS als auch bei Temperaturen zu erhalten</value>
@@ -738,6 +756,9 @@ Ein Wechsel des Modus kann einen Neustart erfordern.</value>
   </data>
   <data name="CycleGodModePresetAutomationStepControl_Title" xml:space="preserve">
     <value>Benutzerdefinierter Modus voreinstellen</value>
+  </data>
+  <data name="AmdOverclocking_Tab_Advanced" xml:space="preserve">
+    <value>Advanced</value>
   </data>
   <data name="DashboardBattery_AcConnected" xml:space="preserve">
     <value>Netzadapter verbunden</value>

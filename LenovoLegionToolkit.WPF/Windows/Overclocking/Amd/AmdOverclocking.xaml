@@ -8,7 +8,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="AMD Precision Boost Overclocking"
     Width="1050"
-    Height="950"
+    Height="780"
     ExtendsContentIntoTitleBar="True"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
@@ -198,7 +198,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -261,215 +260,296 @@
             </Grid>
         </Border>
 
-        <Border
-            Grid.Row="3"
-            Margin="24,5,24,10"
-            Padding="20,15"
-            Background="{DynamicResource ControlFillColorDefaultBrush}"
-            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+            <TabControl
+                x:Name="_tabControl"
+                Margin="24,8,8,16"
+                HorizontalContentAlignment="Center"
+                Grid.IsSharedSizeScope="True"
+                ItemContainerStyle="{StaticResource SegmentedControlItemStyle}"
+                Style="{StaticResource SegmentedControlStyle}">
 
-                <Grid Grid.Column="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon
-                        Margin="0,0,15,0"
-                        FontSize="24"
-                        Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
-                        Symbol="PointScan24" />
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Text="{x:Static resources:Resource.AmdOverclocking_FMax_Frequency_Title}" />
-                        <TextBlock
-                            FontSize="11"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="{x:Static resources:Resource.AmdOverclocking_FMax_Frequency_Message}" />
-                    </StackPanel>
-
-                    <StackPanel
-                        Grid.Column="2"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
-
-                        <StackPanel
-                            Margin="0,0,10,0"
-                            IsEnabled="{Binding ElementName=_fMaxToggle, Path=IsChecked}"
-                            Orientation="Horizontal">
-                            <ui:NumberBox
-                                x:Name="_fMaxNumberBox"
-                                Width="100"
-                                SpinButtonPlacementMode="Compact" />
-                            <TextBlock
-                                Margin="5,0,0,0"
-                                VerticalAlignment="Center"
-                                FontSize="11"
-                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                Text="{x:Static resources:Resource.MHz}" />
-                        </StackPanel>
-
-                        <ui:ToggleSwitch
-                            x:Name="_fMaxToggle"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            IsChecked="True" />
-                    </StackPanel>
-                </Grid>
-
-                <Rectangle
-                    Grid.Column="1"
-                    Width="1"
-                    Margin="20,2"
-                    Fill="{DynamicResource DividerStrokeColorDefaultBrush}" />
-
-                <Grid Grid.Column="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon
-                        Margin="0,0,15,0"
-                        FontSize="24"
-                        Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
-                        Symbol="Games24" />
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Text="{x:Static resources:Resource.AmdOverclocking_X3D_Gaming_Mode_Title}" />
-                        <TextBlock
-                            FontSize="11"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="{x:Static resources:Resource.AmdOverclocking_X3D_Gaming_Mode_Message}" />
-                    </StackPanel>
-                    <ui:ToggleSwitch
-                        x:Name="_x3dGamingToggle"
-                        Grid.Column="2"
-                        VerticalAlignment="Center"
-                        Checked="X3DGamingModeEnabled_OnClick"
-                        Unchecked="X3DGamingModeDisabled_OnClick" />
-                </Grid>
-            </Grid>
-        </Border>
-
-        <ScrollViewer
-            Grid.Row="4"
-            Padding="24,0,24,20"
-            Focusable="False">
-            <StackPanel>
-                <Grid Margin="4,10,4,15">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                        <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="ArrowAutofitContent24" />
-                        <TextBlock
-                            Margin="10,0,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            FontWeight="SemiBold"
-                            Text="{x:Static resources:Resource.AmdOverclocking_Per_Core_Title}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <TextBlock
-                            Margin="0,0,10,0"
-                            VerticalAlignment="Center"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="{x:Static resources:Resource.AmdOverclocking_Global_Offset}" />
-                        <ui:Button
-                            Margin="0,0,5,0"
-                            Click="OnGlobalDecrementClick"
-                            Icon="Subtract24"
-                            ToolTip="{x:Static resources:Resource.AmdOverclocking_Global_Plus}" />
-                        <ui:Button
-                            Click="OnGlobalIncrementClick"
-                            Icon="Add24"
-                            ToolTip="{x:Static resources:Resource.AmdOverclocking_Global_Dim}" />
-                    </StackPanel>
-                </Grid>
-
-                <ItemsControl x:Name="_ccdItemsControl">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Expander IsExpanded="{Binding IsExpanded}" Style="{StaticResource ModernExpanderStyle}">
-                                <Expander.Header>
-                                    <StackPanel Orientation="Horizontal">
+                <TabItem Header="{x:Static resources:Resource.AmdOverclocking_Tab_Settings}">
+                    <StackPanel Margin="0,10,0,20">
+                            <Border
+                                Margin="0,0,0,8"
+                                Padding="16,14"
+                                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:SymbolIcon
+                                        Margin="0,0,12,0"
+                                        FontSize="20"
+                                        Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                        Symbol="BatteryCharge24" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock
                                             FontSize="14"
                                             FontWeight="Bold"
-                                            Text="{Binding HeaderTitle}" />
+                                            Text="{x:Static resources:Resource.AmdOverclocking_AllowOnBattery_Title}" />
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_AllowOnBattery_Message}" />
                                     </StackPanel>
-                                </Expander.Header>
+                                    <ui:ToggleSwitch
+                                        x:Name="_allowOnBatteryToggle"
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Checked="AllowOnBatteryToggle_Changed"
+                                        Unchecked="AllowOnBatteryToggle_Changed" />
+                                </Grid>
+                            </Border>
 
-                                <ItemsControl ItemsSource="{Binding Cores}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <UniformGrid Columns="2" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid
-                                                Height="44"
-                                                Margin="4,2"
-                                                IsEnabled="{Binding IsEnabled}">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
+                            <Border
+                                Margin="0,0,0,8"
+                                Padding="16,14"
+                                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:SymbolIcon
+                                        Margin="0,0,12,0"
+                                        FontSize="20"
+                                        Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                        Symbol="Gauge24" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="14"
+                                            FontWeight="Bold"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_AllowInAllPowerModes_Title}" />
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_AllowInAllPowerModes_Message}" />
+                                    </StackPanel>
+                                    <ui:ToggleSwitch
+                                        x:Name="_allowInAllPowerModesToggle"
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Checked="AllowInAllPowerModesToggle_Changed"
+                                        Unchecked="AllowInAllPowerModesToggle_Changed" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                </TabItem>
 
-                                                <Rectangle
-                                                    Grid.ColumnSpan="2"
-                                                    Margin="10,0"
-                                                    Style="{StaticResource RowSeparator}" />
+                <TabItem Header="{x:Static resources:Resource.AmdOverclocking_Tab_CurveOptimizer}">
+                    <StackPanel Margin="0,10,0,20">
+                            <Grid Margin="4,5,4,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                                                <StackPanel
-                                                    Margin="15,0,0,0"
-                                                    VerticalAlignment="Center"
-                                                    Orientation="Horizontal">
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="ArrowAutofitContent24" />
+                                    <TextBlock
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        FontWeight="SemiBold"
+                                        Text="{x:Static resources:Resource.AmdOverclocking_Per_Core_Title}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <TextBlock
+                                        Margin="0,0,10,0"
+                                        VerticalAlignment="Center"
+                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                        Text="{x:Static resources:Resource.AmdOverclocking_Global_Offset}" />
+                                    <ui:Button
+                                        Margin="0,0,5,0"
+                                        Click="OnGlobalDecrementClick"
+                                        Icon="Subtract24"
+                                        ToolTip="{x:Static resources:Resource.AmdOverclocking_Global_Plus}" />
+                                    <ui:Button
+                                        Click="OnGlobalIncrementClick"
+                                        Icon="Add24"
+                                        ToolTip="{x:Static resources:Resource.AmdOverclocking_Global_Dim}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <ItemsControl x:Name="_ccdItemsControl">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Expander IsExpanded="{Binding IsExpanded}" Style="{StaticResource ModernExpanderStyle}">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
                                                     <TextBlock
-                                                        VerticalAlignment="Center"
-                                                        FontWeight="Medium"
-                                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                        Text="{Binding DisplayName}" />
+                                                        FontSize="14"
+                                                        FontWeight="Bold"
+                                                        Text="{Binding HeaderTitle}" />
                                                 </StackPanel>
+                                            </Expander.Header>
 
-                                                <ui:NumberBox
-                                                    Grid.Column="1"
-                                                    Margin="0,0,15,0"
-                                                    HorizontalAlignment="Right"
-                                                    Style="{StaticResource ModernNumberBox}"
-                                                    Value="{Binding OffsetValue, Mode=TwoWay}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Expander>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+                                            <ItemsControl ItemsSource="{Binding Cores}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid Columns="2" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid
+                                                            Height="44"
+                                                            Margin="4,2"
+                                                            IsEnabled="{Binding IsEnabled}">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <Rectangle
+                                                                Grid.ColumnSpan="2"
+                                                                Margin="10,0"
+                                                                Style="{StaticResource RowSeparator}" />
+
+                                                            <StackPanel
+                                                                Margin="15,0,0,0"
+                                                                VerticalAlignment="Center"
+                                                                Orientation="Horizontal">
+                                                                <TextBlock
+                                                                    VerticalAlignment="Center"
+                                                                    FontWeight="Medium"
+                                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                    Text="{Binding DisplayName}" />
+                                                            </StackPanel>
+
+                                                            <ui:NumberBox
+                                                                Grid.Column="1"
+                                                                Margin="0,0,15,0"
+                                                                HorizontalAlignment="Right"
+                                                                Style="{StaticResource ModernNumberBox}"
+                                                                Value="{Binding OffsetValue, Mode=TwoWay}" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Expander>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                </TabItem>
+
+                <TabItem Header="{x:Static resources:Resource.AmdOverclocking_Tab_Advanced}">
+                    <StackPanel Margin="0,10,0,20">
+                            <Border
+                                Margin="0,0,0,8"
+                                Padding="20,15"
+                                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:SymbolIcon
+                                        Margin="0,0,15,0"
+                                        FontSize="24"
+                                        Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                        Symbol="PointScan24" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="14"
+                                            FontWeight="Bold"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_FMax_Frequency_Title}" />
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_FMax_Frequency_Message}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <StackPanel
+                                            Margin="0,0,10,0"
+                                            IsEnabled="{Binding ElementName=_fMaxToggle, Path=IsChecked}"
+                                            Orientation="Horizontal">
+                                            <ui:NumberBox
+                                                x:Name="_fMaxNumberBox"
+                                                Width="100"
+                                                SpinButtonPlacementMode="Compact" />
+                                            <TextBlock
+                                                Margin="5,0,0,0"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                                Text="{x:Static resources:Resource.MHz}" />
+                                        </StackPanel>
+
+                                        <ui:ToggleSwitch
+                                            x:Name="_fMaxToggle"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            IsChecked="True" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Padding="20,15"
+                                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:SymbolIcon
+                                        Margin="0,0,15,0"
+                                        FontSize="24"
+                                        Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                        Symbol="Games24" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="14"
+                                            FontWeight="Bold"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_X3D_Gaming_Mode_Title}" />
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Static resources:Resource.AmdOverclocking_X3D_Gaming_Mode_Message}" />
+                                    </StackPanel>
+                                    <ui:ToggleSwitch
+                                        x:Name="_x3dGamingToggle"
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Checked="X3DGamingModeEnabled_OnClick"
+                                        Unchecked="X3DGamingModeDisabled_OnClick" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                </TabItem>
+            </TabControl>
         </ScrollViewer>
 
         <Border
-            Grid.Row="5"
+            Grid.Row="4"
             Padding="24,16"
             Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
             BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"

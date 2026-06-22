@@ -234,10 +234,11 @@ public sealed class PowerStateListener : IListener<PowerStateListener.ChangedEve
             await _rgbController.SetLightControlOwnerAsync(true, true).ConfigureAwait(false);
         }
 
-        if (currentAdapterStatus == PowerAdapterStatus.Connected)
+        var overclockingController = IoCContainer.Resolve<AmdOverclockingController>();
+        if (overclockingController.IsActive())
         {
-            var overclockingController = IoCContainer.Resolve<AmdOverclockingController>();
-            if (overclockingController.IsActive())
+            var shouldApply = currentAdapterStatus == PowerAdapterStatus.Connected || overclockingController.AllowOnBattery;
+            if (shouldApply)
             {
                 Log.Instance.Trace($"Applying overclocking profile...");
                 await overclockingController.ApplyInternalProfileAsync().ConfigureAwait(false);

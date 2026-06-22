@@ -277,6 +277,42 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Apply Curve Optimizer and advanced options over all power mode. 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_AllowInAllPowerModes_Message {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_AllowInAllPowerModes_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Allow in all power modes 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_AllowInAllPowerModes_Title {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_AllowInAllPowerModes_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Apply Curve Optimizer and FMax even when running on battery power. 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_AllowOnBattery_Message {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_AllowOnBattery_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Allow on battery 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_AllowOnBattery_Title {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_AllowOnBattery_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Apply Changes 的本地化字符串。
         /// </summary>
         public static string AmdOverclocking_Apply_Changes {
@@ -417,6 +453,33 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string AmdOverclocking_Success_Title {
             get {
                 return ResourceManager.GetString("AmdOverclocking_Success_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Advanced 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_Tab_Advanced {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_Tab_Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Curve Optimizer 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_Tab_CurveOptimizer {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_Tab_CurveOptimizer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Settings 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_Tab_Settings {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_Tab_Settings", resourceCulture);
             }
         }
         

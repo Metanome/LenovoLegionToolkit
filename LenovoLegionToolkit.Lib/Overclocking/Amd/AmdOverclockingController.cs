@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.Resources;
+using LenovoLegionToolkit.Lib.Settings;
 using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.Utils;
 using ZenStates.Core;
@@ -25,6 +26,7 @@ public sealed class AmdOverclockingController : IDisposable
     private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly string _internalProfilePath = Path.Combine(Folders.AppData, "amd_overclocking.json");
     private readonly string _statusFilePath = Path.Combine(Folders.AppData, "system_status.json");
+    private readonly AmdOverclockingSettings _settings;
 
     private Cpu? _cpu;
     private MachineInformation? _machineInformation;
@@ -35,6 +37,41 @@ public sealed class AmdOverclockingController : IDisposable
     private AmdWmiCommand? _cachedDowncoreCmd;
 
     public bool DoNotApply { get; set; }
+
+    public bool Enabled
+    {
+        get => _settings.Store.Enabled;
+        set
+        {
+            _settings.Store.Enabled = value;
+            _settings.SynchronizeStore();
+        }
+    }
+
+    public bool AllowOnBattery
+    {
+        get => _settings.Store.AllowOnBattery;
+        set
+        {
+            _settings.Store.AllowOnBattery = value;
+            _settings.SynchronizeStore();
+        }
+    }
+
+    public bool AllowInAllPowerModes
+    {
+        get => _settings.Store.AllowInAllPowerModes;
+        set
+        {
+            _settings.Store.AllowInAllPowerModes = value;
+            _settings.SynchronizeStore();
+        }
+    }
+
+    public AmdOverclockingController(AmdOverclockingSettings settings)
+    {
+        _settings = settings;
+    }
 
     public async Task InitializeAsync()
     {
@@ -79,11 +116,7 @@ public sealed class AmdOverclockingController : IDisposable
 
     public bool IsSupported() => _isInitialized && _machineInformation?.Properties.IsAmdDevice == true;
 
-    public bool IsActive()
-    {
-        var profile = LoadProfile();
-        return profile?.Enabled == true;
-    }
+    public bool IsActive() => _settings.Store.Enabled;
 
     public Cpu GetCpu() => _cpu ?? throw new InvalidOperationException(Resource.AmdOverclocking_Not_Initialized_Message);
 
@@ -149,13 +182,16 @@ public sealed class AmdOverclockingController : IDisposable
             return;
         }
 
-        var status = await Power.IsPowerAdapterConnectedAsync().ConfigureAwait(false);
-
-        switch (status)
+        if (!_settings.Store.AllowOnBattery)
         {
-            case PowerAdapterStatus.ConnectedLowWattage:
-            case PowerAdapterStatus.Disconnected:
-                throw new InvalidOperationException(Resource.AmdOverclocking_Ac_Message);
+            var status = await Power.IsPowerAdapterConnectedAsync().ConfigureAwait(false);
+
+            switch (status)
+            {
+                case PowerAdapterStatus.ConnectedLowWattage:
+                case PowerAdapterStatus.Disconnected:
+                    throw new InvalidOperationException(Resource.AmdOverclocking_Ac_Message);
+            }
         }
 
         EnsureInitialized();
@@ -172,13 +208,12 @@ public sealed class AmdOverclockingController : IDisposable
                     }
                 }
             }
-        }).ConfigureAwait(false);
-    }
 
-    public async Task ApplyFMaxOverrideAsync(uint fmax)
-    {
-        EnsureInitialized();
-        await Task.Run(() => _cpu.SetFMax(fmax)).ConfigureAwait(false);
+            if (profile.FMax.HasValue)
+            {
+                _cpu.SetFMax(profile.FMax.Value);
+            }
+        }).ConfigureAwait(false);
     }
 
     public async Task ApplyInternalProfileAsync()

@@ -393,16 +393,13 @@ public partial class App
 
         var feature = IoCContainer.Resolve<AmdOverclockingController>();
 
-        if (feature.IsActive())
+        var cleanInfo = new ShutdownInfo
         {
-            var cleanInfo = new ShutdownInfo
-            {
-                Status = "Normal",
-                AbnormalCount = 0
-            };
+            Status = "Normal",
+            AbnormalCount = 0
+        };
 
-            feature.SaveShutdownInfo(cleanInfo);
-        }
+        feature.SaveShutdownInfo(cleanInfo);
 
         Dispatcher.Invoke(Shutdown);
     }
@@ -439,11 +436,6 @@ public partial class App
     private void ExecuteShutdownLogic()
     {
         var overclockController = IoCContainer.Resolve<AmdOverclockingController>();
-
-        if (!overclockController.IsActive())
-        {
-            return;
-        }
 
         var cleanInfo = new ShutdownInfo
         {
