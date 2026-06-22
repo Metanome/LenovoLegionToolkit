@@ -99,10 +99,10 @@
 
                     <!--  Inactive badge  -->
                     <Border
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
                         Margin="0,8,8,0"
                         Padding="6,3,6,3"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
                         Background="{DynamicResource SystemFillColorNeutralBackgroundBrush}"
                         BorderBrush="{DynamicResource ControlElevationBorderBrush}"
                         BorderThickness="1"
@@ -115,11 +115,11 @@
                                 VerticalAlignment="Center"
                                 Fill="{DynamicResource TextFillColorSecondaryBrush}" />
                             <TextBlock
+                                MaxWidth="50"
                                 FontSize="10"
                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                MaxWidth="50"
-                                TextTrimming="CharacterEllipsis"
                                 Text="{x:Static resources:Resource.Inactive}"
+                                TextTrimming="CharacterEllipsis"
                                 ToolTip="{x:Static resources:Resource.Inactive}" />
                         </StackPanel>
                     </Border>
@@ -173,17 +173,18 @@
                         <wpfui:Button
                             HorizontalAlignment="Center"
                             Appearance="Primary"
+                            Click="Kaguya_Click"
                             Content="{x:Static resources:Resource.DonatePage_Sponsor}"
                             Icon="Heart24"
-                            IsEnabled="False" />
+                            IsEnabled="True" />
                     </StackPanel>
 
                     <!--  Active badge  -->
                     <Border
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
                         Margin="0,8,8,0"
                         Padding="6,3,6,3"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
                         Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}"
                         BorderBrush="{DynamicResource ControlElevationBorderBrush}"
                         BorderThickness="1"
@@ -196,11 +197,11 @@
                                 VerticalAlignment="Center"
                                 Fill="{DynamicResource SystemFillColorSuccessBrush}" />
                             <TextBlock
+                                MaxWidth="50"
                                 FontSize="10"
                                 Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                                MaxWidth="50"
-                                TextTrimming="CharacterEllipsis"
                                 Text="{x:Static resources:Resource.Active}"
+                                TextTrimming="CharacterEllipsis"
                                 ToolTip="{x:Static resources:Resource.Active}" />
                         </StackPanel>
                     </Border>
@@ -261,10 +262,10 @@
 
                     <!--  Active badge  -->
                     <Border
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
                         Margin="0,8,8,0"
                         Padding="6,3,6,3"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
                         Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}"
                         BorderBrush="{DynamicResource ControlElevationBorderBrush}"
                         BorderThickness="1"
@@ -277,11 +278,11 @@
                                 VerticalAlignment="Center"
                                 Fill="{DynamicResource SystemFillColorSuccessBrush}" />
                             <TextBlock
+                                MaxWidth="50"
                                 FontSize="10"
                                 Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                                MaxWidth="50"
-                                TextTrimming="CharacterEllipsis"
                                 Text="{x:Static resources:Resource.Active}"
+                                TextTrimming="CharacterEllipsis"
                                 ToolTip="{x:Static resources:Resource.Active}" />
                         </StackPanel>
                     </Border>

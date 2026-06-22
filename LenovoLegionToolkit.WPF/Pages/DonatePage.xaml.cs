@@ -16,6 +16,12 @@ public partial class DonatePage
         e.Handled = true;
     }
 
+    private void Kaguya_Click(object sender, RoutedEventArgs e)
+    {
+        Constants.KaguyaUri.Open();
+        e.Handled = true;
+    }
+
     private void DrSkinnerGitHub_Click(object sender, RoutedEventArgs e)
     {
         Constants.DrSkinnerGitHubUri.Open();
