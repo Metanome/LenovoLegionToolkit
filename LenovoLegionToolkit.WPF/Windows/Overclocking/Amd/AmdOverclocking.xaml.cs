@@ -119,6 +119,8 @@ public partial class AmdOverclocking : UiWindow
 
         await LoadFromHardwareAsync();
 
+        _controller.SaveDefaultProfile(GetProfileFromUi());
+
         if (existingProfile != null)
         {
             UpdateUiFromProfile(existingProfile.Value);

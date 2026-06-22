@@ -6,6 +6,7 @@ using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Messaging;
 using LenovoLegionToolkit.Lib.Messaging.Messages;
 using LenovoLegionToolkit.Lib.System.Management;
+using LenovoLegionToolkit.Lib.Overclocking.Amd;
 using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.Lib.Listeners;
@@ -63,6 +64,12 @@ public class PowerModeListener(
                 await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                 await gpuOverclockController.EnsureOverclockIsAppliedAsync().ConfigureAwait(false);
             });
+        }
+
+        var amdOverclockingController = IoCContainer.Resolve<AmdOverclockingController>();
+        if (amdOverclockingController.IsActive() && !amdOverclockingController.AllowInAllPowerModes)
+        {
+            await amdOverclockingController.ApplyDefaultProfileAsync().ConfigureAwait(false);
         }
     }
 

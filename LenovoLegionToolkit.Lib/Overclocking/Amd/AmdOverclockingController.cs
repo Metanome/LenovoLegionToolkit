@@ -27,6 +27,7 @@ public sealed class AmdOverclockingController : IDisposable
 
     private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly string _internalProfilePath = Path.Combine(Folders.AppData, "amd_overclocking.json");
+    private readonly string _defaultProfilePath = Path.Combine(Folders.AppData, "default_amd_overclocking.json");
     private readonly string _statusFilePath = Path.Combine(Folders.AppData, "system_status.json");
     private readonly AmdOverclockingSettings _settings;
 
@@ -174,6 +175,46 @@ public sealed class AmdOverclockingController : IDisposable
         catch (Exception ex)
         {
             Log.Instance.Trace($"Save Profile Failed: {ex.Message}");
+        }
+    }
+
+    public OverclockingProfile? LoadDefaultProfile()
+    {
+        if (!File.Exists(_defaultProfilePath)) return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<OverclockingProfile>(File.ReadAllText(_defaultProfilePath));
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Load Default Profile Failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    public void SaveDefaultProfile(OverclockingProfile profile)
+    {
+        if (File.Exists(_defaultProfilePath)) return;
+
+        try
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            File.WriteAllText(_defaultProfilePath, JsonSerializer.Serialize(profile, options));
+            Log.Instance.Trace($"Default profile saved.");
+        }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Save Default Profile Failed: {ex.Message}");
+        }
+    }
+
+    public async Task ApplyDefaultProfileAsync()
+    {
+        if (LoadDefaultProfile() is { } defaultProfile)
+        {
+            await ApplyProfileAsync(defaultProfile).ConfigureAwait(false);
+            Log.Instance.Trace($"Default overclocking profile applied.");
         }
     }
 
