@@ -1,3 +1,4 @@
+using LenovoLegionToolkit.Lib.Controllers;
 using LenovoLegionToolkit.Lib.Controllers.GodMode;
 using LenovoLegionToolkit.Lib.Features;
 using LenovoLegionToolkit.Lib.Resources;
@@ -280,6 +281,19 @@ public sealed class AmdOverclockingController : IDisposable
         {
             var powerModeFeature = IoCContainer.Resolve<PowerModeFeature>();
             var state = await powerModeFeature.GetStateAsync().ConfigureAwait(false);
+            var settings = IoCContainer.Resolve<ApplicationSettings>();
+            var mappingMode = settings.Store.PowerModeMappingMode;
+
+            if (mappingMode == PowerModeMappingMode.WindowsPowerMode)
+            {
+                var windowsPowerModeController = IoCContainer.Resolve<WindowsPowerModeController>();
+                await windowsPowerModeController.SetBalancedPowerModeAsync(skipThrottle: true).ConfigureAwait(false);
+            }
+            else if (mappingMode == PowerModeMappingMode.WindowsPowerPlan)
+            {
+                var windowsPowerPlanController = IoCContainer.Resolve<WindowsPowerPlanController>();
+                await windowsPowerPlanController.SetBalancedPowerPlanAsync(skipThrottle: true).ConfigureAwait(false);
+            }
 
             if (state == PowerModeState.GodMode)
             {

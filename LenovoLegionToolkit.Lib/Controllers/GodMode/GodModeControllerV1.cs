@@ -224,7 +224,7 @@ public class GodModeControllerV1(
             }
         }
 
-        RaisePresetChanged(presetId);
+        await RaisePresetChanged(presetId);
 
         Log.Instance.Trace($"State applied. [name={preset.Name}, id={presetId}]");
     }

@@ -249,6 +249,13 @@ public partial class App
         };
 
         await Task.WhenAll(initTasks);
+
+        var postTasks = new List<Task>
+        {
+            SafeInitAsync(PostApplyAmdOverclockingProfileAsync, "AMD Overclocking Profile"),
+        };
+
+        await Task.WhenAll(postTasks);
     }
 
     private Task StartBackgroundServicesAsync()
@@ -750,7 +757,6 @@ public partial class App
             if (await feature.IsSupportedAsync())
             {
                 await feature.EnsureGodModeStateIsAppliedAsync();
-                await feature.EnsureCorrectWindowsPowerSettingsAreSetAsync();
             }
         }
         catch (Exception ex)
@@ -948,13 +954,7 @@ public partial class App
             if (feature.IsActive())
             {
                 await feature.InitializeAsync().ConfigureAwait(false);
-
-                if (!feature.DoNotApply)
-                {
-                    await feature.ApplyInternalProfileAsync().ConfigureAwait(false);
-                }
-
-                Log.Instance.Trace($"AMD Overclocking Controller initialization task finished.");
+                Log.Instance.Trace($"AMD Overclocking Controller initialized.");
             }
         }
         catch (InvalidOperationException)
@@ -964,6 +964,16 @@ public partial class App
         catch (Exception ex)
         {
             Log.Instance.Trace($"Failed to apply profile on startup: {ex.Message}", ex);
+        }
+    }
+
+    private static async Task PostApplyAmdOverclockingProfileAsync()
+    {
+        var feature = IoCContainer.Resolve<AmdOverclockingController>();
+
+        if (feature.IsActive() && !feature.DoNotApply && feature.IsSupported())
+        {
+            await feature.ApplyInternalProfileAsync().ConfigureAwait(false);
         }
     }
 

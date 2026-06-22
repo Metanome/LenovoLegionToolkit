@@ -259,7 +259,6 @@ public sealed class PowerStateListener : IListener<PowerStateListener.ChangedEve
                 await _powerModeFeature.SetStateAsync(_powerModeFeature.LastPowerModeState).ConfigureAwait(false);
             }
 
-            await _powerModeFeature.EnsureCorrectWindowsPowerSettingsAreSetAsync().ConfigureAwait(false);
             await _powerModeFeature.EnsureGodModeStateIsAppliedAsync().ConfigureAwait(false);
         }
 

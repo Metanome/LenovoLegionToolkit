@@ -103,7 +103,7 @@ public class GodModeControllerV4(
             Log.Instance.Trace($"Overclocking is disabled.");
         }
 
-        RaisePresetChanged(presetId);
+        await RaisePresetChanged(presetId);
         Log.Instance.Trace($"State applied. [name={preset.Name}, id={presetId}]");
     }
 

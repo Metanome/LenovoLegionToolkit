@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using LenovoLegionToolkit.Lib.Controllers;
+﻿using LenovoLegionToolkit.Lib.Controllers;
 using LenovoLegionToolkit.Lib.Controllers.GodMode;
 using LenovoLegionToolkit.Lib.Listeners;
 using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.System.Management;
 using LenovoLegionToolkit.Lib.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using static LenovoLegionToolkit.Lib.Settings.GodModeSettings;
 
 namespace LenovoLegionToolkit.Lib.Features;
@@ -123,7 +124,10 @@ public class PowerModeFeature(
     {
         var state = await GetStateAsync().ConfigureAwait(false);
         if (state != PowerModeState.GodMode)
+        {
+            await EnsureCorrectWindowsPowerSettingsAreSetAsync().ConfigureAwait(false);
             return;
+        }
 
         await godModeController.ApplyStateAsync().ConfigureAwait(false);
     }

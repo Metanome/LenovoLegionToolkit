@@ -123,7 +123,7 @@ public abstract class AbstractGodModeController(GodModeSettings settings)
 
     protected abstract Task<GodModePreset> GetDefaultStateAsync();
 
-    protected async void RaisePresetChanged(Guid presetId)
+    protected async Task RaisePresetChanged(Guid presetId)
     {
         var feature = IoCContainer.Resolve<PowerModeFeature>();
         var (_, preset) = await GetActivePresetAsync().ConfigureAwait(false);
