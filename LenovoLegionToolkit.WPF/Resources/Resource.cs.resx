@@ -673,6 +673,9 @@ Tento čas nemusí být přesný, pokud byl notebook nabíjen ve spánku nebo ve
     <value>Vlastní logo pro spuštění musí být přesně {0} pixelů velké.
 Podporované formáty jsou: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Vlastní logo nebylo možné nastavit: {0}</value>
   </data>

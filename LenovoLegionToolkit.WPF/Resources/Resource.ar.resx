@@ -672,6 +672,9 @@
     <value>شعار التمهيد المخصص يجب أن يكون كبير على وجه الدقة {0} بكسل.
 الصيغ المدعومة هي: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>لا يمكن تعيين شعار مخصص: {0}</value>
   </data>

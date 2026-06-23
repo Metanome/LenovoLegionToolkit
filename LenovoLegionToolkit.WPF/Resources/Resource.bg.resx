@@ -672,6 +672,9 @@
     <value>Потребителското лого трябва да бъде с големина от точно {0} пиксела.
 Поддържаните формати са: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Потребителското лого не беше зададено успешно: {0}</value>
   </data>

@@ -673,6 +673,9 @@ Ta wartość może być niedokładna, jeżeli komputer był wtedy uśpiony lub w
     <value>Własne logo musi być w rozmiarze {0} pikseli.
 Obsługiwane formaty obrazka: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Logo użytkownika nie mogło zostać ustawione: {0}</value>
   </data>

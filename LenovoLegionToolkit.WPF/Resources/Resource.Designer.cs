@@ -1738,6 +1738,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Disable Windows Startup Animation 的本地化字符串。
+        /// </summary>
+        public static string BootLogoWindow_Disable_Windows_Animation {
+            get {
+                return ResourceManager.GetString("BootLogoWindow_Disable_Windows_Animation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Custom logo could not be set: {0} 的本地化字符串。
         /// </summary>
         public static string BootLogoWindow_SetCustomFailed {

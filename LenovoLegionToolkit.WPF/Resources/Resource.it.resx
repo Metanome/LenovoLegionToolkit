@@ -672,6 +672,9 @@ l'orario indicato potrebbe non essere corretto se il laptop è stato caricato me
     <value>Il logo di avvio personalizzato deve essere esattamente grande {0} pixel.
 I formati supportati sono: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Impossibile impostare il logo personalizzato: {0}</value>
   </data>

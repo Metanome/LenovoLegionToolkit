@@ -672,6 +672,9 @@
     <value>Користувальницька познака завантаження має бути рівно {0} пікселів.
 Підтримувані формати: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Користувацький логотип не може бути встановленим: {0}</value>
   </data>

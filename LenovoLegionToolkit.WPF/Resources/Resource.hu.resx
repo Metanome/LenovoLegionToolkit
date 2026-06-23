@@ -673,6 +673,9 @@ Ez az idő nem biztos, hogy pontos, ha a laptopot alvó vagy kikapcsolt állapot
     <value>Az egyéni boot logónak pontosan {0} pixel méretűnek kell lennie.
 A támogatott formátumok a következők: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Az egyéni logót nem lehetett beállítani: {0}</value>
   </data>

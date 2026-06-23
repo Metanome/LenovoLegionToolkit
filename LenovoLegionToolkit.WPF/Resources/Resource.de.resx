@@ -672,6 +672,9 @@ Diese Zeit ist möglicherweise nicht genau, wenn der Laptop im Schlaf oder im au
     <value>Das benutzerdefinierte Boot-Logo muss genau {0} Pixel groß sein.
 Unterstützte Formate sind: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Benutzerdefiniertes Logo kann nicht eingestellt werden: {0}</value>
   </data>

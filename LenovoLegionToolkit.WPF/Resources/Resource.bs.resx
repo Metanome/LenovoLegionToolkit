@@ -673,6 +673,9 @@ Ovo vrijeme možda neće biti tačno ako je laptop bio napunjen dok je spavao il
     <value>Custom boot logo must be exactly {0} pixels large.
 Supported formats are: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Custom logo could not be set: {0}</value>
   </data>

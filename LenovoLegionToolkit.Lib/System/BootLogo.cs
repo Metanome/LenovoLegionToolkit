@@ -107,8 +107,6 @@ public static class BootLogo
                 await UnMountEfiPartitionAsync(drive.Value).ConfigureAwait(false);
         }
 
-        await DisableWindowsBootUXAsync().ConfigureAwait(false);
-
         Log.Instance.Trace($"Enabled logo. [sourcePath={sourcePath}]");
     }
 
@@ -131,8 +129,6 @@ public static class BootLogo
 
         WriteChecksum(SHA256_VERSION, new byte[32]);
         SetInfo(GetInfo() with { Enabled = 0 });
-
-        await EnableWindowsBootUXAsync().ConfigureAwait(false);
 
         Log.Instance.Trace($"Disabled logo.");
     }
@@ -369,34 +365,13 @@ public static class BootLogo
         Log.Instance.Trace($"Image valid. [sourcePath={sourcePath}, actualExtension={actualExtension}]");
     }
 
-    private static async Task DisableWindowsBootUXAsync()
+    public static async Task SetWindowsBootAnimationAsync(bool disable)
     {
-        Log.Instance.Trace($"Disabling Windows boot animation...");
+        var arg = disable ? "on" : "off";
+        Log.Instance.Trace($"Setting bootuxdisabled {arg}...");
 
-        try
-        {
-            var (result, _) = await CMD.RunAsync("bcdedit", "-set bootuxdisabled on").ConfigureAwait(false);
-            Log.Instance.Trace($"Disable Windows boot animation result: {result}");
-        }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Failed to disable Windows boot animation. [ex={ex.Message}]");
-        }
-    }
-
-    private static async Task EnableWindowsBootUXAsync()
-    {
-        Log.Instance.Trace($"Enabling Windows boot animation...");
-
-        try
-        {
-            var (result, _) = await CMD.RunAsync("bcdedit", "-set bootuxdisabled off").ConfigureAwait(false);
-            Log.Instance.Trace($"Enable Windows boot animation result: {result}");
-        }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Failed to enable Windows boot animation. [ex={ex.Message}]");
-        }
+        var (result, _) = await CMD.RunAsync("bcdedit", $"-set bootuxdisabled {arg}").ConfigureAwait(false);
+        Log.Instance.Trace($"bootuxdisabled {arg} result: {result}");
     }
 
     private static char GetUnusedDriveLetter()

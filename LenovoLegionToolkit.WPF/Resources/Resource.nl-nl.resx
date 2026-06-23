@@ -673,6 +673,9 @@ Deze tijd is mogelijk niet nauwkeurig als de laptop is opgeladen tijdens het sla
     <value>Aangepaste opstartlogo moet precies {0} pixels groot zijn.
 Ondersteunde formaten zijn: {1}.</value>
   </data>
+  <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
+    <value>Disable Windows Startup Animation</value>
+  </data>
   <data name="BootLogoWindow_SetCustomFailed" xml:space="preserve">
     <value>Aangepaste logo kon niet ingesteld worden: {0}</value>
   </data>
