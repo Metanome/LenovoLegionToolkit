@@ -337,7 +337,7 @@ public partial class AmdOverclocking : UiWindow
         if (sfd.ShowDialog() == true)
         {
             _controller.SaveProfile(GetProfileFromUi(), sfd.FileName);
-            ShowStatus("Saved", "Success", InfoBarSeverity.Success);
+            ShowStatus(Resource.Export, Resource.AmdOverclocking_Success_Title, InfoBarSeverity.Success);
         }
     }
 
@@ -348,7 +348,7 @@ public partial class AmdOverclocking : UiWindow
         {
             var loadedProfile = _controller.LoadProfile(ofd.FileName);
             UpdateUiFromProfile(loadedProfile);
-            ShowStatus("Loaded", "Success", InfoBarSeverity.Informational);
+            ShowStatus(Resource.Import, Resource.AmdOverclocking_Success_Title, InfoBarSeverity.Informational);
         }
     }
 

@@ -1,10 +1,3 @@
-using LenovoLegionToolkit.Lib.Controllers;
-using LenovoLegionToolkit.Lib.Controllers.GodMode;
-using LenovoLegionToolkit.Lib.Features;
-using LenovoLegionToolkit.Lib.Resources;
-using LenovoLegionToolkit.Lib.Settings;
-using LenovoLegionToolkit.Lib.System;
-using LenovoLegionToolkit.Lib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,6 +6,13 @@ using System.Management;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using LenovoLegionToolkit.Lib.Controllers;
+using LenovoLegionToolkit.Lib.Controllers.GodMode;
+using LenovoLegionToolkit.Lib.Features;
+using LenovoLegionToolkit.Lib.Resources;
+using LenovoLegionToolkit.Lib.Settings;
+using LenovoLegionToolkit.Lib.System;
+using LenovoLegionToolkit.Lib.Utils;
 using ZenStates.Core;
 
 namespace LenovoLegionToolkit.Lib.Overclocking.Amd;
@@ -308,7 +308,7 @@ public sealed class AmdOverclockingController : IDisposable
         }
         catch (Exception ex)
         {
-            Log.Instance.Trace($"ForceApplyGodModePowerPlanAsync failed.", ex);
+            Log.Instance.Trace($"ForceApplyPowerMappingAsync failed.", ex);
         }
     }
 

@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:resources="clr-namespace:LenovoLegionToolkit.WPF.Resources"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="AMD Precision Boost Overclocking"
+    Title="{x:Static resources:Resource.AmdOverclocking_Title}"
     Width="1050"
     Height="850"
     ExtendsContentIntoTitleBar="True"
@@ -203,7 +203,7 @@
         </Grid.RowDefinitions>
 
         <ui:TitleBar
-            Title="AMD Precision Boost Overclocking"
+            Title="{x:Static resources:Resource.AmdOverclocking_Title}"
             Grid.Row="0"
             Margin="5" />
 
