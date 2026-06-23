@@ -1728,7 +1728,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Custom boot logo must be exactly {0} pixels large.
+        ///   查找类似 Custom boot logo must within {0} pixels large.
         ///Supported formats are: {1}. 的本地化字符串。
         /// </summary>
         public static string BootLogoWindow_Description {

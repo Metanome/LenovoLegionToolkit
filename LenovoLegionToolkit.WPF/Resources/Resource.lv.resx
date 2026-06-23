@@ -676,7 +676,7 @@ Tiks izpildītas tikai tās darbības, kas atbilst pašreizējam stāvoklim.</va
     <value>Noklusējuma Sāknēšanās Logo ir iestatīts</value>
   </data>
   <data name="BootLogoWindow_Description" xml:space="preserve">
-    <value>Custom boot logo must be exactly {0} pixels large.
+    <value>Custom boot logo must within {0} pixels large.
 Supported formats are: {1}.</value>
   </data>
   <data name="BootLogoWindow_Disable_Windows_Animation" xml:space="preserve">
