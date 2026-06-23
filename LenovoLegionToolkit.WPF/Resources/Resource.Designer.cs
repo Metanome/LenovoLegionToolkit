@@ -403,7 +403,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Maximum CPU boost frequency override (MHz) 的本地化字符串。
+        ///   查找类似 Maximum CPU boost frequency override (MHz). 的本地化字符串。
         /// </summary>
         public static string AmdOverclocking_FMax_Frequency_Message {
             get {
@@ -565,7 +565,7 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Disable CCD 1 to get stability on both FPS and temperatures 的本地化字符串。
+        ///   查找类似 Disable CCD 1 to get stability on both FPS and temperatures. 的本地化字符串。
         /// </summary>
         public static string AmdOverclocking_X3D_Gaming_Mode_Message {
             get {
