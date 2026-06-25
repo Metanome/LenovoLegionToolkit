@@ -562,6 +562,13 @@ public readonly struct LampArrayInfo(string id, string displayName, LampArray la
     public readonly LampArray LampArray = lampArray;
 }
 
+public readonly record struct LogoDiyVersion(uint Raw)
+{
+    public bool SupportsSha256 => Raw is 0 or >= 0x00020003;
+
+    public override string ToString() => $"0x{Raw:X}";
+}
+
 public readonly struct MachineInformation
 {
     public readonly struct FeatureData(FeatureData.SourceType sourceType, IEnumerable<CapabilityID> capabilities)

@@ -51,6 +51,12 @@ public static class BootLogo
         }
     }
 
+    public static LogoDiyVersion GetLogoDiyVersion()
+    {
+        var raw = ReadExistingLBLDVCVersion();
+        return new LogoDiyVersion(raw < 0 ? 0U : (uint)raw);
+    }
+
     public static (bool, Resolution, ImageFormat[], string[]) GetStatus()
     {
         var info = GetInfo();
@@ -70,8 +76,6 @@ public static class BootLogo
         var version = useSha256 ? SHA256_VERSION : existingVersion;
 
         Log.Instance.Trace($"Existing LBLDVC version: 0x{existingVersion.ToString("X")}, using SHA256: {useSha256}");
-
-        SetInfo(info with { Enabled = 1 });
 
         char? drive = null;
         try
@@ -100,6 +104,7 @@ public static class BootLogo
             }
 
             WriteChecksum(version, hash);
+            SetInfo(info with { Enabled = 1 });
         }
         finally
         {
@@ -295,19 +300,27 @@ public static class BootLogo
 
     private static void DeleteLogosOnEfiPartition(char drive)
     {
-        Log.Instance.Trace($"Deleting logos on EFI partition...");
-
         var directoryPath = $@"{drive}:\EFI\Lenovo\Logo";
         if (!Directory.Exists(directoryPath))
-        {
-            Log.Instance.Trace($"No logos to delete.");
             return;
+
+        try
+        {
+            Directory.Delete(directoryPath, true);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            var dirInfo = new DirectoryInfo(directoryPath);
+            dirInfo.Attributes &= ~FileAttributes.ReadOnly;
+            foreach (var file in dirInfo.EnumerateFiles("*", SearchOption.AllDirectories))
+            {
+                file.Attributes &= ~FileAttributes.ReadOnly;
+                file.Delete();
+            }
+            Directory.Delete(directoryPath, true);
         }
 
-        var files = Directory.EnumerateFiles(directoryPath, "mylogo*").ToArray();
-        files.ForEach(File.Delete);
-
-        Log.Instance.Trace($"Logos deleted. [count={files.Length}]");
+        Log.Instance.Trace($"Logo directory deleted. [path={directoryPath}]");
     }
 
     private static string CopyLogoToEfiPartition(BootLogoInfo info, string sourcePath, char drive)
