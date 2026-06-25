@@ -71,7 +71,6 @@ public partial class BootLogoWindow
             var ofd = new OpenFileDialog
             {
                 Title = "Open",
-                InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}",
                 Filter = $"Images|{string.Join(";", filters)}",
                 CheckFileExists = true,
             };

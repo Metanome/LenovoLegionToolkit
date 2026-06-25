@@ -345,6 +345,7 @@ public static class BootLogo
             [0xFF, 0xD8, ..] => ".jpg",
             [0x89, 0x50, 0x4E, 0x47] => ".png",
             [0x42, 0x4D, ..] => ".bmp",
+            [0x47, 0x49, 0x46, 0x38, 0x37, 0x61] => ".gif",
             _ => Path.GetExtension(sourcePath)
         };
     }

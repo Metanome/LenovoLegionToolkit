@@ -525,6 +525,7 @@ internal readonly struct LENOVO_SPECTRUM_STATE_RESPONSE
 public enum BootLogoFormat : byte
 {
     Jpeg = 0x1,
+    Gif = 0x8,
     Bmp = 0x10,
     Png = 0x20,
 }
