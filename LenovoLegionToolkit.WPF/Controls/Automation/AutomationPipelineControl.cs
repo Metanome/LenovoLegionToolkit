@@ -554,6 +554,7 @@ public class AutomationPipelineControl : UserControl
         {
             control = automationStep switch
             {
+                AIEngineAutomationStep s => new AIEngineAutomationStepControl(s),
                 AlwaysOnUsbAutomationStep s => new AlwaysOnUsbAutomationStepControl(s),
                 BatteryAutomationStep s => new BatteryAutomationStepControl(s),
                 BatteryNightChargeAutomationStep s => new BatteryNightChargeAutomationStepControl(s),

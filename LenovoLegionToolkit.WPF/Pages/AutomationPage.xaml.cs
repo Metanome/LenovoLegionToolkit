@@ -167,6 +167,7 @@ public partial class AutomationPage
     {
         var steps = new List<IAutomationStep>
         {
+            new AIEngineAutomationStep(default),
             new AlwaysOnUsbAutomationStep(default),
             new BatteryAutomationStep(default),
             new BatteryNightChargeAutomationStep(default),
