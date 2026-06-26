@@ -10,7 +10,7 @@ using LenovoLegionToolkit.Lib.Listeners;
 using LenovoLegionToolkit.Lib.Utils;
 using LenovoLegionToolkit.WPF.Resources;
 using LenovoLegionToolkit.WPF.Utils;
-using LenovoLegionToolkit.WPF.Windows.Utils;
+using LenovoLegionToolkit.WPF.Windows.Settings;
 using Wpf.Ui.Common;
 using Button = Wpf.Ui.Controls.Button;
 
@@ -26,7 +26,7 @@ public class ITSModeControl : AbstractComboBoxFeatureCardControl<ITSMode>
         Icon = SymbolRegular.Settings24,
         FontSize = 20,
         Margin = new(8, 0, 0, 0),
-        Visibility = Visibility.Collapsed,
+        Visibility = Visibility.Visible,
     };
 
     public ITSModeControl()
@@ -36,9 +36,24 @@ public class ITSModeControl : AbstractComboBoxFeatureCardControl<ITSMode>
         Subtitle = Resource.ITSModeControl_Message;
 
         AutomationProperties.SetName(_configButton, Resource.ITSModeControl_Title);
+        _configButton.Click += ConfigButton_Click;
 
         IsVisibleChanged += ITSModeControl_IsVisibleChanged;
         _iTSModeListener.Changed += ITSModeListener_Changed;
+    }
+
+    protected override FrameworkElement GetAccessory(ComboBox comboBox)
+    {
+        var panel = new StackPanel { Orientation = Orientation.Horizontal };
+        panel.Children.Add(_configButton);
+        panel.Children.Add(comboBox);
+        return panel;
+    }
+
+    private void ConfigButton_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new ITSModeConfigWindow { Owner = Window.GetWindow(this) };
+        window.ShowDialog();
     }
 
     private async void ITSModeListener_Changed(object? sender, ITSModeListener.ChangedEventArgs e)

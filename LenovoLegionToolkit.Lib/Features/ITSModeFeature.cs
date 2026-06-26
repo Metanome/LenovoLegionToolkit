@@ -155,12 +155,16 @@ public partial class ITSModeFeature : IFeature<ITSMode>
             var supportedStates = await GetAllStatesAsync().ConfigureAwait(false);
             var supportedSet = new HashSet<ITSMode>(supportedStates);
 
-            var toggleOrder = new[] { ITSMode.MmcCool, ITSMode.ItsAuto, ITSMode.MmcPerformance, ITSMode.MmcGeek };
+            var settings = IoCContainer.Resolve<ITSModeSettings>();
+            var userOrder = settings.Store.FnQModeOrder;
+            if (userOrder == null || userOrder.Count == 0)
+                userOrder = [ITSMode.MmcCool, ITSMode.ItsAuto, ITSMode.MmcPerformance, ITSMode.MmcGeek];
+            var disabledSet = new HashSet<ITSMode>(settings.Store.DisabledModes ?? []);
 
             var isConnected = await Power.IsPowerAdapterConnectedAsync().ConfigureAwait(false) == PowerAdapterStatus.Connected;
 
-            var availableStates = toggleOrder
-                .Where(s => supportedSet.Contains(s) && (isConnected || s != ITSMode.MmcGeek))
+            var availableStates = userOrder
+                .Where(s => supportedSet.Contains(s) && !disabledSet.Contains(s) && (isConnected || s != ITSMode.MmcGeek))
                 .ToArray();
 
             if (availableStates.Length == 0) return ITSMode.None;
