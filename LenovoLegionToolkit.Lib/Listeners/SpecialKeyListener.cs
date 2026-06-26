@@ -279,12 +279,23 @@ public class SpecialKeyListener(
         var currentState = await precisionTouchpadLockFeature.GetStateAsync().ConfigureAwait(false);
         var newState = currentState == TouchpadLockState.On ? TouchpadLockState.Off : TouchpadLockState.On;
         await precisionTouchpadLockFeature.SetStateAsync(newState).ConfigureAwait(false);
+        await NotifyTouchpadLockAsync().ConfigureAwait(false);
     }
 
     private static void OpenSnippingTool()
     {
         Log.Instance.Trace($"Starting snipping tool..");
         Process.Start("explorer", "ms-screenclip:");
+    }
+
+    private async Task NotifyTouchpadLockAsync()
+    {
+        if (!await precisionTouchpadLockFeature.IsSupportedAsync().ConfigureAwait(false))
+            return;
+        var status = await precisionTouchpadLockFeature.GetStateAsync().ConfigureAwait(false);
+        MessagingCenter.Publish(status == TouchpadLockState.Off
+            ? new NotificationMessage(NotificationType.TouchpadOn)
+            : new NotificationMessage(NotificationType.TouchpadOff));
     }
 
     private static void NotifySpectrumBacklight(SpectrumKeyboardBacklightBrightness value)

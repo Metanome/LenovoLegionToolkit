@@ -18,7 +18,7 @@ namespace LenovoLegionToolkit.Lib.Listeners;
 public class DriverKeyListener(
     FnKeysDisabler fnKeysDisabler,
     MicrophoneFeature microphoneFeature,
-    TouchpadLockFeature touchpadLockFeature,
+    TouchpadLockWmiFeature touchpadLockWmiFeature,
     WhiteKeyboardBacklightFeature whiteKeyboardBacklightFeature)
     : IListener<DriverKeyListener.ChangedEventArgs>
 {
@@ -175,9 +175,9 @@ public class DriverKeyListener(
 
     private async Task NotifyTouchpadLockAsync()
     {
-        if (!await touchpadLockFeature.IsSupportedAsync().ConfigureAwait(false))
+        if (!await touchpadLockWmiFeature.IsSupportedAsync().ConfigureAwait(false))
             return;
-        var status = await touchpadLockFeature.GetStateAsync().ConfigureAwait(false);
+        var status = await touchpadLockWmiFeature.GetStateAsync().ConfigureAwait(false);
         MessagingCenter.Publish(status == TouchpadLockState.Off
             ? new NotificationMessage(NotificationType.TouchpadOn)
             : new NotificationMessage(NotificationType.TouchpadOff));
