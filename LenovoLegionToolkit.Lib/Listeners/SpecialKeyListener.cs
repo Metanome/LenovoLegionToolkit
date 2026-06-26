@@ -17,7 +17,8 @@ public class SpecialKeyListener(
     ApplicationSettings settings,
     FnKeysDisabler fnKeysDisabler,
     RefreshRateFeature feature,
-    MicrophoneFeature microphoneFeature)
+    MicrophoneFeature microphoneFeature,
+    PrecisionTouchpadLockFeature precisionTouchpadLockFeature)
     : AbstractWMIListener<SpecialKeyListener.ChangedEventArgs, SpecialKey, int>(WMI.LenovoUtilityEvent.Listen)
 {
     public class ChangedEventArgs(SpecialKey specialKey, int rawValue) : EventArgs
@@ -172,6 +173,9 @@ public class SpecialKeyListener(
             case SpecialKey.FnF8:
                 ToggleAirplaneMode();
                 break;
+            case SpecialKey.FnF8_ThinkBook:
+                await TogglePrecisionTouchPad().ConfigureAwait(false);
+                break;
             case SpecialKey.WhiteBacklightOff:
                 NotifyWhiteBacklight(WhiteKeyboardBacklightState.Off);
                 break;
@@ -265,6 +269,16 @@ public class SpecialKeyListener(
         var isAirplaneModeOn = AirplaneMode.Toggle();
         MessagingCenter.Publish(new NotificationMessage(
             isAirplaneModeOn ? NotificationType.AirplaneModeOn : NotificationType.AirplaneModeOff));
+    }
+
+    public async Task TogglePrecisionTouchPad()
+    {
+        if (!await precisionTouchpadLockFeature.IsSupportedAsync().ConfigureAwait(false))
+            return;
+
+        var currentState = await precisionTouchpadLockFeature.GetStateAsync().ConfigureAwait(false);
+        var newState = currentState == TouchpadLockState.On ? TouchpadLockState.Off : TouchpadLockState.On;
+        await precisionTouchpadLockFeature.SetStateAsync(newState).ConfigureAwait(false);
     }
 
     private static void OpenSnippingTool()

@@ -747,6 +747,7 @@ public enum SpecialKey
     SpectrumPreset4 = 35,
     SpectrumPreset5 = 36,
     SpectrumPreset6 = 37,
+    FnF8_ThinkBook = 41,
     FnN = 42,
     FnF4 = 62,
     FnF8 = 63,

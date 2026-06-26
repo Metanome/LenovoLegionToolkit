@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Management;
 using System.Threading.Tasks;
 
 // ReSharper disable InconsistentNaming
@@ -15,5 +16,11 @@ public static partial class WMI
               $"SELECT * FROM LENOVO_UTILITY_DATA",
               "SetFeature",
               new() { { "featuretype", ledState } });
+
+        public static async Task<bool> GetFeatureSupportStateAsync(int dataType, uint minVersion)
+        {
+            var data = await CallAsync<uint>("root\\WMI", $"SELECT * FROM LENOVO_UTILITY_DATA", "GetIfSupportOrVersion", new() { { "datatype", dataType } }, props => (uint)props["Data"].Value);
+            return data >= minVersion;
+        }
     }
 }
