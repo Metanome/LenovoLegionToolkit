@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Station.Core;
-using LenovoLegionToolkit.Lib.Station.Logging;
 using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.WPF.Station.Core;
@@ -14,13 +13,11 @@ namespace LenovoLegionToolkit.WPF.Station.Core;
 public sealed class ExtensionManager : IExtensionManager
 {
     private readonly ExtensionContextFactory _contextFactory;
-    private readonly IExtensionLogger _logger;
     private readonly List<IExtensionProvider> _providers = [];
 
-    public ExtensionManager(ExtensionContextFactory contextFactory, IExtensionLogger logger)
+    public ExtensionManager(ExtensionContextFactory contextFactory)
     {
         _contextFactory = contextFactory;
-        _logger = logger;
     }
 
     public IReadOnlyCollection<IExtensionProvider> Providers => _providers.AsReadOnly();
@@ -35,24 +32,24 @@ public sealed class ExtensionManager : IExtensionManager
     public void Load()
     {
         var pluginRoot = Path.Combine(Folders.AppData, "Plugins");
-        _logger.Trace($"Starting extension discovery. BaseDirectory={Folders.AppData}");
-        _logger.Trace($"Expected plugin root: {pluginRoot}");
+        Log.Instance.Trace($"Starting extension discovery. BaseDirectory={Folders.AppData}");
+        Log.Instance.Trace($"Expected plugin root: {pluginRoot}");
 
         if (!Directory.Exists(pluginRoot))
         {
-            _logger.Trace($"Plugin directory not found: {pluginRoot}");
+            Log.Instance.Trace($"Plugin directory not found: {pluginRoot}");
             return;
         }
 
         var dlls = Directory.EnumerateFiles(pluginRoot, "*.dll", SearchOption.AllDirectories).ToArray();
-        _logger.Trace($"Discovered {dlls.Length} plugin assembly file(s)");
+        Log.Instance.Trace($"Discovered {dlls.Length} plugin assembly file(s)");
 
         AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
         try
         {
             foreach (var dll in dlls)
             {
-                _logger.Trace($"Discovered plugin candidate: {dll}");
+                Log.Instance.Trace($"Discovered plugin candidate: {dll}");
                 TryLoadAssemblyProviders(dll);
             }
         }
@@ -61,7 +58,7 @@ public sealed class ExtensionManager : IExtensionManager
             AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
         }
 
-        _logger.Trace($"Extension discovery completed. Loaded provider count: {_providers.Count}");
+        Log.Instance.Trace($"Extension discovery completed. Loaded provider count: {_providers.Count}");
     }
 
     private static Assembly? OnAssemblyResolve(object? sender, ResolveEventArgs args)
@@ -77,19 +74,20 @@ public sealed class ExtensionManager : IExtensionManager
 
     public async Task StopAsync()
     {
-        _logger.Trace($"Stopping extension providers. Count={_providers.Count}");
+        Log.Instance.Trace($"Stopping extension providers. Count={_providers.Count}");
 
         foreach (var provider in _providers)
         {
             try
             {
-                _logger.Trace($"Disposing provider: {provider.GetType().FullName}");
+                Log.Instance.Trace($"Disposing provider: {provider.GetType().FullName}");
                 await provider.DisposeAsync().ConfigureAwait(false);
-                _logger.Trace($"Disposed provider successfully: {provider.GetType().FullName}");
+                Log.Instance.Trace($"Disposed provider successfully: {provider.GetType().FullName}");
             }
             catch (Exception ex)
             {
-                _logger.Error($"Failed to dispose provider {provider.GetType().FullName}", ex);
+                Log.Instance.ErrorReport($"Failed to dispose provider {provider.GetType().FullName}", ex);
+                Log.Instance.Trace($"Failed to dispose provider {provider.GetType().FullName}", ex);
             }
         }
 
@@ -100,17 +98,17 @@ public sealed class ExtensionManager : IExtensionManager
     {
         try
         {
-            _logger.Trace($"Loading extension assembly: {assemblyPath}");
+            Log.Instance.Trace($"Loading extension assembly: {assemblyPath}");
 
             var assembly = Assembly.LoadFrom(assemblyPath);
 
-            _logger.Trace($"Assembly loaded successfully: {assembly.FullName}");
+            Log.Instance.Trace($"Assembly loaded successfully: {assembly.FullName}");
 
             Type[] types;
             try
             {
                 types = assembly.GetTypes();
-                _logger.Trace($"Assembly type scan succeeded. Type count={types.Length}");
+                Log.Instance.Trace($"Assembly type scan succeeded. Type count={types.Length}");
             }
             catch (ReflectionTypeLoadException ex)
             {
@@ -119,7 +117,8 @@ public sealed class ExtensionManager : IExtensionManager
                     .Select(e => e!.Message)
                     .ToArray() ?? [];
 
-                _logger.Error($"Failed to enumerate types from assembly {assemblyPath}. LoaderExceptions={string.Join(" | ", loaderExceptions)}", ex);
+                Log.Instance.ErrorReport($"Failed to enumerate types from assembly {assemblyPath}", ex);
+                Log.Instance.Trace($"Failed to enumerate types from assembly {assemblyPath}. LoaderExceptions={string.Join(" | ", loaderExceptions)}", ex);
                 return;
             }
 
@@ -127,25 +126,25 @@ public sealed class ExtensionManager : IExtensionManager
                 .Where(t => !t.IsAbstract && typeof(IExtensionProvider).IsAssignableFrom(t))
                 .ToArray();
 
-            _logger.Trace($"Provider type scan completed. Provider count={providerTypes.Length}");
+            Log.Instance.Trace($"Provider type scan completed. Provider count={providerTypes.Length}");
 
             if (providerTypes.Length == 0)
             {
-                _logger.Trace($"No IExtensionProvider implementations found in assembly: {assemblyPath}");
+                Log.Instance.Trace($"No IExtensionProvider implementations found in assembly: {assemblyPath}");
                 return;
             }
 
             foreach (var providerType in providerTypes)
             {
-                _logger.Trace($"Creating provider instance: {providerType.FullName}");
+                Log.Instance.Trace($"Creating provider instance: {providerType.FullName}");
 
                 if (Activator.CreateInstance(providerType) is not IExtensionProvider provider)
                 {
-                    _logger.Trace($"Activator returned null or incompatible instance for provider type: {providerType.FullName}");
+                    Log.Instance.Trace($"Activator returned null or incompatible instance for provider type: {providerType.FullName}");
                     continue;
                 }
 
-                _logger.Trace($"Initializing provider: {providerType.FullName}");
+                Log.Instance.Trace($"Initializing provider: {providerType.FullName}");
 
                 provider.Initialize(_contextFactory.Create(providerType.FullName ?? providerType.Name));
 
@@ -155,17 +154,13 @@ public sealed class ExtensionManager : IExtensionManager
                 var version = provider.GetData(nameof(ExtensionDataKey.Version)) as string;
                 var capabilityDisplay = string.IsNullOrEmpty(capability) ? "(none)" : capability;
 
-                _logger.Trace(
-                    $"Loaded provider successfully: {providerType.FullName}, " +
-                    $"Version: {version}, " +
-                    $"Capabilities: {capabilityDisplay}, " +
-                    $"Total loaded providers: {_providers.Count}"
-                );
+                Log.Instance.Trace($"Loaded provider successfully: {providerType.FullName}, Version: {version}, Capabilities: {capabilityDisplay}, Total loaded providers: {_providers.Count}");
             }
         }
         catch (Exception ex)
         {
-            _logger.Error($"Failed to load extension assembly {assemblyPath}", ex);
+            Log.Instance.ErrorReport($"Failed to load extension assembly {assemblyPath}", ex);
+            Log.Instance.Trace($"Failed to load extension assembly {assemblyPath}", ex);
         }
     }
 }
