@@ -27,7 +27,6 @@ public sealed class AmdOverclockingController : IDisposable
     private const string WMI_SCOPE = @"root\wmi";
 
     private readonly SemaphoreSlim _lock = new(1, 1);
-    private readonly string _internalProfilePath = Path.Combine(Folders.AppData, "amd_overclocking.json");
     private readonly string _defaultProfilePath = Path.Combine(Folders.AppData, "default_amd_overclocking.json");
     private readonly string _statusFilePath = Path.Combine(Folders.AppData, "system_status.json");
     private readonly AmdOverclockingSettings _settings;
@@ -152,31 +151,42 @@ public sealed class AmdOverclockingController : IDisposable
 
     public OverclockingProfile? LoadProfile(string? path = null)
     {
-        var targetPath = path ?? _internalProfilePath;
-        if (!File.Exists(targetPath)) return null;
+        if (path != null)
+        {
+            if (!File.Exists(path)) return null;
 
-        try
-        {
-            return JsonSerializer.Deserialize<OverclockingProfile>(File.ReadAllText(targetPath));
+            try
+            {
+                return JsonSerializer.Deserialize<OverclockingProfile>(File.ReadAllText(path));
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Load Profile Failed: {ex.Message}");
+                return null;
+            }
         }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Load Profile Failed: {ex.Message}");
-            return null;
-        }
+
+        return _settings.GetProfile();
     }
 
     public void SaveProfile(OverclockingProfile profile, string? path = null)
     {
-        try
+        if (path != null)
         {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            File.WriteAllText(path ?? _internalProfilePath, JsonSerializer.Serialize(profile, options));
+            try
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                File.WriteAllText(path, JsonSerializer.Serialize(profile, options));
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Save Profile Failed: {ex.Message}");
+            }
+
+            return;
         }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"Save Profile Failed: {ex.Message}");
-        }
+
+        _settings.SetProfile(profile);
     }
 
     public OverclockingProfile? LoadDefaultProfile()
