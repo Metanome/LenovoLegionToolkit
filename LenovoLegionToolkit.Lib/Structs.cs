@@ -657,6 +657,7 @@ public readonly struct OverclockingProfile
     public short? EDCVdd { get; init; }
     public short? TDCSoc { get; init; }
     public short? TDCVdd { get; init; }
+    public Dictionary<CurveShapeLevel, List<int>>? CurveShapeValues { get; init; }
 }
 
 public struct Package

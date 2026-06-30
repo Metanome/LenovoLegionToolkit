@@ -376,6 +376,78 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 High 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_High {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 High Temperature 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_High_Temperature {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_High_Temperature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Low 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_Low {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Low Temperature 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_Low_Temperature {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_Low_Temperature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Maximum 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_Maximum {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_Maximum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Medium 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_Medium {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_Medium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Medium Temperature 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_Medium_Temperature {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_Medium_Temperature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Minium 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_CurveShaper_Minimum {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_CurveShaper_Minimum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Profile apply has been canceled due to abnormal restart. 的本地化字符串。
         /// </summary>
         public static string AmdOverclocking_Do_Not_Apply_Message {
@@ -552,6 +624,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string AmdOverclocking_Tab_CurveOptimizer {
             get {
                 return ResourceManager.GetString("AmdOverclocking_Tab_CurveOptimizer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Curve Shaper Optimizer 的本地化字符串。
+        /// </summary>
+        public static string AmdOverclocking_Tab_CurveShaperOptimizer {
+            get {
+                return ResourceManager.GetString("AmdOverclocking_Tab_CurveShaperOptimizer", resourceCulture);
             }
         }
         

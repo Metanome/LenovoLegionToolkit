@@ -447,6 +447,439 @@
                     </StackPanel>
                 </TabItem>
 
+                <TabItem Header="{x:Static resources:Resource.AmdOverclocking_Tab_CurveShaperOptimizer}">
+                    <StackPanel Margin="0,10,0,20">
+                        <Grid Margin="4,5,4,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="ArrowAutofitContent24" />
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_Tab_CurveShaperOptimizer}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <TextBlock
+                                    Margin="0,0,10,0"
+                                    VerticalAlignment="Center"
+                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_Global_Offset}" />
+                                <ui:Button
+                                    Margin="0,0,5,0"
+                                    Click="CurveShaperGlobalDecrement_Click"
+                                    Icon="Subtract24" />
+                                <ui:Button
+                                    Click="CurveShaperGlobalIncrement_Click"
+                                    Icon="Add24" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Border
+                            x:Name="_curveShaperPanel"
+                            Margin="0,0,0,8"
+                            Padding="20,15"
+                            Background="{DynamicResource ControlFillColorDefaultBrush}"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="0,0,0,10"
+                                    HorizontalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_Low_Temperature}" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    Margin="0,0,0,10"
+                                    HorizontalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_Medium_Temperature}" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="3"
+                                    Margin="0,0,0,10"
+                                    HorizontalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_High_Temperature}" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,0,15,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_Minimum}" />
+                                <StackPanel
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Min,0" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Min,0" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Min,1" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Min,1" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="1"
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Min,2" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Min,2" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Margin="0,0,15,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_Low}" />
+                                <StackPanel
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Low,0" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Low,0" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="2"
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Low,1" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Low,1" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="2"
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Low,2" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Low,2" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Margin="0,0,15,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_Medium}" />
+                                <StackPanel
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Med,0" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Med,0" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="3"
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Med,1" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Med,1" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="3"
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Med,2" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Med,2" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Row="4"
+                                    Grid.Column="0"
+                                    Margin="0,0,15,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_High}" />
+                                <StackPanel
+                                    Grid.Row="4"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="High,0" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="High,0" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="4"
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="High,1" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="High,1" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="4"
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="High,2" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="High,2" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Row="5"
+                                    Grid.Column="0"
+                                    Margin="0,0,15,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{x:Static resources:Resource.AmdOverclocking_CurveShaper_Maximum}" />
+                                <StackPanel
+                                    Grid.Row="5"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Max,0" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Max,0" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="5"
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Max,1" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Max,1" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Row="5"
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <ui:Button
+                                        Click="CurveShaperDecrement_Click"
+                                        Icon="Subtract24"
+                                        Tag="Max,2" />
+                                    <TextBlock
+                                        Width="30"
+                                        VerticalAlignment="Center"
+                                        Text="0"
+                                        TextAlignment="Center" />
+                                    <ui:Button
+                                        Click="CurveShaperIncrement_Click"
+                                        Icon="Add24"
+                                        Tag="Max,2" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <ui:Button
+                            MinWidth="100"
+                            Margin="0,0,10,0"
+                            Appearance="Secondary"
+                            Click="CurveShaperReset_Click"
+                            Content="{x:Static resources:Resource.Reset}"
+                            Icon="ArrowCounterclockwise24" />
+                    </StackPanel>
+                </TabItem>
+
                 <TabItem Header="{x:Static resources:Resource.AmdOverclocking_Tab_Advanced}">
                     <StackPanel Margin="0,10,0,20">
                         <Border

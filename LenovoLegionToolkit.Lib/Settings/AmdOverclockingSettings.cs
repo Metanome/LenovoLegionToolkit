@@ -19,6 +19,7 @@ public class AmdOverclockingSettings() : AbstractSettings<AmdOverclockingSetting
         public short? EDCVdd { get; set; }
         public short? TDCSoc { get; set; }
         public short? TDCVdd { get; set; }
+        public Dictionary<CurveShapeLevel, List<int>>? CurveShapeValues { get; set; } = [];
     }
 
     public bool HasProfile =>
@@ -30,7 +31,8 @@ public class AmdOverclockingSettings() : AbstractSettings<AmdOverclockingSetting
         Store.EDCSoc.HasValue ||
         Store.EDCVdd.HasValue ||
         Store.TDCSoc.HasValue ||
-        Store.TDCVdd.HasValue;
+        Store.TDCVdd.HasValue ||
+        (Store.CurveShapeValues?.Any(kvp => kvp.Value.Any(v => v != 0)) == true);
 
     public OverclockingProfile? GetProfile()
     {
@@ -47,6 +49,9 @@ public class AmdOverclockingSettings() : AbstractSettings<AmdOverclockingSetting
             EDCVdd = Store.EDCVdd,
             TDCSoc = Store.TDCSoc,
             TDCVdd = Store.TDCVdd,
+            CurveShapeValues = Store.CurveShapeValues?
+                .Where(kvp => kvp.Value.Any(v => v != 0))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
     }
 
@@ -61,6 +66,9 @@ public class AmdOverclockingSettings() : AbstractSettings<AmdOverclockingSetting
         Store.EDCVdd = profile.EDCVdd;
         Store.TDCSoc = profile.TDCSoc;
         Store.TDCVdd = profile.TDCVdd;
+        Store.CurveShapeValues = profile.CurveShapeValues?
+            .Where(kvp => kvp.Value.Any(v => v != 0))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         SynchronizeStore();
     }
 }

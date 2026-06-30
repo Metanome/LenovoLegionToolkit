@@ -102,6 +102,15 @@ public enum CpuProfileMode
     X3DGaming
 }
 
+public enum CurveShapeLevel
+{
+    Min,
+    Low,
+    Med,
+    High,
+    Max
+}
+
 public enum CustomSpecialKey
 {
     [Display(ResourceType = typeof(Resource), Name = "CustomSpecialKey_Default")]

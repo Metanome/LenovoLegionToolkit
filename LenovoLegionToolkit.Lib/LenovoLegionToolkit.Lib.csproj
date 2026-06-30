@@ -29,7 +29,7 @@
 		<PackageReference Include="PresentMonFps-Modified" Version="2.0.7" />
 		<PackageReference Include="NvAPIWrapper.Net-Modified" Version="0.8.1.117" />
 		<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.7-pre689" />
-		<PackageReference Include="ZenStates-Core" Version="1.0.2" />
+		<PackageReference Include="ZenStates-Core" Version="1.0.3" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" PrivateAssets="all" />
 	</ItemGroup>
 

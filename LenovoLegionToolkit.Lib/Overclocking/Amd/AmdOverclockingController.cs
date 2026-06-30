@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Management;
 using System.Text.Json;
 using System.Threading;
@@ -233,48 +234,68 @@ public sealed class AmdOverclockingController : IDisposable
     {
         if (DoNotApply)
         {
+            Log.Instance.Trace($"Overclocking is disabled (DoNotApply). Skipping.");
             return;
         }
 
         if (!_settings.Store.AllowOnBattery)
         {
-            var status = await Power.IsPowerAdapterConnectedAsync().ConfigureAwait(false);
-
-            switch (status)
-            {
-                case PowerAdapterStatus.ConnectedLowWattage:
-                case PowerAdapterStatus.Disconnected:
-                    throw new InvalidOperationException(Resource.AmdOverclocking_Ac_Message);
-            }
+            var powerStatus = await Power.IsPowerAdapterConnectedAsync().ConfigureAwait(false);
+            if (powerStatus is PowerAdapterStatus.Disconnected or PowerAdapterStatus.ConnectedLowWattage)
+                throw new InvalidOperationException(Resource.AmdOverclocking_Ac_Message);
         }
 
         EnsureInitialized();
 
         await Task.Run(() =>
         {
-            if (_cpu.smu.Rsmu.SMU_MSG_SetDldoPsmMargin != 0)
+            bool supportsCO = _cpu.smu.Rsmu.SMU_MSG_SetDldoPsmMargin != 0;
+
+            // Curve Optimizer
+            if (supportsCO && profile.CoreValues?.Count > 0)
             {
-                for (var i = 0; i < profile.CoreValues.Count && i < 16; i++)
+                var applied = new List<string>();
+                for (int i = 0; i < Math.Min(profile.CoreValues.Count, 16); i++)
                 {
-                    if (profile.CoreValues[i] is { } val && IsCoreActive(i))
+                    if (profile.CoreValues[i] is { } value && IsCoreActive(i))
                     {
-                        _cpu.SetPsmMarginSingleCore(EncodeCoreMarginBitmask(i), (int)val);
+                        if (_cpu.SetPsmMarginSingleCore(EncodeCoreMarginBitmask(i), (int)value))
+                        {
+                            applied.Add($"Core {i}: {value}");
+                        }
                     }
                 }
+                Log.Instance.Trace($"Curve Optimizer applied: {(applied.Count > 0 ? string.Join(", ", applied) : "none")}");
             }
 
-            ApplyIfSet(profile.FMax, value => _cpu.SetFMax(value));
-            ApplyIfSet(profile.PowerLimit1, value => _cpu.SetStapmLimit((uint)value));
-            ApplyIfSet(profile.PowerLimit2, value => _cpu.SetFastLimit((uint)value));
-            ApplyIfSet(profile.PowerLimit3, value => _cpu.SetSlowLimit((uint)value));
-            ApplyIfSet(profile.TDCSoc, value => _cpu.SetTDCSOCLimit((uint)value));
-            ApplyIfSet(profile.TDCVdd, value => _cpu.SetTDCVDDLimit((uint)value));
-            ApplyIfSet(profile.EDCSoc, value => _cpu.SetEDCSOCLimit((uint)value));
-            ApplyIfSet(profile.EDCVdd, value => _cpu.SetEDCVDDLimit((uint)value));
+            // Curve Shaper
+            if (profile.CurveShapeValues?.Count > 0)
+            {
+                var shaped = new List<string>();
+                foreach (var kv in profile.CurveShapeValues)
+                {
+                    if (kv.Value.Count >= 3 && kv.Value.Any(v => v != 0))
+                    {
+                        var status = _cpu.SetCurveShaperMargin(kv.Value[2], kv.Value[1], kv.Value[0], (int)kv.Key);
+                        shaped.Add($"Level {(int)kv.Key}:{(status == SMU.Status.OK ? "OK" : "FAIL")}");
+                    }
+                }
+                Log.Instance.Trace($"Curve Shaper: {(shaped.Count > 0 ? string.Join(", ", shaped) : "none")}");
+            }
+
+            // Advanced Settings
+            ApplyAndLog("FMax", profile.FMax, v => _cpu.SetFMax(v));
+            ApplyAndLog("StapmLimit", profile.PowerLimit1, v => _cpu.SetStapmLimit((uint)v));
+            ApplyAndLog("FastLimit", profile.PowerLimit2, v => _cpu.SetFastLimit((uint)v));
+            ApplyAndLog("SlowLimit", profile.PowerLimit3, v => _cpu.SetSlowLimit((uint)v));
+            ApplyAndLog("TDCSOC", profile.TDCSoc, v => _cpu.SetTDCSOCLimit((uint)v));
+            ApplyAndLog("TDCVDD", profile.TDCVdd, v => _cpu.SetTDCVDDLimit((uint)v));
+            ApplyAndLog("EDCSOC", profile.EDCSoc, v => _cpu.SetEDCSOCLimit((uint)v));
+            ApplyAndLog("EDCVDD", profile.EDCVdd, v => _cpu.SetEDCVDDLimit((uint)v));
         }).ConfigureAwait(false);
 
         await ForceApplyPowerMappingAsync().ConfigureAwait(false);
-        Log.Instance.Trace($"Overclocking Profile applied.");
+        Log.Instance.Trace($"Overclocking profile applied successfully.");
     }
 
     public async Task ApplyInternalProfileAsync()
@@ -340,10 +361,13 @@ public sealed class AmdOverclockingController : IDisposable
         return _cpu.GetPsmMarginSingleCore(EncodeCoreMarginBitmask(coreIndex)) != null;
     }
 
-    private static void ApplyIfSet<T>(T? value, Action<T> setter) where T : struct
+    private void ApplyAndLog<T>(string settingName, T? value, Action<T> applyAction) where T : struct
     {
         if (value.HasValue)
-            setter(value.Value);
+        {
+            Log.Instance.Trace($"{settingName,-12} = {value.Value}");
+            applyAction(value.Value);
+        }
     }
 
     public static uint[] MakeCmdArgs(uint arg = 0, uint maxArgs = 6)

@@ -287,6 +287,11 @@ public partial class AmdOverclocking : UiWindow
                 }
             }
         }
+
+        if (profile.Value.CurveShapeValues != null)
+        {
+            ApplyCurveShapeToUi(profile.Value.CurveShapeValues);
+        }
     }
 
     public async Task ApplyInternalProfileAsync()
@@ -313,6 +318,7 @@ public partial class AmdOverclocking : UiWindow
             TDCVdd = (short?)_tdcVddBox.Value,
             EDCSoc = (short?)_edcSocBox.Value,
             EDCVdd = (short?)_edcVddBox.Value,
+            CurveShapeValues = GetCurveShapeValuesFromUi(),
         };
     }
 
@@ -396,6 +402,41 @@ public partial class AmdOverclocking : UiWindow
         }
     }
 
+    private void CurveShaperGlobalDecrement_Click(object sender, RoutedEventArgs e)
+    {
+        AdjustAllCurveShaperValues(-1);
+    }
+
+    private void CurveShaperGlobalIncrement_Click(object sender, RoutedEventArgs e)
+    {
+        AdjustAllCurveShaperValues(+1);
+    }
+
+    private void AdjustAllCurveShaperValues(int delta)
+    {
+        var seen = new HashSet<string>();
+
+        foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(_curveShaperPanel))
+        {
+            if (btn.Tag is not string tag || string.IsNullOrEmpty(tag))
+                continue;
+
+            if (!seen.Add(tag))
+                continue;
+
+            if (btn.Parent is not System.Windows.Controls.StackPanel panel)
+                continue;
+
+            var textBlock = panel.Children.OfType<System.Windows.Controls.TextBlock>().FirstOrDefault();
+            if (textBlock is null || !int.TryParse(textBlock.Text, out var value))
+                continue;
+
+            value += delta;
+            value = Math.Clamp(value, -200, 200);
+            textBlock.Text = value.ToString();
+        }
+    }
+
     private async void EnableToggle_Checked(object sender, RoutedEventArgs e)
     {
         if (_isUpdatingUi) return;
@@ -453,6 +494,7 @@ public partial class AmdOverclocking : UiWindow
         _edcVddBox.IsEnabled = enabled;
         _x3dGamingToggle.IsEnabled = enabled;
         _ccdItemsControl.IsEnabled = enabled;
+        _curveShaperPanel.IsEnabled = enabled;
         _applyButton.IsEnabled = enabled;
         _loadButton.IsEnabled = enabled;
         _saveButton.IsEnabled = enabled;
@@ -525,4 +567,146 @@ public partial class AmdOverclocking : UiWindow
         _controller.SwitchProfile(CpuProfileMode.Productivity);
         await Power.RestartAsync().ConfigureAwait(false);
     }
+
+    #region Curve Shape
+
+    private void CurveShaperDecrement_Click(object sender, RoutedEventArgs e)
+    {
+        AdjustCurveShaperValue(sender, -1);
+    }
+
+    private void CurveShaperIncrement_Click(object sender, RoutedEventArgs e)
+    {
+        AdjustCurveShaperValue(sender, +1);
+    }
+
+    private static void AdjustCurveShaperValue(object sender, int delta)
+    {
+        if (sender is not System.Windows.Controls.Button btn)
+            return;
+
+        var tag = btn.Tag as string;
+        if (string.IsNullOrEmpty(tag))
+            return;
+
+        if (btn.Parent is not System.Windows.Controls.StackPanel panel)
+            return;
+
+        var textBlock = panel.Children.OfType<System.Windows.Controls.TextBlock>().FirstOrDefault();
+        if (textBlock is null)
+            return;
+
+        if (!int.TryParse(textBlock.Text, out var value))
+            return;
+
+        value += delta;
+        value = Math.Clamp(value, -200, 200);
+        textBlock.Text = value.ToString();
+    }
+
+    private async void CurveShaperApply_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var profile = GetProfileFromUi();
+            await _controller.ApplyProfileAsync(profile);
+            _controller.SaveProfile(profile);
+            ShowStatus($"{Resource.AmdOverclocking_Success_Title}", $"{Resource.AmdOverclocking_Success_Message}", InfoBarSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            ShowStatus($"{Resource.Error}", ex.Message, InfoBarSeverity.Error);
+        }
+    }
+
+    private void CurveShaperReset_Click(object sender, RoutedEventArgs e)
+    {
+        ApplyCurveShapeToUi(null);
+    }
+
+    private Dictionary<CurveShapeLevel, List<int>>? GetCurveShapeValuesFromUi()
+    {
+        var result = new Dictionary<CurveShapeLevel, List<int>>();
+        var seen = new HashSet<string>();
+
+        foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(_curveShaperPanel))
+        {
+            if (btn.Tag is not string tag || string.IsNullOrEmpty(tag))
+                continue;
+
+            if (!seen.Add(tag))
+                continue;
+
+            var parts = tag.Split(',');
+            if (parts.Length != 2) continue;
+            if (!Enum.TryParse<CurveShapeLevel>(parts[0], out var level)) continue;
+            if (!int.TryParse(parts[1], out var tempIndex)) continue;
+
+            if (btn.Parent is not System.Windows.Controls.StackPanel panel)
+                continue;
+
+            var textBlock = panel.Children.OfType<System.Windows.Controls.TextBlock>().FirstOrDefault();
+            if (textBlock is null || !int.TryParse(textBlock.Text, out var value))
+                continue;
+
+            if (!result.ContainsKey(level))
+                result[level] = [0, 0, 0];
+
+            if (tempIndex < result[level].Count)
+                result[level][tempIndex] = value;
+        }
+
+        return result.Any(kvp => kvp.Value.Any(v => v != 0)) ? result : null;
+    }
+
+    private void ApplyCurveShapeToUi(Dictionary<CurveShapeLevel, List<int>>? values)
+    {
+        var seen = new HashSet<string>();
+
+        foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(_curveShaperPanel))
+        {
+            if (btn.Tag is not string tag || string.IsNullOrEmpty(tag))
+                continue;
+
+            if (!seen.Add(tag))
+                continue;
+
+            var parts = tag.Split(',');
+            if (parts.Length != 2) continue;
+            if (!Enum.TryParse<CurveShapeLevel>(parts[0], out var level)) continue;
+            if (!int.TryParse(parts[1], out var tempIndex)) continue;
+
+            if (btn.Parent is not System.Windows.Controls.StackPanel panel)
+                continue;
+
+            var textBlock = panel.Children.OfType<System.Windows.Controls.TextBlock>().FirstOrDefault();
+            if (textBlock is null)
+                continue;
+
+            var newValue = 0;
+            if (values != null &&
+                values.TryGetValue(level, out var list) &&
+                tempIndex < list.Count)
+            {
+                newValue = list[tempIndex];
+            }
+
+            textBlock.Text = newValue.ToString();
+        }
+    }
+
+    private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
+            if (child is T typed)
+                yield return typed;
+
+            foreach (var grandChild in FindVisualChildren<T>(child))
+                yield return grandChild;
+        }
+    }
+
+    #endregion
 }
