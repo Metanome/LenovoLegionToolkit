@@ -20,6 +20,7 @@ public abstract partial class AbstractDGPUNotify : IDGPUNotify
     private readonly object _lock = new();
 
     private CancellationTokenSource? _notifyLaterCancellationTokenSource;
+    private bool _lastAvailability = true;
 
     public event EventHandler<bool>? Notified;
 
@@ -54,10 +55,19 @@ public abstract partial class AbstractDGPUNotify : IDGPUNotify
             var isAvailable = IsDGPUAvailable(dgpuHardwareId);
             await NotifyDGPUStatusAsync(isAvailable).ConfigureAwait(false);
 
-            if (publish)
-                Notified?.Invoke(this, isAvailable);
+            var changed = isAvailable != _lastAvailability;
 
-            Log.Instance.Trace($"Notified: {isAvailable}");
+            if (publish && changed)
+            {
+                _lastAvailability = isAvailable;
+                Notified?.Invoke(this, isAvailable);
+            }
+            else if (changed)
+            {
+                _lastAvailability = isAvailable;
+            }
+
+            Log.Instance.Trace($"Notified: {isAvailable} [changed={changed}]");
         }
         catch (Exception ex)
         {
