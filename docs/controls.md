@@ -1,19 +1,21 @@
-# Custom Controls Reference
+# Custom Controls & Theme Reference
 
-This project defines its own controls on top of WPF UI 2.1.0. There are two namespaces to know:
+This document serves as a guide to the custom controls, standard elements, and theme architecture in the Lenovo Legion Toolkit.
+
+---
+
+## 1. Custom Controls Reference
+
+The application defines its own controls on top of `Wpf.Ui` 2.1.0 under two main namespaces:
 
 ```xml
 xmlns:custom="clr-namespace:LenovoLegionToolkit.WPF.Controls.Custom"
 xmlns:controls="clr-namespace:LenovoLegionToolkit.WPF.Controls"
 ```
 
----
-
-## `custom:CardControl`
-
+### `custom:CardControl`
 A content card with an optional icon, header, and right-side content. Wraps `Wpf.Ui.Controls.CardControl` with compact mode support.
-
-**Key properties:** `Icon` (SymbolRegular name), `Header` (usually a `CardHeaderControl`), `Click`
+*   **Properties:** `Icon` (Symbol name), `Header` (usually a `CardHeaderControl`), `Click`.
 
 ```xml
 <custom:CardControl Margin="0,0,0,8" Icon="Info24">
@@ -24,15 +26,9 @@ A content card with an optional icon, header, and right-side content. Wraps `Wpf
 </custom:CardControl>
 ```
 
-> For a clickable card with no right-side content, use `CardAction` instead.
-
----
-
-## `custom:CardAction`
-
+### `custom:CardAction`
 A fully clickable card row with an optional icon and chevron. Wraps `Wpf.Ui.Controls.CardAction`.
-
-**Key properties:** `Icon`, `Content`, `IsChevronVisible` (default `true`), `Click`
+*   **Properties:** `Icon`, `Content`, `IsChevronVisible` (default `true`), `Click`.
 
 ```xml
 <custom:CardAction Margin="0,0,0,4" Icon="Keyboard24" Click="MyAction_Click">
@@ -40,13 +36,9 @@ A fully clickable card row with an optional icon and chevron. Wraps `Wpf.Ui.Cont
 </custom:CardAction>
 ```
 
----
-
-## `custom:CardExpander`
-
+### `custom:CardExpander`
 An expandable card section. Wraps `Wpf.Ui.Controls.CardExpander`.
-
-**Key properties:** `Header`, `Icon`, `IsExpanded`
+*   **Properties:** `Header`, `Icon`, `IsExpanded`.
 
 ```xml
 <custom:CardExpander Icon="Settings24">
@@ -57,13 +49,9 @@ An expandable card section. Wraps `Wpf.Ui.Controls.CardExpander`.
 </custom:CardExpander>
 ```
 
----
-
-## `custom:NavigationItem`
-
+### `custom:NavigationItem`
 A navigation entry used inside `wpfui:NavigationStore`. Wraps `Wpf.Ui.Controls.NavigationItem`.
-
-**Key properties:** `Content` (label text), `Icon` (SymbolRegular name), `PageType` (target page type), `PageTag` (string identifier)
+*   **Properties:** `Content` (label text), `Icon` (Symbol name), `PageType`, `PageTag`.
 
 ```xml
 <custom:NavigationItem
@@ -73,38 +61,21 @@ A navigation entry used inside `wpfui:NavigationStore`. Wraps `Wpf.Ui.Controls.N
     PageType="{x:Type pages:DashboardPage}" />
 ```
 
-> Navigation items go inside `wpfui:NavigationStore.Items` (main nav) or `wpfui:NavigationStore.Footer` (bottom items like Settings, Donate, About).
-
----
-
-## `custom:Badge`
-
-A small badge/pill indicator. Wraps `Wpf.Ui.Controls.Badge`.
+### `custom:Badge`
+A small badge/pill indicator wrapping `Wpf.Ui.Controls.Badge`.
 
 ```xml
 <custom:Badge Content="NEW" />
 ```
 
----
-
-## `controls:CardHeaderControl`
-
-The standard header block used inside cards. Defined in `LenovoLegionToolkit.WPF.Controls`.
-
-**Properties:**
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Title` | `string` | Primary bold label (required) |
-| `Subtitle` | `string` | Secondary smaller text below title |
-| `SubtitleToolTip` | `string?` | Tooltip shown on subtitle |
-| `Info` | `string` | Blue info line with icon (accent color) |
-| `Warning` | `string` | Yellow warning line with icon |
-| `Error` | `string` | Red error line with icon |
-| `Success` | `string` | Green success line with icon |
-| `Accessory` | `UIElement?` | Element placed on the right column of the header |
-
-> In compact mode, `Subtitle`/`Info`/`Warning`/`Error`/`Success` are hidden and shown as a tooltip instead.
+### `controls:CardHeaderControl`
+The standard header block used inside cards.
+*   **Properties:**
+    *   `Title`: Primary bold label (required).
+    *   `Subtitle`: Secondary smaller text below title.
+    *   `SubtitleToolTip`: Tooltip shown on subtitle.
+    *   `Info`/`Warning`/`Error`/`Success`: Colored status message line with icon.
+    *   `Accessory`: UIElement placed on the right column of the header.
 
 ```xml
 <controls:CardHeaderControl
@@ -113,21 +84,13 @@ The standard header block used inside cards. Defined in `LenovoLegionToolkit.WPF
     Warning="{Binding MyWarningText}" />
 ```
 
----
-
-## `controls:LoadableControl`
-
+### `controls:LoadableControl`
 Wraps any content and shows a `ProgressRing` spinner while loading.
-
-**Properties:**
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `IsLoading` | `bool` | `true` | Shows spinner when `true` |
-| `IsIndeterminate` | `bool` | `true` | Indeterminate vs. progress ring |
-| `Progress` | `double` | — | Progress value when not indeterminate |
-| `ContentVisibilityWhileLoading` | `Visibility` | `Hidden` | Whether content is hidden or collapsed during load |
-| `IndicatorWidth/Height` | `double` | `48` | Spinner size |
+*   **Properties:**
+    *   `IsLoading`: Shows spinner when `true`.
+    *   `IsIndeterminate`: Indeterminate vs. progress ring.
+    *   `Progress`: Progress value when not indeterminate.
+    *   `ContentVisibilityWhileLoading`: Visibility of content during load.
 
 ```xml
 <controls:LoadableControl x:Name="_list" IsLoading="True">
@@ -135,27 +98,115 @@ Wraps any content and shows a `ProgressRing` spinner while loading.
 </controls:LoadableControl>
 ```
 
----
-
-## `controls:SelectableControl`
-
-A rubber-band (drag-to-select) selection overlay wrapping any content. Fires a `Selected` event with a `ContainsCenter` delegate to determine which child elements fall within the drawn rectangle.
-
-Used in fan curve and spectrum keyboard editors.
+### `controls:SelectableControl`
+A rubber-band (drag-to-select) selection overlay wrapping any content. Used in fan curve and spectrum keyboard editors to drag and select multiple items.
 
 ---
 
-## WPF UI base controls (used directly)
+## 2. Theme Architecture
 
-These come directly from `Wpf.Ui` and are used without a custom wrapper:
+The application's look and feel is managed by a theme service layer:
 
-| Control | Namespace prefix | Notes |
-|---------|-----------------|-------|
-| `SymbolIcon` | `wpfui:` | Render a single icon glyph. Use `Symbol=` and optionally `Filled="True"` |
-| `Button` | `wpfui:` | Has `Icon=` and `Appearance=` (`Primary`, `Secondary`, `Transparent`) |
-| `ToggleSwitch` | `wpfui:` | Standard on/off toggle |
-| `TitleBar` | `wpfui:` | Window title bar with WinUI-style controls |
-| `Snackbar` | `wpfui:` | Toast notification bar |
-| `DynamicScrollViewer` | `wpfui:` | ScrollViewer that adjusts scrollbar visibility dynamically |
-| `NumberBox` | `wpfui:` | Numeric input with increment/decrement |
-| `Hyperlink` | `wpfui:` | Clickable link, use `Tag=` for URL and handle `Click` |
+*   **`Theme` Enum** (`Lib\Enums.cs`): Drives active themes (`System`, `Light`, `Dark`).
+*   **`ThemeManager`** (`Wpf\Utils\ThemeManager.cs`): Applies the target theme via `Wpf.Ui.Appearance.Theme.Apply` and updates accent colors via `Wpf.Ui.Appearance.Accent.Apply`.
+*   **`SystemThemeListener`** (`Lib\Listeners\SystemThemeListener.cs`): Listens for OS theme preference modifications (in the registry) and triggers theme updates to match the system.
+
+---
+
+## 3. Global UI Theme Catalog
+
+To ensure complete coverage when customizing or creating global themes, the theme resource dictionaries target and override the styling brushes for the following elements:
+
+### Containers & Windows
+*   `UiWindow` (Base window class, MainWindow, dialogs)
+*   `UiPage` / `Page` (Base page element for pages like Dashboard, Settings, Battery)
+*   `NavigationStore` (Sidebar navigation container)
+*   `ScrollViewer` (Scroll containers used throughout pages and popups)
+*   `TitleBar` / `wpfui:TitleBar` (Custom title bars with WinUI controls)
+*   `MessageBox` (`Wpf.Ui.Controls.MessageBox` for popups and confirmations)
+
+### Card Controls
+*   `CardControl` / `custom:CardControl` (Dashboard widgets)
+*   `CardAction` / `custom:CardAction` (Clickable settings rows)
+*   `CardExpander` / `custom:CardExpander` (Collapsible configuration panels)
+*   `GroupBox` (OSD thresholds, Edit Sensor Group layout)
+*   `Expander` (Used in AMD Overclocking settings)
+
+### Navigation & Menus
+*   `NavigationItem` / `custom:NavigationItem` (Sidebar tab items)
+*   `NavigationHeader` (Sidebar section header labels)
+*   `TabControl` & `TabItem` (Inner tab selections, e.g., Spectrum RGB profiles)
+*   `ContextMenu` & `MenuItem` (Right-click popups on cards and GPU process list)
+
+### Input & Form Controls
+*   `ToggleSwitch` (Standard settings toggles)
+*   `ComboBox` & `ComboBoxItem` (Dropdown selection lists)
+*   `TextBox` (Text input fields)
+*   `NumberBox` (Numeric inputs with spin buttons)
+*   `RadioButton` (Visual selection pill elements)
+*   `CheckBox` (Checkboxes)
+*   `Slider` (Sliders used for overclocking, fan curve thresholds, and background opacity/blur)
+*   `Button` (Standard and styled action buttons)
+
+### Lists & Data Displays
+*   `ListBox` & `ListBoxItem` (Process selection lists, settings submenus, trigger logs)
+*   `ListView` & `ListViewItem` (Process lists for dGPU activity)
+*   `ProgressBar` (CPU/GPU/RAM metrics display)
+*   `TextBlock` (Heading styles, labels, subtext values)
+
+### Interactive Icons & Custom Helpers
+*   `SymbolIcon` (Standard icons for navigation and setting headers)
+*   `Snackbar` (System tray & overlay notifications)
+*   `ColorPickerControl` & `MultiColorPickerControl` (White/RGB customizable color wheels)
+*   `FanCurveControl` & `FanCurveControlV2` (Graph canvases drawing grid lines and node markers)
+*   `ToolTip` (Hover description popups)
+*   `Hyperlink` / `wpfui:Hyperlink` (Web links)
+
+---
+
+## 4. WPF UI Theme Resource Brushes
+
+To customize the colors of the controls above, resource dictionaries should target and override the following WPF UI brushes and colors:
+
+### Window & Panel Backgrounds
+*   `ApplicationBackgroundBrush` / `ApplicationBackgroundColor`: Main window background fill.
+*   `SolidBackgroundFillColorBaseBrush`: Primary background fill for container pages.
+*   `SolidBackgroundFillColorSecondaryBrush`: Secondary background fill for panels or inputs (e.g. scripting edit area).
+*   `SolidBackgroundFillColorTertiaryBrush`: Third-level container background.
+
+### Text & Foregrounds
+*   `TextFillColorPrimaryBrush`: Main body text and prominent headers.
+*   `TextFillColorSecondaryBrush`: Subtitles, descriptive labels, and secondary texts.
+*   `TextFillColorTertiaryBrush`: Inactive placeholder texts and line numbers.
+*   `TextFillColorDisabledBrush`: Disabled text elements.
+*   `TextOnAccentFillColorPrimaryBrush`: High-contrast text shown on top of accent-colored components (such as primary buttons).
+
+### Card Surfaces
+*   `CardBackgroundFillColorDefaultBrush`: Surface background for widgets/cards (`CardControl`, `CardAction`).
+*   `CardBackgroundFillColorSecondaryBrush`: Surface background for inner expander/collapsible sections.
+
+### Form Inputs & Buttons (Fill)
+*   `ControlFillColorDefaultBrush`: Base background fill for buttons, dropdowns, and checkboxes.
+*   `ControlFillColorSecondaryBrush`: Hover state background fill.
+*   `ControlFillColorTertiaryBrush`: Pressed state background fill.
+*   `ControlFillColorDisabledBrush`: Inactive/disabled background fill.
+*   `ControlFillColorInputActiveBrush`: Focused background fill for active text inputs (`TextBox`, `NumberBox`).
+*   `SubtleFillColorSecondaryBrush` / `SubtleFillColorTertiaryBrush`: Subtle hover and pressed overlay colors for transparent buttons or menus.
+
+### Borders & Dividers (Strokes)
+*   `CardStrokeColorDefaultBrush`: Outer border lines for cards.
+*   `ControlStrokeColorDefaultBrush`: Outer border lines for buttons and form elements.
+*   `ControlStrokeColorSecondaryBrush`: Hover border lines.
+*   `DividerStrokeColorDefaultBrush`: Visual separator line dividers.
+*   `ControlElevationBorderBrush`: Shadow/depth border brush for buttons.
+
+### Accent Coloring
+*   `SystemAccentColor` / `SystemAccentColorBrush`: The application's core accent color.
+*   `SystemAccentColorLight1` / `Light2` / `Light3`: Accent shades used for Light themes.
+*   `SystemAccentColorDark1` / `Dark2` / `Dark3`: Accent shades used for Dark themes.
+
+### Status Indicators
+*   `SystemFillColorSuccessBrush`: Dynamic brush for success states (e.g., connected/compatible).
+*   `SystemFillColorCautionBrush`: Dynamic brush for warnings and caution labels.
+*   `SystemFillColorCriticalBrush`: Dynamic brush for critical status levels (e.g., low battery, error alerts).
+*   `SystemFillColorNeutralBrush`: Dynamic brush for neutral offline/disabled flags.
