@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.Extensions;
@@ -56,6 +56,21 @@ public class RefreshRateFeature : IFeature<RefreshRate>
             return default(RefreshRate);
         }
 
+        var displaySource = display.ToPathDisplaySource();
+        var pathInfos = WindowsDisplayAPI.DisplayConfig.PathInfo.GetActivePaths(virtualModeAware: true);
+        var activePath = pathInfos.FirstOrDefault(p => p.DisplaySource == displaySource);
+        if (activePath is not null)
+        {
+            var target = activePath.TargetsInfo.FirstOrDefault(t => t.IsCurrentlyInUse || t.IsPathActive);
+            if (target is not null && target.IsBoostRefreshRate && target.IsSignalInformationAvailable)
+            {
+                var physicalFreq = (int)(target.SignalInfo.VerticalSyncFrequencyInMillihertz / 1000);
+                var drrResult = new RefreshRate(physicalFreq);
+                Log.Instance.Trace($"Dynamic Refresh Rate (DRR) is active. Physical refresh rate is {drrResult}");
+                return drrResult;
+            }
+        }
+
         var currentSettings = display.CurrentSetting;
         var result = new RefreshRate(currentSettings.Frequency);
 
@@ -74,10 +89,11 @@ public class RefreshRateFeature : IFeature<RefreshRate>
         }
 
         var currentSettings = display.CurrentSetting;
+        var currentState = await GetStateAsync();
 
-        Log.Instance.Trace($"Current built in display settings: {currentSettings.ToExtendedString()}");
+        Log.Instance.Trace($"Current built in display settings: {currentSettings.ToExtendedString()} (reported: {currentState})");
 
-        if (currentSettings.Frequency == state.Frequency)
+        if (currentState.Frequency == state.Frequency)
         {
             Log.Instance.Trace($"Frequency already set to {state.Frequency}");
             return;
