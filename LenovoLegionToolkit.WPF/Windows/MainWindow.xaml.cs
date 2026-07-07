@@ -554,35 +554,24 @@ public partial class MainWindow
 
     private static unsafe void SetEfficiencyMode(bool enabled)
     {
-        var ptr = IntPtr.Zero;
+        const uint PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION = 0x00000004;
 
-        try
+        var priorityClass = enabled
+            ? PROCESS_CREATION_FLAGS.IDLE_PRIORITY_CLASS
+            : PROCESS_CREATION_FLAGS.NORMAL_PRIORITY_CLASS;
+        PInvoke.SetPriorityClass(PInvoke.GetCurrentProcess(), priorityClass);
+
+        var state = new PROCESS_POWER_THROTTLING_STATE
         {
-            var priorityClass = enabled
-                ? PROCESS_CREATION_FLAGS.IDLE_PRIORITY_CLASS
-                : PROCESS_CREATION_FLAGS.NORMAL_PRIORITY_CLASS;
-            PInvoke.SetPriorityClass(PInvoke.GetCurrentProcess(), priorityClass);
+            Version = PInvoke.PROCESS_POWER_THROTTLING_CURRENT_VERSION,
+            ControlMask = PInvoke.PROCESS_POWER_THROTTLING_EXECUTION_SPEED | PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION,
+            StateMask = enabled ? (PInvoke.PROCESS_POWER_THROTTLING_EXECUTION_SPEED | PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION) : 0,
+        };
 
-            var state = new PROCESS_POWER_THROTTLING_STATE
-            {
-                Version = PInvoke.PROCESS_POWER_THROTTLING_CURRENT_VERSION,
-                ControlMask = PInvoke.PROCESS_POWER_THROTTLING_EXECUTION_SPEED,
-                StateMask = enabled ? PInvoke.PROCESS_POWER_THROTTLING_EXECUTION_SPEED : 0,
-            };
-
-            var size = Marshal.SizeOf<PROCESS_POWER_THROTTLING_STATE>();
-            ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(state, ptr, false);
-
-            PInvoke.SetProcessInformation(PInvoke.GetCurrentProcess(),
-                PROCESS_INFORMATION_CLASS.ProcessPowerThrottling,
-                ptr.ToPointer(),
-                (uint)size);
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(ptr);
-        }
+        PInvoke.SetProcessInformation(PInvoke.GetCurrentProcess(),
+            PROCESS_INFORMATION_CLASS.ProcessPowerThrottling,
+            &state,
+            (uint)sizeof(PROCESS_POWER_THROTTLING_STATE));
     }
 
     public void SetWindowOpacity(double opacity)
