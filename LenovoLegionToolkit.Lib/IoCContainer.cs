@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Autofac;
 
 namespace LenovoLegionToolkit.Lib;
@@ -22,6 +22,11 @@ public static class IoCContainer
                 cb.RegisterModule(module);
 
             _container = cb.Build();
+
+            if (_container.IsRegistered<System.DgpuAwakeManager>())
+            {
+                _ = _container.Resolve<System.DgpuAwakeManager>();
+            }
         }
     }
 

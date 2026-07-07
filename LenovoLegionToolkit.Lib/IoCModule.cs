@@ -164,7 +164,7 @@ public class IoCModule : Module
         builder.Register<SunriseSunset>();
 
         builder.Register<BatteryDischargeRateMonitorService>();
-        builder.Register<DgpuAwakeManager>().SingleInstance().AutoActivate();
+        builder.Register<DgpuAwakeManager>().SingleInstance();
 
         builder.Register<AmdOverclockingController>();
 

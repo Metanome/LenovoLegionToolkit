@@ -95,7 +95,7 @@ public class ResolutionFeature : IFeature<Resolution>
         {
             Log.Instance.Trace($"Setting display to {newSettings.ToExtendedString()}");
 
-            display.SetSettingsUsingPathInfo(newSettings);
+            await display.SetSettingsUsingPathInfoAsync(newSettings).ConfigureAwait(false);
 
             Log.Instance.Trace($"Display set to {newSettings.ToExtendedString()}");
         }

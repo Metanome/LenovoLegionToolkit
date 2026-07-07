@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.Extensions;
@@ -11,6 +12,8 @@ namespace LenovoLegionToolkit.Lib.Features;
 
 public class RefreshRateFeature : IFeature<RefreshRate>
 {
+    private const int MinimumDrrFrequency = 60;
+
     public Task<bool> IsSupportedAsync() => Task.FromResult(true);
 
     public async Task<RefreshRate[]> GetAllStatesAsync()
@@ -42,7 +45,7 @@ public class RefreshRateFeature : IFeature<RefreshRate>
         if (OSExtensions.GetCurrent() == OS.Windows11 && result.Count > 0)
         {
             var maxFreq = result.Max(r => r.Frequency);
-            if (maxFreq > 60)
+            if (maxFreq > MinimumDrrFrequency)
             {
                 var displaySource = display.DisplayScreen.ToPathDisplaySource();
                 var pathInfos = WindowsDisplayAPI.DisplayConfig.PathInfo.GetActivePaths(virtualModeAware: true);
@@ -77,21 +80,36 @@ public class RefreshRateFeature : IFeature<RefreshRate>
         if (activePath is not null)
         {
             var target = activePath.TargetsInfo.FirstOrDefault(t => t.IsCurrentlyInUse || t.IsPathActive);
-            if (target is not null && target.IsBoostRefreshRate && target.IsSignalInformationAvailable)
+            if (target is not null)
             {
-                var physicalFreq = (int)(target.SignalInfo.VerticalSyncFrequencyInMillihertz / 1000);
-                var drrResult = new RefreshRate(physicalFreq, isDynamic: true);
-                Log.Instance.Trace($"Dynamic Refresh Rate (DRR) is active. Physical refresh rate is {drrResult}");
-                return drrResult;
+                if (target.IsBoostRefreshRate)
+                {
+                    var currentSettings = display.DisplayScreen.CurrentSetting;
+                    var maxFreq = display.DisplayScreen.GetPossibleSettings()
+                        .Where(dps => Match(dps, currentSettings))
+                        .Select(dps => dps.Frequency)
+                        .DefaultIfEmpty(MinimumDrrFrequency)
+                        .Max();
+                    var drrResult = new RefreshRate(maxFreq, isDynamic: true);
+                    Log.Instance.Trace($"Dynamic Refresh Rate (DRR) is active. Reporting rate: {drrResult}");
+                    return drrResult;
+                }
+
+                var freq = (int)(target.FrequencyInMillihertz / 1000);
+                var result = new RefreshRate(freq);
+
+                Log.Instance.Trace($"Current refresh rate is {result}");
+
+                return result;
             }
         }
 
-        var currentSettings = display.DisplayScreen.CurrentSetting;
-        var result = new RefreshRate(currentSettings.Frequency);
+        var currentSettingsFallback = display.DisplayScreen.CurrentSetting;
+        var fallbackResult = new RefreshRate(currentSettingsFallback.Frequency);
 
-        Log.Instance.Trace($"Current refresh rate is {result} [currentSettings={currentSettings.ToExtendedString()}]");
+        Log.Instance.Trace($"Current refresh rate is {fallbackResult}");
 
-        return result;
+        return fallbackResult;
     }
 
     public async Task SetStateAsync(RefreshRate state)
@@ -115,9 +133,22 @@ public class RefreshRateFeature : IFeature<RefreshRate>
         }
 
         var possibleSettings = display.DisplayScreen.GetPossibleSettings();
+        var targetFrequency = state.Frequency;
+        var physicalFrequency = 0;
+
+        if (state.IsDynamic)
+        {
+            var availableFrequencies = possibleSettings
+                .Where(dps => Match(dps, currentSettings))
+                .Select(dps => dps.Frequency)
+                .Distinct();
+            targetFrequency = GetDynamicLowFrequency(state.Frequency, availableFrequencies);
+            physicalFrequency = state.Frequency;
+        }
+
         var newSettings = possibleSettings
             .Where(dps => Match(dps, currentSettings))
-            .Where(dps => dps.Frequency == state.Frequency)
+            .Where(dps => dps.Frequency == targetFrequency)
             .Select(dps => new DisplaySetting(dps, currentSettings.Position, currentSettings.Orientation, DisplayFixedOutput.Default))
             .FirstOrDefault();
 
@@ -125,7 +156,7 @@ public class RefreshRateFeature : IFeature<RefreshRate>
         {
             Log.Instance.Trace($"Setting display to {newSettings.ToExtendedString()}...");
 
-            display.SetSettingsUsingPathInfo(newSettings, state.IsDynamic);
+            await display.SetSettingsUsingPathInfoAsync(newSettings, state.IsDynamic, physicalFrequency).ConfigureAwait(false);
 
             Log.Instance.Trace($"Display set to {newSettings.ToExtendedString()}");
         }
@@ -133,6 +164,19 @@ public class RefreshRateFeature : IFeature<RefreshRate>
         {
             Log.Instance.Trace($"Could not find matching settings for frequency {state}");
         }
+    }
+
+    private static int GetDynamicLowFrequency(int maxFrequency, IEnumerable<int> availableFrequencies)
+    {
+        if (availableFrequencies.Contains(maxFrequency / 2))
+        {
+            return maxFrequency / 2;
+        }
+        if (availableFrequencies.Contains(MinimumDrrFrequency))
+        {
+            return MinimumDrrFrequency;
+        }
+        return availableFrequencies.Min();
     }
 
     private static bool Match(DisplayPossibleSetting dps, DisplayPossibleSetting ds)
