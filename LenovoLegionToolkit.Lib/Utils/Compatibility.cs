@@ -447,23 +447,34 @@ public static partial class Compatibility
         BiosVersion? biosVersion)
     {
         if (!supportedPowerModes.Contains(PowerModeState.GodMode))
+        {
             return null;
+        }
 
-        // V1: Legacy Legion
+        if (GetSupportITSMode(model))
+        {
+            return GodModePlatform.NonGaming;
+        }
+
         if (GetSupportsGodModeV1Internal(smartFanVersion, legionZoneVersion, biosVersion))
+        {
             return GodModePlatform.LegacyLegion;
+        }
 
-        // V3: Specific Legion models with OC support
         if (GetSupportsGodModeV3Internal(smartFanVersion, legionZoneVersion, gen, model, machineType))
+        {
             return GodModePlatform.Legion;
+        }
 
-        // V4: Catch-all for smartFan 8/9 or legionZone 5/6
         if (smartFanVersion is 8 or 9 || legionZoneVersion is 5 or 6)
+        {
             return GodModePlatform.Legion;
+        }
 
-        // V2: Older models
         if (smartFanVersion is 6 or 7 || legionZoneVersion is 3 or 4)
+        {
             return GodModePlatform.Legion;
+        }
 
         return null;
     }

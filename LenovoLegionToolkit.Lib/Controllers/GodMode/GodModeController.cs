@@ -1198,7 +1198,10 @@ public class GodModeController(
     private async Task<GodModePlatformConfiguration> GetConfigAsync()
     {
         if (_config != null)
+        {
             return _config;
+        }
+
         var mi = await GetMachineInformationAsync().ConfigureAwait(false);
         _config = mi.Properties.GodModePlatform switch
         {
