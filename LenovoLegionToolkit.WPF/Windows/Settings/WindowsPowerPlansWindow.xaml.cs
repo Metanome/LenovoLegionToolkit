@@ -345,8 +345,7 @@ public partial class WindowsPowerPlansWindow
 
     private async Task BuildGodModeTabsAsync(WindowsPowerPlan[] powerPlans, WindowsPowerMode[] powerModes)
     {
-        var controller = await _godModeController.GetControllerAsync().ConfigureAwait(false);
-        var presets = await controller.GetGodModePresetsAsync().ConfigureAwait(false);
+        var presets = await _godModeController.GetGodModePresetsAsync().ConfigureAwait(false);
 
         if (presets.Count > 1)
         {

@@ -337,8 +337,8 @@
                             AutomationProperties.Name="{x:Static resources:Resource.GodModeSettingsWindow_Advanced_MaxOffset_Title}"
                             ClearButtonEnabled="False"
                             MaxDecimalPlaces="0"
-                            Maximum="115"
-                            Minimum="0" />
+                            Maximum="255"
+                            Minimum="-255" />
                     </custom:CardControl>
 
                     <custom:CardControl x:Name="_minValueOffsetCardControl" Margin="0,0,0,8">
@@ -352,8 +352,8 @@
                             AutomationProperties.Name="{x:Static resources:Resource.GodModeSettingsWindow_Advanced_MinOffset_Title}"
                             ClearButtonEnabled="False"
                             MaxDecimalPlaces="0"
-                            Maximum="0"
-                            Minimum="-100" />
+                            Maximum="255"
+                            Minimum="-255" />
                     </custom:CardControl>
 
                 </StackPanel>

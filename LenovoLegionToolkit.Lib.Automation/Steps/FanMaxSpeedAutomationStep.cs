@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LenovoLegionToolkit.Lib.Controllers.GodMode;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.System.Management;
+using LenovoLegionToolkit.Lib.Utils;
 using Newtonsoft.Json;
 
 namespace LenovoLegionToolkit.Lib.Automation.Steps;
@@ -25,14 +27,12 @@ public class FanMaxSpeedAutomationStep(ToggleState state)
 
     public async Task RunAsync(AutomationContext context, AutomationEnvironment environment, CancellationToken token)
     {
-        var controller = await _godModeController.GetControllerAsync().ConfigureAwait(false);
+        var mi = await Compatibility.GetMachineInformationAsync().ConfigureAwait(false);
 
-        var typeName = controller.GetType().Name;
-
-        bool? applied = typeName switch
+        bool? applied = mi.Properties.GodModePlatform switch
         {
-            "GodModeControllerV1" => await HandleLegacyAsync().ConfigureAwait(false),
-            "GodModeControllerV2" or "GodModeControllerV3" or "GodModeControllerV4" => await HandleModernAsync().ConfigureAwait(false),
+            GodModePlatform.LegacyLegion => await HandleLegacyAsync().ConfigureAwait(false),
+            GodModePlatform.Legion or GodModePlatform.NonGaming => await HandleModernAsync(mi).ConfigureAwait(false),
             _ => null
         };
 
@@ -57,9 +57,17 @@ public class FanMaxSpeedAutomationStep(ToggleState state)
         return targetState;
     }
 
-    private async Task<bool> HandleModernAsync()
+    private async Task<bool> HandleModernAsync(MachineInformation mi)
     {
-        var currentValue = await WMI.LenovoOtherMethod.GetFeatureValueAsync(CapabilityID.FanFullSpeed).ConfigureAwait(false);
+        uint fanFullSpeedId = mi.Properties.GodModePlatform switch
+        {
+            GodModePlatform.NonGaming => (uint)NonGamingCapabilityID.FanFullSpeed,
+            _ => (uint)CapabilityID.FanFullSpeed,
+        };
+
+        uint idRaw = fanFullSpeedId & 0xFFFF00FF;
+
+        var currentValue = await WMI.LenovoOtherMethod.GetFeatureValueAsync(idRaw).ConfigureAwait(false);
 
         var targetValue = State switch
         {
@@ -70,7 +78,7 @@ public class FanMaxSpeedAutomationStep(ToggleState state)
         };
 
         if (currentValue != targetValue)
-            await WMI.LenovoOtherMethod.SetFeatureValueAsync(CapabilityID.FanFullSpeed, targetValue).ConfigureAwait(false);
+            await WMI.LenovoOtherMethod.SetFeatureValueAsync(idRaw, targetValue).ConfigureAwait(false);
 
         return targetValue != 0;
     }

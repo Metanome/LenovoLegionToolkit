@@ -89,6 +89,26 @@ public enum CapabilityID
     GpuCurrentTemperature = 0x05050000
 }
 
+public enum NonGamingCapabilityID
+{
+    CPUShortTermPowerLimit = 0x01010000,
+    CPULongTermPowerLimit = 0x01020000,
+    CPUTemperatureLimit = 0x01040000,
+    CPUPL1Tau = 0x01070000,
+    GPUConfigurableTGP = 0x02010000,
+    GPUPowerBoost = 0x02020000,
+    GPUTemperatureLimit = 0x02030000,
+    GPUToCPUDynamicBoost = 0x020B0000,
+    FanFullSpeed = 0x04020000,
+}
+
+public enum GodModePlatform
+{
+    LegacyLegion,
+    Legion,
+    NonGaming
+}
+
 public enum CPUOverclockingID
 {
     PrecisionBoostOverdriveScaler = 0x414D4401,

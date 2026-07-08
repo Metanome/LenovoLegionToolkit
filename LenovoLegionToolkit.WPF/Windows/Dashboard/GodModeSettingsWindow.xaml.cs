@@ -46,7 +46,7 @@ public partial class GodModeSettingsWindow
     private Control InitializeFanControlContainer(MachineInformation mi)
     {
         int contentIndex = _fanCurveControlStackPanel.Children.IndexOf(_fanCurveButton);
-        Control ctrl = mi.Properties.SupportsGodModeV2
+        Control ctrl = mi.SmartFanVersion >= 6
             ? new Controls.FanCurveControlV2()
             : new Controls.FanCurveControl();
         _fanCurveControlStackPanel.Children.Insert(contentIndex, ctrl);

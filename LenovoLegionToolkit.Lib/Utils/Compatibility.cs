@@ -219,10 +219,7 @@ public static partial class Compatibility
             {
                 SupportsAlwaysOnAc = GetAlwaysOnAcStatus(),
                 SupportsExtremeMode = GetSupportsExtremeMode(supportedPowerModes, smartFanVersion, legionZoneVersion),
-                SupportsGodModeV1 = GetSupportsGodModeV1(supportedPowerModes, smartFanVersion, legionZoneVersion, biosVersion),
-                SupportsGodModeV2 = GetSupportsGodModeV2(supportedPowerModes, smartFanVersion, legionZoneVersion),
-                SupportsGodModeV3 = GetSupportsGodModeV3(supportedPowerModes, smartFanVersion, legionZoneVersion, generation, model, machineType),
-                SupportsGodModeV4 = GetSupportsGodModeV4(supportedPowerModes, smartFanVersion, legionZoneVersion),
+                GodModePlatform = GetGodModePlatform(supportedPowerModes, smartFanVersion, legionZoneVersion, generation, model, machineType, biosVersion),
                 SupportsGSync = await GetSupportsGSyncAsync().ConfigureAwait(false),
                 SupportsIGPUMode = await GetSupportsIGPUModeAsync().ConfigureAwait(false),
                 SupportsAIMode = await GetSupportsAIModeAsync().ConfigureAwait(false),
@@ -440,11 +437,39 @@ public static partial class Compatibility
         return smartFanVersion is 6 or 7 or 8 || legionZoneVersion is 3 or 4 or 5;
     }
 
-    private static bool GetSupportsGodModeV1(IEnumerable<PowerModeState> supportedPowerModes, int smartFanVersion, int legionZoneVersion, BiosVersion? biosVersion)
+    private static GodModePlatform? GetGodModePlatform(
+        IEnumerable<PowerModeState> supportedPowerModes,
+        int smartFanVersion,
+        int legionZoneVersion,
+        int gen,
+        string model,
+        string machineType,
+        BiosVersion? biosVersion)
     {
         if (!supportedPowerModes.Contains(PowerModeState.GodMode))
-            return false;
+            return null;
 
+        // V1: Legacy Legion
+        if (GetSupportsGodModeV1Internal(smartFanVersion, legionZoneVersion, biosVersion))
+            return GodModePlatform.LegacyLegion;
+
+        // V3: Specific Legion models with OC support
+        if (GetSupportsGodModeV3Internal(smartFanVersion, legionZoneVersion, gen, model, machineType))
+            return GodModePlatform.Legion;
+
+        // V4: Catch-all for smartFan 8/9 or legionZone 5/6
+        if (smartFanVersion is 8 or 9 || legionZoneVersion is 5 or 6)
+            return GodModePlatform.Legion;
+
+        // V2: Older models
+        if (smartFanVersion is 6 or 7 || legionZoneVersion is 3 or 4)
+            return GodModePlatform.Legion;
+
+        return null;
+    }
+
+    private static bool GetSupportsGodModeV1Internal(int smartFanVersion, int legionZoneVersion, BiosVersion? biosVersion)
+    {
         var affectedBiosVersions = new BiosVersion[]
         {
             new("G9CN", 24),
@@ -460,21 +485,8 @@ public static partial class Compatibility
         return smartFanVersion is 4 or 5 || legionZoneVersion is 1 or 2;
     }
 
-    private static bool GetSupportsGodModeV2(IEnumerable<PowerModeState> supportedPowerModes, int smartFanVersion, int legionZoneVersion)
+    private static bool GetSupportsGodModeV3Internal(int smartFanVersion, int legionZoneVersion, int gen, string model, string machineType)
     {
-        if (!supportedPowerModes.Contains(PowerModeState.GodMode))
-            return false;
-
-        return smartFanVersion is 6 or 7 || legionZoneVersion is 3 or 4;
-    }
-
-    private static bool GetSupportsGodModeV3(IEnumerable<PowerModeState> supportedPowerModes, int smartFanVersion, int legionZoneVersion, int gen, string model, string machineType)
-    {
-        if (!supportedPowerModes.Contains(PowerModeState.GodMode))
-        {
-            return false;
-        }
-
         var affectedSeries = new LegionSeries[]
         {
             LegionSeries.Legion_5,
@@ -483,9 +495,9 @@ public static partial class Compatibility
 
         var affectedModels = new string[]
         {
-            "Legion 5", // Y7000P
-            "Legion 7", // Y9000X, Not Y9000P.
-            "Legion Pro 5 16IAX10H", // Y7000P With RTX 5070TI
+            "Legion 5",
+            "Legion 7",
+            "Legion Pro 5 16IAX10H",
             "LOQ",
             "Y7000",
             "R7000"
@@ -496,16 +508,6 @@ public static partial class Compatibility
         var isSupportedVersion = smartFanVersion is 8 or 9 || legionZoneVersion is 5 or 6;
 
         return (isAffectedSeries || isAffectedModel) && isSupportedVersion && gen >= 10;
-    }
-
-    private static bool GetSupportsGodModeV4(IEnumerable<PowerModeState> supportedPowerModes, int smartFanVersion, int legionZoneVersion)
-    {
-        if (!supportedPowerModes.Contains(PowerModeState.GodMode))
-            return false;
-
-        // In theory, All models that has denied by GetSupportsGodModeV3() will be supported by GodModeControllerV4.
-
-        return smartFanVersion is 8 or 9 || legionZoneVersion is 5 or 6;
     }
 
 
@@ -590,7 +592,7 @@ public static partial class Compatibility
         return 0;
     }
 
-    private static LegionSeries GetLegionSeries(string model, string machineType)
+    internal static LegionSeries GetLegionSeries(string model, string machineType)
     {
         if (MachineTypeMap.TryGetValue(machineType, out var series))
         {
@@ -896,8 +898,7 @@ public static partial class Compatibility
 
         GodModeController godModeController = IoCContainer.Resolve<GodModeController>();
 
-        var godModeCtrl = await godModeController. GetControllerAsync().ConfigureAwait(true);
-        var godModeControllerTypeName = godModeCtrl?.GetType().Name ?? "Null GodModeController or Result";
-        Log.Instance.Trace($"Using {godModeControllerTypeName}");
+        var godModePlatform = _machineInformation!.Value.Properties.GodModePlatform?.ToString() ?? "None";
+        Log.Instance.Trace($"Using GodMode platform: {godModePlatform}");
     }
 }
