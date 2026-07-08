@@ -446,14 +446,14 @@ public static partial class Compatibility
         string machineType,
         BiosVersion? biosVersion)
     {
-        if (!supportedPowerModes.Contains(PowerModeState.GodMode))
-        {
-            return null;
-        }
-
         if (GetSupportITSMode(model))
         {
             return GodModePlatform.NonGaming;
+        }
+
+        if (!supportedPowerModes.Contains(PowerModeState.GodMode))
+        {
+            return null;
         }
 
         if (GetSupportsGodModeV1Internal(smartFanVersion, legionZoneVersion, biosVersion))
