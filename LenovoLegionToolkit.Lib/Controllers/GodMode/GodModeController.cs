@@ -301,19 +301,22 @@ public class GodModeController(
             return;
         }
 
-        if (mi.SmartFanVersion >= 8)
+        if (config.Platform == GodModePlatform.Legion)
         {
-            if (await legionSpaceDisabler.GetStatusAsync().ConfigureAwait(false) == SoftwareStatus.Enabled)
+            if (mi.SmartFanVersion >= 8)
             {
-                Log.Instance.Trace($"Can't correctly apply state when Legion Space is running.");
+                if (await legionSpaceDisabler.GetStatusAsync().ConfigureAwait(false) == SoftwareStatus.Enabled)
+                {
+                    Log.Instance.Trace($"Can't correctly apply state when Legion Space is running.");
+                    return;
+                }
+            }
+
+            if (await legionZoneDisabler.GetStatusAsync().ConfigureAwait(false) == SoftwareStatus.Enabled)
+            {
+                Log.Instance.Trace($"Can't correctly apply state when Legion Zone is running.");
                 return;
             }
-        }
-
-        if (await legionZoneDisabler.GetStatusAsync().ConfigureAwait(false) == SoftwareStatus.Enabled)
-        {
-            Log.Instance.Trace($"Can't correctly apply state when Legion Zone is running.");
-            return;
         }
 
         Log.Instance.Trace($"Applying state...");
@@ -373,7 +376,7 @@ public class GodModeController(
             }
         }
 
-        if (preset.FanTable != null)
+        if (preset.FanTable != null && config.Platform != GodModePlatform.NonGaming)
         {
             await ApplyFanSettingsAsync(config, fanTable, fanFullSpeed).ConfigureAwait(false);
         }
