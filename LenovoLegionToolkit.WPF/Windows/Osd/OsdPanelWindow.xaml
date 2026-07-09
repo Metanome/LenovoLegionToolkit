@@ -226,6 +226,22 @@
                         <TextBlock
                             Grid.Column="0"
                             Style="{DynamicResource SensorLabelStyle}"
+                            Text="{x:Static resources:Resource.OsdItem_Voltage}" />
+                        <TextBlock
+                            x:Name="_cpuVoltage"
+                            Grid.Column="1"
+                            Style="{DynamicResource SensorValueStyle}"
+                            Text="-" />
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            Style="{DynamicResource SensorLabelStyle}"
                             Text="{x:Static resources:Resource.SensorsControl_CPU_Power}" />
                         <TextBlock
                             x:Name="_cpuPower"

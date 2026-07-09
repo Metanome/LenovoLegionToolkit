@@ -1,9 +1,12 @@
+using System;
 using System.Windows;
+using System.Windows.Controls;
 using LenovoLegionToolkit.Lib;
+using LenovoLegionToolkit.Lib.Controllers.Sensors;
 using LenovoLegionToolkit.Lib.Settings;
 using LenovoLegionToolkit.Lib.System;
+using LenovoLegionToolkit.WPF.Resources;
 using LenovoLegionToolkit.WPF.Settings;
-using LenovoLegionToolkit.WPF.Utils;
 
 namespace LenovoLegionToolkit.WPF.Windows.Settings;
 
@@ -19,6 +22,19 @@ public partial class SensorSettingsWindow
         _cpuFrequencySelector.SelectedIndex = _sensorsSettings.Store.ShowCpuAverageFrequency ? 1 : 0;
         _memoryDisplayModeSelector.SelectedIndex = _sensorsSettings.Store.DisplayMemoryInGigabytes ? 1 : 0;
 
+        var controller = IoCContainer.Resolve<SensorsGroupController>();
+        int coreCount = controller.AvailableVoltageCoreCount;
+        if (coreCount == 0) coreCount = 1;
+        for (int i = 0; i < coreCount; i++)
+        {
+            _voltageCoreSelector.Items.Add(new ComboBoxItem { Content = $"{Resource.Core} {i + 1}" });
+        }
+
+        _voltageCoreSelector.SelectedIndex = Math.Min(_sensorsSettings.Store.CpuVoltageCoreIndex, coreCount - 1);
+
+        _voltageSelector.SelectedIndex = (int)_sensorsSettings.Store.CpuVoltageMode;
+        UpdateCoreSelectorVisibility();
+
         if (Displays.HasMultipleGpus())
         {
             _gpuSelectionCard.Visibility = Visibility.Visible;
@@ -32,13 +48,30 @@ public partial class SensorSettingsWindow
         _temperatureUnitSelector.SelectedIndex = _appSettings.Store.TemperatureUnit == TemperatureUnit.F ? 1 : 0;
     }
 
+    private void _voltageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        UpdateCoreSelectorVisibility();
+        _sensorsSettings.Store.CpuVoltageCoreIndex = _voltageCoreSelector.SelectedIndex;
+    }
+
+    private void UpdateCoreSelectorVisibility()
+    {
+        _voltageCoreSelector.Visibility = _voltageSelector.SelectedIndex == (int)CpuVoltageMode.Core
+            ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     private void DefaultButton_Click(object sender, RoutedEventArgs e)
     {
         _sensorsSettings.Store.ShowCpuAverageFrequency = false;
         _sensorsSettings.Store.SelectedGpuIsIgpu = false;
         _sensorsSettings.Store.DisplayMemoryInGigabytes = false;
+        _sensorsSettings.Store.CpuVoltageMode = CpuVoltageMode.Average;
+        _sensorsSettings.Store.CpuVoltageCoreIndex = 0;
         _appSettings.Store.TemperatureUnit = TemperatureUnit.C;
         _cpuFrequencySelector.SelectedIndex = 0;
+        _voltageSelector.SelectedIndex = 0;
+        _voltageCoreSelector.SelectedIndex = 0;
+        UpdateCoreSelectorVisibility();
         _gpuSelector.SelectedIndex = 0;
         _memoryDisplayModeSelector.SelectedIndex = 0;
         _temperatureUnitSelector.SelectedIndex = 0;
@@ -56,6 +89,8 @@ public partial class SensorSettingsWindow
     private void ApplyButton_Click(object sender, RoutedEventArgs e)
     {
         _sensorsSettings.Store.ShowCpuAverageFrequency = _cpuFrequencySelector.SelectedIndex == 1;
+        _sensorsSettings.Store.CpuVoltageMode = (CpuVoltageMode)_voltageSelector.SelectedIndex;
+        _sensorsSettings.Store.CpuVoltageCoreIndex = _voltageCoreSelector.SelectedIndex;
         if (Displays.HasMultipleGpus())
         {
             _sensorsSettings.Store.SelectedGpuIsIgpu = _gpuSelector.SelectedIndex == 1;

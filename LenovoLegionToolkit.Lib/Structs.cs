@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Devices.Lights;
 using LenovoLegionToolkit.Lib.Extensions;
+using LibreHardwareMonitor.Hardware;
 using Newtonsoft.Json;
 using Octokit;
 
@@ -1358,29 +1359,52 @@ public struct UpdateFromServer(ProjectInfo projectInfo, string patchNote)
 
 public sealed record HardwareSensorSnapshot
 {
-    public float CpuTemp { get; init; } = -1;
-    public float CpuUsage { get; init; } = -1;
-    public float CpuPower { get; init; } = -1;
-    public float CpuMaxClock { get; init; } = -1;
-    public float CpuAvgClock { get; init; } = -1;
-    public float CpuPClock { get; init; } = -1;
-    public float CpuPAvgClock { get; init; } = -1;
-    public float CpuEClock { get; init; } = -1;
-    public float CpuEAvgClock { get; init; } = -1;
+    private readonly float[] _values = new float[Enum.GetValues<SensorItem>().Length];
 
-    public float GpuUsage { get; init; } = -1;
-    public float GpuTemp { get; init; } = -1;
-    public float GpuClock { get; init; } = -1;
-    public float GpuPower { get; init; } = -1;
-    public float GpuVramTemp { get; init; } = -1;
-    public float GpuVramUtilization { get; init; } = -1;
-    public float GpuVramUsed { get; init; } = -1;
-    public float GpuVramTotal { get; init; } = -1;
+    public HardwareSensorSnapshot()
+    {
+        for (int i = 0; i < _values.Length; i++)
+            _values[i] = -1;
+    }
 
-    public float MemUsage { get; init; } = -1;
-    public float MemUsed { get; init; } = -1;
-    public float MemTotal { get; init; } = -1;
-    public double MemMaxTemp { get; init; } = -1;
+    public float this[SensorItem item]
+    {
+        get => _values[(int)item];
+        init => _values[(int)item] = value;
+    }
 
-    public (float, float) SsdTemps { get; init; } = (-1, -1);
+    public float GetValue(SensorItem item) => _values[(int)item];
+
+    public HardwareSensorSnapshot WithValue(SensorItem item, float value)
+    {
+        var copy = new HardwareSensorSnapshot();
+        Array.Copy(_values, copy._values, _values.Length);
+        copy._values[(int)item] = value;
+        return copy;
+    }
+
+    public HardwareSensorSnapshot WithValues(IReadOnlyDictionary<SensorItem, float> values)
+    {
+        var copy = new HardwareSensorSnapshot();
+        Array.Copy(_values, copy._values, _values.Length);
+        foreach (var (item, val) in values)
+            copy._values[(int)item] = val;
+        return copy;
+    }
+}
+
+public readonly record struct SensorSlot
+{
+    public SensorItem Item { get; init; }
+    public SensorType Type { get; init; }
+    public string NamePattern { get; init; }
+    public bool DgpuOnly { get; init; }
+
+    public SensorSlot(SensorItem item, SensorType type, string namePattern, bool dgpuOnly = false)
+    {
+        Item = item;
+        Type = type;
+        NamePattern = namePattern;
+        DgpuOnly = dgpuOnly;
+    }
 }

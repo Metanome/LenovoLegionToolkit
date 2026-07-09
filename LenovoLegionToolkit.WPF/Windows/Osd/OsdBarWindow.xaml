@@ -121,6 +121,10 @@
                         Style="{DynamicResource TextBlockStyle}"
                         Text="-" />
                     <TextBlock
+                        x:Name="_cpuVoltage"
+                        Style="{DynamicResource TextBlockStyle}"
+                        Text="-" />
+                    <TextBlock
                         x:Name="_cpuPower"
                         Style="{DynamicResource TextBlockStyle}"
                         Text="-" />

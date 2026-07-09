@@ -292,29 +292,30 @@ public partial class SensorsControlV2
         HardwareSensorSnapshot snapshot,
         BatteryInformation? batteryInfo)
     {
-        var cpuUsage = snapshot.CpuUsage;
-        var cpuTemp = snapshot.CpuTemp;
-        var cpuClock = _sensorsGroupControllers.ShowAverageCpuFrequency ? snapshot.CpuAvgClock : snapshot.CpuMaxClock;
+        var cpuUsage = snapshot[SensorItem.CpuUtilization];
+        var cpuTemp = snapshot[SensorItem.CpuTemperature];
+        var cpuClock = _sensorsGroupControllers.ShowAverageCpuFrequency
+            ? snapshot[SensorItem.CpuAverageFrequency] : snapshot[SensorItem.CpuMaxFrequency];
         if (_sensorsGroupControllers.IsHybrid)
         {
-            cpuClock = _sensorsGroupControllers.ShowAverageCpuFrequency ? snapshot.CpuPAvgClock : snapshot.CpuPClock;
+            cpuClock = _sensorsGroupControllers.ShowAverageCpuFrequency
+                ? snapshot[SensorItem.CpuPAverageFrequency] : snapshot[SensorItem.CpuPMaxFrequency];
         }
-        var cpuPower = snapshot.CpuPower;
+        var cpuPower = snapshot[SensorItem.CpuPower];
 
-        var gpuUsage = snapshot.GpuUsage;
-        var gpuVramUsage = snapshot.GpuVramUtilization;
-        var gpuVramUsed = snapshot.GpuVramUsed;
-        var gpuVramTotal = snapshot.GpuVramTotal;
-        var gpuTemp = snapshot.GpuTemp;
-        var gpuClock = snapshot.GpuClock;
-        var gpuPower = snapshot.GpuPower;
-        var gpuVramTemp = snapshot.GpuVramTemp;
+        var gpuUsage = snapshot[SensorItem.GpuUtilization];
+        var gpuVramUsage = snapshot[SensorItem.GpuVramUtilization];
+        var gpuVramUsed = snapshot[SensorItem.GpuVramUsed];
+        var gpuVramTotal = snapshot[SensorItem.GpuVramTotal];
+        var gpuTemp = snapshot[SensorItem.GpuCoreTemperature];
+        var gpuClock = snapshot[SensorItem.GpuFrequency];
+        var gpuPower = snapshot[SensorItem.GpuPower];
+        var gpuVramTemp = snapshot[SensorItem.GpuVramTemperature];
 
-        var diskTemps = snapshot.SsdTemps;
-        var memoryUsage = snapshot.MemUsage;
-        var memoryUsed = snapshot.MemUsed;
-        var memoryTotal = snapshot.MemTotal;
-        var memoryTemp = snapshot.MemMaxTemp;
+        var memoryUsage = snapshot[SensorItem.MemoryUtilization];
+        var memoryUsed = snapshot[SensorItem.MemoryUsed];
+        var memoryTotal = snapshot[SensorItem.MemoryTotal];
+        var memoryTemp = snapshot[SensorItem.MemoryTemperature];
 
         lock (_updateLock)
         {
@@ -377,8 +378,8 @@ public partial class SensorsControlV2
             if (_activeSensorItems.Contains(SensorItem.PchFanSpeed)) UpdateValue(_pchFanSpeedBar, _pchFanSpeedLabel, data.PCH.MaxFanSpeed, data.PCH.FanSpeed, $"{data.PCH.FanSpeed} {Resource.RPM}", $"{data.PCH.MaxFanSpeed} {Resource.RPM}");
 
             // --- Disk & Memory ---
-            if (_activeSensorItems.Contains(SensorItem.Disk1Temperature)) UpdateValue(_disk1TemperatureBar, _disk1TemperatureLabel, 100, diskTemps.Item1, GetTemperatureText(diskTemps.Item1));
-            if (_activeSensorItems.Contains(SensorItem.Disk2Temperature)) UpdateValue(_disk2TemperatureBar, _disk2TemperatureLabel, 100, diskTemps.Item2, GetTemperatureText(diskTemps.Item2));
+            if (_activeSensorItems.Contains(SensorItem.Disk1Temperature)) UpdateValue(_disk1TemperatureBar, _disk1TemperatureLabel, 100, snapshot[SensorItem.Disk1Temperature], GetTemperatureText(snapshot[SensorItem.Disk1Temperature]));
+            if (_activeSensorItems.Contains(SensorItem.Disk2Temperature)) UpdateValue(_disk2TemperatureBar, _disk2TemperatureLabel, 100, snapshot[SensorItem.Disk2Temperature], GetTemperatureText(snapshot[SensorItem.Disk2Temperature]));
             if (_activeSensorItems.Contains(SensorItem.MemoryUtilization)) UpdateValue(_memoryUtilizationBar, _memoryUtilizationLabel, 100, memoryUsage, GetMemoryUsageText(memoryUsage, memoryUsed, memoryTotal));
             if (_activeSensorItems.Contains(SensorItem.MemoryTemperature)) UpdateValue(_memoryTemperatureBar, _memoryTemperatureLabel, 100, memoryTemp, GetTemperatureText(memoryTemp));
 

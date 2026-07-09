@@ -233,6 +233,7 @@ public readonly struct SensorSnapshot
     public double CpuEClock { get; init; }
     public double CpuTemp { get; init; }
     public double CpuPower { get; init; }
+    public double CpuVoltage { get; init; }
     public int CpuFanSpeed { get; init; }
     public double GpuUsage { get; init; }
     public double GpuFrequency { get; init; }

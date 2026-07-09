@@ -30,6 +30,7 @@ public partial class OsdBarWindow : OsdWindowBase
             { OsdItem.CpuUtilization, _cpuUsage },
             { OsdItem.CpuTemperature, _cpuTemperature },
             { OsdItem.CpuPower, _cpuPower },
+            { OsdItem.CpuVoltage, _cpuVoltage },
             { OsdItem.CpuFan, _cpuFanSpeed },
 
             // GPU
@@ -60,7 +61,7 @@ public partial class OsdBarWindow : OsdWindowBase
             { _fpsGroup, ([OsdItem.Fps, OsdItem.LowFps, OsdItem.FrameTime], _separatorFps) },
 
             // CPU
-            { _cpuGroup, ([OsdItem.CpuFrequency, OsdItem.CpuPCoreFrequency, OsdItem.CpuECoreFrequency, OsdItem.CpuUtilization, OsdItem.CpuTemperature, OsdItem.CpuPower, OsdItem.CpuFan], _separatorCpu) },
+            { _cpuGroup, ([OsdItem.CpuFrequency, OsdItem.CpuPCoreFrequency, OsdItem.CpuECoreFrequency, OsdItem.CpuUtilization, OsdItem.CpuTemperature, OsdItem.CpuPower, OsdItem.CpuVoltage, OsdItem.CpuFan], _separatorCpu) },
 
             // GPU
             { _gpuGroup, ([OsdItem.GpuFrequency, OsdItem.GpuUtilization, OsdItem.GpuTemperature, OsdItem.GpuVramUtilization, OsdItem.GpuVramTemperature, OsdItem.GpuPower, OsdItem.GpuFan], _separatorGpu) },
@@ -173,6 +174,7 @@ public partial class OsdBarWindow : OsdWindowBase
         UpdateTextBlock(_cpuEFrequency, data.CpuEClock, $"{{0:F0}} {Resource.MHz}");
         UpdateTemperatureTextBlock(_cpuTemperature, data.CpuTemp, store.TempThresholdWarning, store.TempThresholdCritical);
         UpdateTextBlock(_cpuPower, data.CpuPower, $"{{0:F1}} {Resource.Watt}");
+        UpdateTextBlock(_cpuVoltage, data.CpuVoltage, $"{{0:F2}} V");
         UpdateTextBlock(_cpuFanSpeed, data.CpuFanSpeed);
 
         UpdateTextBlock(_gpuUsage, data.GpuUsage, $"{{0:F0}}{Resource.Percent}", store.UsageThresholdWarning, store.UsageThresholdCritical);

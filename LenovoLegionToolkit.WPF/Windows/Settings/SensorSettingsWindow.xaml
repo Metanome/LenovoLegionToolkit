@@ -71,6 +71,27 @@
                     </ComboBox>
                 </custom:CardControl>
 
+                <custom:CardControl Margin="0,0,0,8">
+                    <custom:CardControl.Header>
+                        <controls:CardHeaderControl Title="{x:Static resources:Resource.SensorSettingsPage_Voltage_Title}" Subtitle="{x:Static resources:Resource.SensorSettingsPage_Voltage_Message}" />
+                    </custom:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox
+                            x:Name="_voltageSelector"
+                            MinWidth="120"
+                            SelectionChanged="_voltageSelector_SelectionChanged">
+                            <ComboBoxItem Content="{x:Static resources:Resource.SensorSettingsPage_VoltageMode_Average}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.SensorSettingsPage_VoltageMode_Maximum}" />
+                            <ComboBoxItem Content="{x:Static resources:Resource.SensorSettingsPage_VoltageMode_Core}" />
+                        </ComboBox>
+                        <ComboBox
+                            x:Name="_voltageCoreSelector"
+                            MinWidth="80"
+                            Margin="8,0,0,0"
+                            Visibility="Collapsed" />
+                    </StackPanel>
+                </custom:CardControl>
+
                 <custom:CardControl x:Name="_gpuSelectionCard" Margin="0,0,0,8">
                     <custom:CardControl.Header>
                         <controls:CardHeaderControl Title="{x:Static resources:Resource.SensorSettingsPage_Preferred_GPU_Title}" Subtitle="{x:Static resources:Resource.SensorSettingsPage_Preferred_GPU_Message}" />

@@ -2135,6 +2135,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Core 的本地化字符串。
+        /// </summary>
+        public static string Core {
+            get {
+                return ResourceManager.GetString("Core", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Cores 的本地化字符串。
         /// </summary>
         public static string Cores {
@@ -5914,6 +5923,15 @@ namespace LenovoLegionToolkit.WPF.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Voltage 的本地化字符串。
+        /// </summary>
+        public static string OsdItem_Voltage {
+            get {
+                return ResourceManager.GetString("OsdItem_Voltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Set the lock position state of the OSD. 的本地化字符串。
         /// </summary>
         public static string OsdLockPositionAutomationStepControl_Message {
@@ -8055,6 +8073,51 @@ namespace LenovoLegionToolkit.WPF.Resources {
         public static string SensorSettingsPage_Used_Memory_GB_Title {
             get {
                 return ResourceManager.GetString("SensorSettingsPage_Used_Memory_GB_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Choose how voltage is displayed on the Dashboard and OSD. 的本地化字符串。
+        /// </summary>
+        public static string SensorSettingsPage_Voltage_Message {
+            get {
+                return ResourceManager.GetString("SensorSettingsPage_Voltage_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Voltage Display Mode 的本地化字符串。
+        /// </summary>
+        public static string SensorSettingsPage_Voltage_Title {
+            get {
+                return ResourceManager.GetString("SensorSettingsPage_Voltage_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Average 的本地化字符串。
+        /// </summary>
+        public static string SensorSettingsPage_VoltageMode_Average {
+            get {
+                return ResourceManager.GetString("SensorSettingsPage_VoltageMode_Average", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Core 的本地化字符串。
+        /// </summary>
+        public static string SensorSettingsPage_VoltageMode_Core {
+            get {
+                return ResourceManager.GetString("SensorSettingsPage_VoltageMode_Core", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Maximum 的本地化字符串。
+        /// </summary>
+        public static string SensorSettingsPage_VoltageMode_Maximum {
+            get {
+                return ResourceManager.GetString("SensorSettingsPage_VoltageMode_Maximum", resourceCulture);
             }
         }
         

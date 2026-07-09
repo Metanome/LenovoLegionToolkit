@@ -336,6 +336,8 @@ public abstract class OsdWindowBase : Window
         if (IsVisible)
         {
             _sensorsGroupControllers.ShowAverageCpuFrequency = _hardwareSensorSettings.Store.ShowCpuAverageFrequency;
+            _sensorsGroupControllers.CpuVoltageMode = _hardwareSensorSettings.Store.CpuVoltageMode;
+            _sensorsGroupControllers.CpuVoltageCoreIndex = _hardwareSensorSettings.Store.CpuVoltageCoreIndex;
 
             _cts?.Cancel();
             _cts?.Dispose();
@@ -739,7 +741,10 @@ public abstract class OsdWindowBase : Window
 
     private async Task RefreshSensorsDataAsync(CancellationToken token)
     {
-        var gs = _sensorsGroupControllers.Snapshot;
+        _sensorsGroupControllers.CpuVoltageMode = _hardwareSensorSettings.Store.CpuVoltageMode;
+        _sensorsGroupControllers.CpuVoltageCoreIndex = _hardwareSensorSettings.Store.CpuVoltageCoreIndex;
+
+        var groupSnapshot = _sensorsGroupControllers.Snapshot;
 
         SensorsData? mainData = null;
         if (_hasLenovoController)
@@ -755,34 +760,38 @@ public abstract class OsdWindowBase : Window
 
         var snapshot = new SensorSnapshot
         {
-            CpuUsage = gs.CpuUsage,
-            CpuFrequency = _sensorsGroupControllers.ShowAverageCpuFrequency ? gs.CpuAvgClock : gs.CpuMaxClock,
-            CpuPClock = _sensorsGroupControllers.ShowAverageCpuFrequency ? gs.CpuPAvgClock : gs.CpuPClock,
-            CpuEClock = _sensorsGroupControllers.ShowAverageCpuFrequency ? gs.CpuEAvgClock : gs.CpuEClock,
-            CpuTemp = gs.CpuTemp,
-            CpuPower = gs.CpuPower,
+            CpuUsage = groupSnapshot[SensorItem.CpuUtilization],
+            CpuFrequency = _sensorsGroupControllers.ShowAverageCpuFrequency
+                ? groupSnapshot[SensorItem.CpuAverageFrequency] : groupSnapshot[SensorItem.CpuMaxFrequency],
+            CpuPClock = _sensorsGroupControllers.ShowAverageCpuFrequency
+                ? groupSnapshot[SensorItem.CpuPAverageFrequency] : groupSnapshot[SensorItem.CpuPMaxFrequency],
+            CpuEClock = _sensorsGroupControllers.ShowAverageCpuFrequency
+                ? groupSnapshot[SensorItem.CpuEAverageFrequency] : groupSnapshot[SensorItem.CpuEMaxFrequency],
+            CpuTemp = groupSnapshot[SensorItem.CpuTemperature],
+            CpuPower = groupSnapshot[SensorItem.CpuPower],
+            CpuVoltage = groupSnapshot[SensorItem.CpuVoltage],
             CpuFanSpeed = mainData?.CPU.FanSpeed ?? -1,
 
-            GpuUsage = gs.GpuUsage,
-            GpuFrequency = gs.GpuClock,
-            GpuTemp = gs.GpuTemp,
-            GpuVramUsage = gs.GpuVramUtilization,
-            GpuVramUsed = gs.GpuVramUsed,
-            GpuVramTotal = gs.GpuVramTotal,
-            GpuVramTemp = gs.GpuVramTemp,
-            GpuPower = gs.GpuPower,
+            GpuUsage = groupSnapshot[SensorItem.GpuUtilization],
+            GpuFrequency = groupSnapshot[SensorItem.GpuFrequency],
+            GpuTemp = groupSnapshot[SensorItem.GpuCoreTemperature],
+            GpuVramUsage = groupSnapshot[SensorItem.GpuVramUtilization],
+            GpuVramUsed = groupSnapshot[SensorItem.GpuVramUsed],
+            GpuVramTotal = groupSnapshot[SensorItem.GpuVramTotal],
+            GpuVramTemp = groupSnapshot[SensorItem.GpuVramTemperature],
+            GpuPower = groupSnapshot[SensorItem.GpuPower],
             GpuFanSpeed = mainData?.GPU.FanSpeed ?? -1,
 
-            MemUsage = gs.MemUsage,
-            MemUsed = gs.MemUsed,
-            MemTotal = gs.MemTotal,
-            MemTemp = (float)gs.MemMaxTemp,
+            MemUsage = groupSnapshot[SensorItem.MemoryUtilization],
+            MemUsed = groupSnapshot[SensorItem.MemoryUsed],
+            MemTotal = groupSnapshot[SensorItem.MemoryTotal],
+            MemTemp = groupSnapshot[SensorItem.MemoryTemperature],
 
             PchTemp = mainData?.PCH.Temperature ?? -1,
             PchFanSpeed = mainData?.PCH.FanSpeed ?? -1,
 
-            Disk1Temp = gs.SsdTemps.Item1,
-            Disk2Temp = gs.SsdTemps.Item2
+            Disk1Temp = groupSnapshot[SensorItem.Disk1Temperature],
+            Disk2Temp = groupSnapshot[SensorItem.Disk2Temperature]
         };
 
         await Dispatcher.BeginInvoke(() => UpdateSensorData(snapshot), DispatcherPriority.Normal);

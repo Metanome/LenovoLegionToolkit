@@ -307,24 +307,24 @@ public partial class StatusWindow
 
                 if (_sensorsGroupController.IsLibreHardwareMonitorInitialized())
                 {
-                    var gs = snapshot ?? _sensorsGroupController.Snapshot;
-                    cpuPower = gs.CpuPower;
-                    gpuPower = gs.GpuPower;
-                    cpuTemp = gs.CpuTemp;
-                    gpuClock = gs.GpuClock;
-                    gpuTemp = gs.GpuTemp;
+                    var groupSnapshot = snapshot ?? _sensorsGroupController.Snapshot;
+                    cpuPower = groupSnapshot[SensorItem.CpuPower];
+                    gpuPower = groupSnapshot[SensorItem.GpuPower];
+                    cpuTemp = groupSnapshot[SensorItem.CpuTemperature];
+                    gpuClock = groupSnapshot[SensorItem.GpuFrequency];
+                    gpuTemp = groupSnapshot[SensorItem.GpuCoreTemperature];
 
                     if (_sensorsGroupController.IsHybrid)
                     {
                         cpuClock = _hardwareSensorSettings.Store.ShowCpuAverageFrequency
-                            ? gs.CpuPAvgClock
-                            : gs.CpuPClock;
+                            ? groupSnapshot[SensorItem.CpuPAverageFrequency]
+                            : groupSnapshot[SensorItem.CpuPMaxFrequency];
                     }
                     else
                     {
                         cpuClock = _hardwareSensorSettings.Store.ShowCpuAverageFrequency
-                            ? gs.CpuAvgClock
-                            : gs.CpuMaxClock;
+                            ? groupSnapshot[SensorItem.CpuAverageFrequency]
+                            : groupSnapshot[SensorItem.CpuMaxFrequency];
                     }
                 }
             }

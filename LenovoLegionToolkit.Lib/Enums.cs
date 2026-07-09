@@ -207,6 +207,8 @@ public enum OsdItem
     CpuTemperature,
     [Display(ResourceType = typeof(Resource), Name = "OsdItem_Power")]
     CpuPower,
+    [Display(ResourceType = typeof(Resource), Name = "OsdItem_Voltage")]
+    CpuVoltage,
     [Display(ResourceType = typeof(Resource), Name = "OsdItem_Fan")]
     CpuFan,
 
@@ -728,13 +730,30 @@ public enum RGBKeyboardBacklightSpeed
     Fastest
 }
 
+public enum CpuVoltageMode
+{
+    [Display(ResourceType = typeof(Resource), Name = "CpuVoltageMode_Average")]
+    Average,
+    [Display(ResourceType = typeof(Resource), Name = "CpuVoltageMode_Maximum")]
+    Maximum,
+    [Display(ResourceType = typeof(Resource), Name = "CpuVoltageMode_Core")]
+    Core,
+}
+
 public enum SensorItem
 {
     CpuUtilization,
     CpuFrequency,
+    CpuMaxFrequency,
+    CpuAverageFrequency,
+    CpuPMaxFrequency,
+    CpuPAverageFrequency,
+    CpuEMaxFrequency,
+    CpuEAverageFrequency,
     CpuFanSpeed,
     CpuTemperature,
     CpuPower,
+    CpuVoltage,
     GpuUtilization,
     GpuFrequency,
     GpuFanSpeed,
@@ -742,11 +761,15 @@ public enum SensorItem
     GpuVramTemperature,
     GpuTemperatures,
     GpuPower,
+    GpuVramUsed,
+    GpuVramTotal,
     PchFanSpeed,
     PchTemperature,
     BatteryState,
     BatteryLevel,
     MemoryUtilization,
+    MemoryUsed,
+    MemoryTotal,
     MemoryTemperature,
     Disk1Temperature,
     Disk2Temperature,

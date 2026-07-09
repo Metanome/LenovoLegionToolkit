@@ -116,7 +116,8 @@ public partial class OsdSettingsWindow
                 [
                     OsdItem.CpuUtilization, OsdItem.CpuFrequency,
                     OsdItem.CpuTemperature,
-                    OsdItem.CpuPower, OsdItem.CpuFan
+                    OsdItem.CpuPower, OsdItem.CpuVoltage,
+                    OsdItem.CpuFan
                 ]
             },
             new OsdItemGroup { Header = Resource.Osd_Gpu, Items =

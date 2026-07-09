@@ -3,6 +3,7 @@ using LenovoLegionToolkit.Lib.AutoListeners;
 using LenovoLegionToolkit.Lib.Controllers;
 using LenovoLegionToolkit.Lib.Controllers.GodMode;
 using LenovoLegionToolkit.Lib.Controllers.Sensors;
+using LenovoLegionToolkit.Lib.Controllers.Sensors.Providers;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Features;
 using LenovoLegionToolkit.Lib.Features.FlipToStart;
@@ -141,6 +142,10 @@ public class IoCModule : Module
         builder.Register<SensorsControllerV3>(true);
         builder.Register<SensorsControllerV4>(true);
         builder.Register<SensorsControllerV5>(true);
+        builder.Register<CpuSensorProvider>(true);
+        builder.Register<GpuSensorProvider>(true);
+        builder.Register<MemorySensorProvider>(true);
+        builder.Register<StorageSensorProvider>(true);
         builder.Register<SensorsGroupController>(true);
         builder.Register<SmartFnLockController>();
         builder.Register<SpectrumKeyboardBacklightController>();
