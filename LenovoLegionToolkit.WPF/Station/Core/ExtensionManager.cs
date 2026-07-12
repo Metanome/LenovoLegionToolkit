@@ -10,15 +10,10 @@ using LenovoLegionToolkit.Lib.Utils;
 
 namespace LenovoLegionToolkit.WPF.Station.Core;
 
-public sealed class ExtensionManager : IExtensionManager
+public sealed class ExtensionManager(ExtensionContextFactory contextFactory) : IExtensionManager
 {
-    private readonly ExtensionContextFactory _contextFactory;
     private readonly List<IExtensionProvider> _providers = [];
-
-    public ExtensionManager(ExtensionContextFactory contextFactory)
-    {
-        _contextFactory = contextFactory;
-    }
+    private readonly string _pluginRoot = Path.Combine(Folders.AppData, "Plugins");
 
     public IReadOnlyCollection<IExtensionProvider> Providers => _providers.AsReadOnly();
 
@@ -31,27 +26,68 @@ public sealed class ExtensionManager : IExtensionManager
 
     public void Load()
     {
-        var pluginRoot = Path.Combine(Folders.AppData, "Plugins");
-        Log.Instance.Trace($"Starting extension discovery. BaseDirectory={Folders.AppData}");
-        Log.Instance.Trace($"Expected plugin root: {pluginRoot}");
+        Log.Instance.Trace($"Starting extension discovery. PluginRoot={_pluginRoot}");
 
-        if (!Directory.Exists(pluginRoot))
+        if (!Directory.Exists(_pluginRoot))
         {
-            Log.Instance.Trace($"Plugin directory not found: {pluginRoot}");
+            Log.Instance.Trace($"Plugin directory not found: {_pluginRoot}");
             return;
         }
 
-        var dlls = Directory.EnumerateFiles(pluginRoot, "*.dll", SearchOption.AllDirectories).ToArray();
-        Log.Instance.Trace($"Discovered {dlls.Length} plugin assembly file(s)");
-
         AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+        var discovered = new List<PluginDiscoveryInfo>();
+
         try
         {
+            var dlls = new List<string>();
+
+            var depDir = Path.Combine(_pluginRoot, "Dependency");
+            if (Directory.Exists(depDir))
+            {
+                var depDlls = Directory.EnumerateFiles(depDir, "*.dll", SearchOption.TopDirectoryOnly).ToArray();
+                Log.Instance.Trace($"Discovered {depDlls.Length} plugin assembly file(s) in Dependency.");
+                dlls.AddRange(depDlls);
+            }
+
+            var rootDlls = Directory.EnumerateFiles(_pluginRoot, "*.dll", SearchOption.TopDirectoryOnly).ToArray();
+            Log.Instance.Trace($"Discovered {rootDlls.Length} plugin assembly file(s) in root.");
+            dlls.AddRange(rootDlls);
+
             foreach (var dll in dlls)
             {
                 Log.Instance.Trace($"Discovered plugin candidate: {dll}");
-                TryLoadAssemblyProviders(dll);
+                TryLoadAssemblyProviderTypes(dll, discovered);
             }
+
+            if (discovered.Count == 0)
+            {
+                Log.Instance.Trace($"No providers discovered.");
+                return;
+            }
+            Log.Instance.Trace($"Phase 1 complete: {discovered.Count} provider(s) discovered.");
+
+            var sorted = TopologicalSort(discovered);
+            Log.Instance.Trace($"Phase 2 complete: {sorted.Count} provider(s) after dependency resolution.");
+
+            foreach (var info in sorted)
+            {
+                try
+                {
+                    Log.Instance.Trace($"Initializing provider: {info.TypeName} (capability={info.Capability ?? "(none)"})");
+                    info.Provider.Initialize(contextFactory.Create(info.TypeName));
+                    _providers.Add(info.Provider);
+
+                    var capability = info.Capability;
+                    var capabilityDisplay = string.IsNullOrEmpty(capability) ? "(none)" : capability;
+                    Log.Instance.Trace($"Loaded provider successfully: {info.TypeName}, Capabilities: {capabilityDisplay}, Total loaded providers: {_providers.Count}");
+                }
+                catch (Exception ex)
+                {
+                    Log.Instance.ErrorReport($"Failed to initialize provider {info.TypeName}", ex);
+                    Log.Instance.Trace($"Failed to initialize provider {info.TypeName}", ex);
+                }
+            }
+            Log.Instance.Trace($"Phase 3 complete. Total loaded: {_providers.Count}");
         }
         finally
         {
@@ -61,14 +97,36 @@ public sealed class ExtensionManager : IExtensionManager
         Log.Instance.Trace($"Extension discovery completed. Loaded provider count: {_providers.Count}");
     }
 
-    private static Assembly? OnAssemblyResolve(object? sender, ResolveEventArgs args)
+    private Assembly? OnAssemblyResolve(object? sender, ResolveEventArgs args)
     {
         var requestedName = new AssemblyName(args.Name);
+
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             if (assembly.GetName().Name == requestedName.Name)
+            {
                 return assembly;
+            }
         }
+
+        var depDir = Path.Combine(_pluginRoot, "Dependency");
+        if (Directory.Exists(depDir))
+        {
+            var candidatePath = Path.Combine(depDir, $"{requestedName.Name}.dll");
+            if (File.Exists(candidatePath))
+            {
+                Log.Instance.Trace($"Resolving assembly '{requestedName.Name}' from Dependency folder: {candidatePath}");
+                try
+                {
+                    return Assembly.LoadFrom(candidatePath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Instance.Trace($"Failed to load assembly from Dependency folder {candidatePath}: {ex.Message}", ex);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -94,7 +152,7 @@ public sealed class ExtensionManager : IExtensionManager
         _providers.Clear();
     }
 
-    private void TryLoadAssemblyProviders(string assemblyPath)
+    private void TryLoadAssemblyProviderTypes(string assemblyPath, List<PluginDiscoveryInfo> discovered)
     {
         try
         {
@@ -136,7 +194,7 @@ public sealed class ExtensionManager : IExtensionManager
 
             foreach (var providerType in providerTypes)
             {
-                Log.Instance.Trace($"Creating provider instance: {providerType.FullName}");
+                Log.Instance.Trace($"Creating provider instance (Phase 1): {providerType.FullName}");
 
                 if (Activator.CreateInstance(providerType) is not IExtensionProvider provider)
                 {
@@ -144,17 +202,14 @@ public sealed class ExtensionManager : IExtensionManager
                     continue;
                 }
 
-                Log.Instance.Trace($"Initializing provider: {providerType.FullName}");
+                var typeName = providerType.FullName ?? providerType.Name;
+                discovered.Add(new PluginDiscoveryInfo
+                {
+                    Provider = provider,
+                    TypeName = typeName
+                });
 
-                provider.Initialize(_contextFactory.Create(providerType.FullName ?? providerType.Name));
-
-                _providers.Add(provider);
-
-                var capability = provider.GetData(nameof(ExtensionDataKey.Capability)) as string;
-                var version = provider.GetData(nameof(ExtensionDataKey.Version)) as string;
-                var capabilityDisplay = string.IsNullOrEmpty(capability) ? "(none)" : capability;
-
-                Log.Instance.Trace($"Loaded provider successfully: {providerType.FullName}, Version: {version}, Capabilities: {capabilityDisplay}, Total loaded providers: {_providers.Count}");
+                Log.Instance.Trace($"Provider instance created (not initialized): {typeName}");
             }
         }
         catch (Exception ex)
@@ -162,5 +217,134 @@ public sealed class ExtensionManager : IExtensionManager
             Log.Instance.ErrorReport($"Failed to load extension assembly {assemblyPath}", ex);
             Log.Instance.Trace($"Failed to load extension assembly {assemblyPath}", ex);
         }
+    }
+
+    private List<PluginDiscoveryInfo> TopologicalSort(List<PluginDiscoveryInfo> discovered)
+    {
+        Log.Instance.Trace($"Starting Phase 2: dependency resolution. Provider count={discovered.Count}");
+
+        var capToIdx = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        for (int i = 0; i < discovered.Count; i++)
+        {
+            var info = discovered[i];
+
+            try
+            {
+                info.Capability = info.Provider.GetData(nameof(ExtensionDataKey.Capability)) as string;
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Provider {info.TypeName}: GetData(Capability) threw, treating as no capability.", ex);
+                info.Capability = null;
+            }
+
+            try
+            {
+                info.Dependencies = (info.Provider.GetData(nameof(ExtensionDataKey.Dependencies)) as string[]) ?? [];
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Provider {info.TypeName}: GetData(Dependencies) threw, treating as no dependencies.", ex);
+                info.Dependencies = [];
+            }
+
+            if (!string.IsNullOrEmpty(info.Capability))
+            {
+                if (capToIdx.ContainsKey(info.Capability))
+                {
+                    Log.Instance.Trace($"Duplicate capability '{info.Capability}' detected. Provider {info.TypeName} will shadow earlier registration.");
+                }
+                capToIdx[info.Capability] = i;
+            }
+
+            Log.Instance.Trace($"Provider [{info.TypeName}]: Capability={info.Capability ?? "(none)"}, Dependencies={string.Join(", ", info.Dependencies)}");
+
+            discovered[i] = info;
+        }
+
+        int n = discovered.Count;
+        var adj = new List<int>[n];
+        var inDegree = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            adj[i] = [];
+        }
+
+        var missingDeps = new HashSet<int>();
+
+        for (int j = 0; j < n; j++)
+        {
+            foreach (var depCapability in discovered[j].Dependencies ?? [])
+            {
+                if (capToIdx.TryGetValue(depCapability, out int i))
+                {
+                    adj[i].Add(j);
+                    inDegree[j]++;
+                }
+                else
+                {
+                    Log.Instance.Trace($"Warning: Provider {discovered[j].TypeName} depends on capability '{depCapability}' which is not provided by any discovered plugin.");
+                    missingDeps.Add(j);
+                }
+            }
+        }
+
+        var queue = new Queue<int>();
+        for (int i = 0; i < n; i++)
+        {
+            if (inDegree[i] == 0)
+            {
+                queue.Enqueue(i);
+            }
+        }
+
+        var sorted = new List<PluginDiscoveryInfo>();
+        while (queue.Count > 0)
+        {
+            int i = queue.Dequeue();
+            sorted.Add(discovered[i]);
+
+            foreach (int j in adj[i])
+            {
+                inDegree[j]--;
+                if (inDegree[j] == 0)
+                {
+                    queue.Enqueue(j);
+                }
+            }
+        }
+
+        if (sorted.Count < n)
+        {
+            var unresolved = new HashSet<int>();
+            for (int i = 0; i < n; i++)
+            {
+                if (inDegree[i] > 0)
+                {
+                    unresolved.Add(i);
+                }
+            }
+
+            Log.Instance.Trace($"Cycle detected in dependency graph. {unresolved.Count} provider(s) involved: {string.Join(", ", unresolved.Select(i => discovered[i].TypeName))}");
+
+            foreach (int i in unresolved)
+            {
+                Log.Instance.ErrorReport(
+                    $"Provider {discovered[i].TypeName} is part of a dependency cycle and will not be loaded.",
+                    new InvalidOperationException("Circular dependency detected"));
+            }
+        }
+
+        foreach (int j in missingDeps)
+        {
+            if (sorted.Contains(discovered[j]))
+            {
+                Log.Instance.Trace($"Note: Provider {discovered[j].TypeName} was loaded with one or more unresolved dependencies.");
+            }
+        }
+
+        Log.Instance.Trace($"Dependency resolution complete. Sorted {sorted.Count} provider(s), {n - sorted.Count} skipped (cycles).");
+        return sorted;
     }
 }

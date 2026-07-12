@@ -1,3 +1,8 @@
+using LenovoLegionToolkit.Lib.Extensions;
+using LenovoLegionToolkit.Lib.Station.Core;
+using LibreHardwareMonitor.Hardware;
+using Newtonsoft.Json;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,10 +13,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Devices.Lights;
-using LenovoLegionToolkit.Lib.Extensions;
-using LibreHardwareMonitor.Hardware;
-using Newtonsoft.Json;
-using Octokit;
 
 
 namespace LenovoLegionToolkit.Lib;
@@ -1314,6 +1315,14 @@ public readonly struct WindowPosition(double left, double top)
 {
     public double Left { get; } = left;
     public double Top { get; } = top;
+}
+
+public struct PluginDiscoveryInfo(IExtensionProvider provider, string typeName, string? capability, string[] dependencies)
+{
+    public required IExtensionProvider Provider { get; init; } = provider;
+    public required string TypeName { get; init; } = typeName;
+    public string? Capability { get; set; } = capability;
+    public string[] Dependencies { get; set; } = dependencies ?? [];
 }
 
 public struct ProjectEntry()
