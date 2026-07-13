@@ -230,7 +230,9 @@ public partial class App
 
         Log.Instance.Trace($"Starting... [version={Assembly.GetEntryAssembly()?.GetName().Version}, build={Assembly.GetEntryAssembly()?.GetBuildDateTimeString()}, os={Environment.OSVersion}, dotnet={Environment.Version}]");
 
-        // Hardware init
+        var totalSw = Stopwatch.StartNew();
+
+        // Init
         await SafeInitAsync(LogSoftwareStatusAsync, "Software Status");
         await SafeInitAsync(InitPowerModeFeatureAsync, "Power Mode");
         await SafeInitAsync(InitItsModeFeatureAsync, "ITS Mode");
@@ -238,36 +240,38 @@ public partial class App
         await SafeInitAsync(InitRgbKeyboardControllerAsync, "RGB Keyboard");
         await SafeInitAsync(InitSpectrumKeyboardControllerAsync, "Spectrum Keyboard");
         await SafeInitAsync(InitGpuOverclockControllerAsync, "GPU Overclock");
+        await SafeInitAsync(InitSensorsGroupControllerFeatureAsync, "Sensors Group");
         await SafeInitAsync(InitHybridModeAsync, "Hybrid Mode");
         await SafeInitAsync(InitAutomationProcessorAsync, "Automation Processor");
         await SafeInitAsync(InitLampArrayControllerAsync, "LampArray");
 
-        // Post-init services
-        await SafeInitAsync(InitAIControllerAsync, "AI Controller");
-        await SafeInitAsync(InitSensorsGroupControllerFeatureAsync, "Sensors Group");
+        // Post-init
         await SafeInitAsync(InitAMDOverclocking, "AMD Overclocking");
         await SafeInitAsync(InitAutomationLocalization, "Automation Localization");
         await SafeInitAsync(PostApplyAmdOverclockingProfileAsync, "AMD Overclocking Profile");
+
+        Log.Instance.Trace($"InitializeHardwareAndFeatures completed [elapsed={totalSw.ElapsedMilliseconds}ms]");
     }
 
-    private Task StartBackgroundServicesAsync()
+    private async Task StartBackgroundServicesAsync()
     {
         if (AppFlags.Instance.Debug)
         {
-            Console.WriteLine(@"[Startup] Starting MacroController...");
+            Console.WriteLine(@"[Startup] Starting background services...");
         }
 
         IoCContainer.Resolve<MacroController>().Start();
 
-        return Task.Run(async () =>
+        await Task.Run(async () =>
         {
             if (AppFlags.Instance.Debug)
             {
-                Console.WriteLine(@"[AsyncWorker] Starting HWiNFO/IPC...");
+                Console.WriteLine(@"[AsyncWorker] Starting background services...");
             }
 
-            await IoCContainer.Resolve<HWiNFOIntegration>().StartStopIfNeededAsync();
-            await IoCContainer.Resolve<IpcServer>().StartStopIfNeededAsync();
+            await SafeInitAsync(InitAIControllerAsync, "AI Controller");
+            await SafeInitAsync(InitHWiNFOAsync, "HWiNFO Integration");
+            await SafeInitAsync(InitIpcServerAsync, "IPC Server");
         });
     }
 
@@ -969,6 +973,16 @@ public partial class App
         }
     }
 
+    private static async Task InitHWiNFOAsync()
+    {
+        await IoCContainer.Resolve<HWiNFOIntegration>().StartStopIfNeededAsync().ConfigureAwait(false);
+    }
+
+    private static async Task InitIpcServerAsync()
+    {
+        await IoCContainer.Resolve<IpcServer>().StartStopIfNeededAsync().ConfigureAwait(false);
+    }
+
     #endregion
     #region UI Helpers
 
@@ -1080,8 +1094,9 @@ public partial class App
     {
         try
         {
+            var sw = Stopwatch.StartNew();
             await action();
-            Log.Instance.Trace($"{taskName} initialized successfully.");
+            Log.Instance.Trace($"{taskName} initialized successfully. [elapsed={sw.ElapsedMilliseconds}ms]");
         }
         catch (Exception ex)
         {

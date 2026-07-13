@@ -227,7 +227,6 @@ public static partial class Compatibility
                 SupportsITSMode = GetSupportITSMode(model),
                 HasQuietToPerformanceModeSwitchingBug = GetHasQuietToPerformanceModeSwitchingBug(biosVersion),
                 HasGodModeToOtherModeSwitchingBug = GetHasGodModeToOtherModeSwitchingBug(biosVersion),
-                HasReapplyParameterIssue = GetHasReapplyParameterIssue(model, machineType),
                 HasSpectrumProfileSwitchingBug = GetHasSpectrumProfileSwitchingBug(model, machineType),
                 IsExcludedFromLenovoLighting = GetIsExcludedFromLenovoLighting(biosVersion, generation, legionSeries),
                 IsExcludedFromPanelLogoLenovoLighting = GetIsExcludedFromPanelLenovoLighting(machineType, model),
@@ -638,23 +637,6 @@ public static partial class Compatibility
         };
 
         return affectedBiosVersions.Any(bv => biosVersion?.IsHigherOrEqualThan(bv) ?? false);
-    }
-
-    private static bool GetHasReapplyParameterIssue(string? machineModel, string machineType)
-    {
-        if (string.IsNullOrEmpty(machineModel))
-        {
-            return false;
-        }
-
-        var affectedSeries = new LegionSeries[]
-        {
-            LegionSeries.Legion_5,
-            LegionSeries.Legion_7,
-            LegionSeries.Legion_9,
-        };
-
-        return affectedSeries.Any(series => GetLegionSeries(machineModel, machineType) == series);
     }
 
     private static bool GetHasSpectrumProfileSwitchingBug(string? machineModel, string machineType)
