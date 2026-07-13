@@ -16,17 +16,17 @@ public sealed class AutomationStepRegistry : IAutomationStepRegistry
 
     public void Register(ExtensionAutomationStepInfo item)
     {
-        Log.Instance.Trace($"[Extension] Registering automation step StepType={item.StepType.FullName}, ControlType={item.ControlType.FullName}");
+        Log.Instance.Trace($"Registering automation step StepType={item.StepType.FullName}, ControlType={item.ControlType.FullName}");
 
         if (_steps.Any(s => s.StepType == item.StepType))
         {
-            Log.Instance.Trace($"[Extension] Skipping duplicate automation step StepType={item.StepType.FullName}");
+            Log.Instance.Trace($"Skipping duplicate automation step StepType={item.StepType.FullName}");
             return;
         }
 
         _steps.Add(item);
-        Log.Instance.Trace($"[Extension] Automation step registered successfully. Total steps: {_steps.Count}");
+        Log.Instance.Trace($"Automation step registered successfully. Total steps: {_steps.Count}");
         StepsChanged?.Invoke(this, EventArgs.Empty);
-        Log.Instance.Trace($"[Extension] AutomationSteps StepsChanged event raised");
+        Log.Instance.Trace($"AutomationSteps StepsChanged event raised");
     }
 }

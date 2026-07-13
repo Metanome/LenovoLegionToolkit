@@ -17,17 +17,17 @@ public sealed class NavigationService : INavigationService
 
     public void Register(ExtensionNavigationItem item)
     {
-        Log.Instance.Trace($"[Extension] Registering navigation item Id={item.Id}, Title={item.Title}, PageTag={item.PageTag}, PageType={item.PageType.FullName}, IsFooter={item.IsFooter}");
+        Log.Instance.Trace($"Registering navigation item Id={item.Id}, Title={item.Title}, PageTag={item.PageTag}, PageType={item.PageType.FullName}, IsFooter={item.IsFooter}");
 
         if (_items.Any(i => i.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase) || i.PageTag.Equals(item.PageTag, StringComparison.OrdinalIgnoreCase)))
         {
-            Log.Instance.Trace($"[Extension] Skipping duplicate navigation item Id={item.Id}, PageTag={item.PageTag}");
+            Log.Instance.Trace($"Skipping duplicate navigation item Id={item.Id}, PageTag={item.PageTag}");
             return;
         }
 
         _items.Add(item);
-        Log.Instance.Trace($"[Extension] Navigation item registered successfully. Total items: {_items.Count}");
+        Log.Instance.Trace($"Navigation item registered successfully. Total items: {_items.Count}");
         ItemsChanged?.Invoke(this, EventArgs.Empty);
-        Log.Instance.Trace($"[Extension] Navigation ItemsChanged event raised");
+        Log.Instance.Trace($"Navigation ItemsChanged event raised");
     }
 }

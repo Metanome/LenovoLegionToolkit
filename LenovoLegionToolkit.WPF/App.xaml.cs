@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
@@ -14,7 +13,6 @@ using System.Windows.Media;
 using LenovoLegionToolkit.Lib;
 using LenovoLegionToolkit.Lib.Automation;
 using LenovoLegionToolkit.Lib.Controllers;
-using LenovoLegionToolkit.Lib.Controllers.GodMode;
 using LenovoLegionToolkit.Lib.Controllers.Sensors;
 using LenovoLegionToolkit.Lib.Extensions;
 using LenovoLegionToolkit.Lib.Features;
@@ -28,19 +26,15 @@ using LenovoLegionToolkit.Lib.Macro;
 using LenovoLegionToolkit.Lib.Messaging;
 using LenovoLegionToolkit.Lib.Messaging.Messages;
 using LenovoLegionToolkit.Lib.Overclocking.Amd;
-using LenovoLegionToolkit.Lib.Scripting;
 using LenovoLegionToolkit.Lib.Services;
 using LenovoLegionToolkit.Lib.Settings;
 using LenovoLegionToolkit.Lib.SoftwareDisabler;
-using LenovoLegionToolkit.Lib.Station.Core;
-using LenovoLegionToolkit.Lib.System;
 using LenovoLegionToolkit.Lib.Utils;
 using LenovoLegionToolkit.WPF.CLI;
 using LenovoLegionToolkit.WPF.Controls.Custom;
 using LenovoLegionToolkit.WPF.Extensions;
 using LenovoLegionToolkit.WPF.Resources;
 using LenovoLegionToolkit.WPF.Station.Core;
-using LenovoLegionToolkit.WPF.Station.Services;
 using LenovoLegionToolkit.WPF.Utils;
 using LenovoLegionToolkit.WPF.Windows;
 using LenovoLegionToolkit.WPF.Windows.Osd;
@@ -709,7 +703,7 @@ public partial class App
 
     #region Feature Initialization
 
-    private static async Task InitItsModeFeatureAsync()
+    private static async Task<bool> InitItsModeFeatureAsync()
     {
         try
         {
@@ -737,14 +731,21 @@ public partial class App
                     }
                 }
             }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't ensure its mode state.", ex);
+            return false;
         }
     }
 
-    private static async Task InitPowerModeFeatureAsync()
+    private static async Task<bool> InitPowerModeFeatureAsync()
     {
         try
         {
@@ -754,65 +755,75 @@ public partial class App
             {
                 await feature.EnsureGodModeStateIsAppliedAsync();
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"InitPowerModeFeatureAsync failed.", ex);
+            return false;
         }
     }
 
-    private static async Task InitAIControllerAsync()
+    private static async Task<bool> InitAIControllerAsync()
     {
         try
         {
             await IoCContainer.Resolve<AIController>().StartIfNeededAsync();
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"InitAIControllerAsync failed.", ex);
+            return false;
         }
     }
 
-    private static async Task LogSoftwareStatusAsync()
+    private static async Task<bool> LogSoftwareStatusAsync()
     {
         if (!Log.Instance.IsTraceEnabled)
         {
-            return;
+            return false;
         }
 
         Log.Instance.Trace($"Vantage status: {await IoCContainer.Resolve<VantageDisabler>().GetStatusAsync()}");
         Log.Instance.Trace($"LegionSpace status: {await IoCContainer.Resolve<LegionSpaceDisabler>().GetStatusAsync()}");
         Log.Instance.Trace($"LegionZone status: {await IoCContainer.Resolve<LegionZoneDisabler>().GetStatusAsync()}");
         Log.Instance.Trace($"FnKeys status: {await IoCContainer.Resolve<FnKeysDisabler>().GetStatusAsync()}");
+        return true;
     }
 
-    private static async Task InitHybridModeAsync()
+    private static async Task<bool> InitHybridModeAsync()
     {
         try
         {
             await IoCContainer.Resolve<HybridModeFeature>().EnsureDGPUEjectedIfNeededAsync();
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't initialize hybrid mode.", ex);
+            return false;
         }
     }
 
-    private static async Task InitAutomationProcessorAsync()
+    private static async Task<bool> InitAutomationProcessorAsync()
     {
         try
         {
             var ap = IoCContainer.Resolve<AutomationProcessor>();
             await ap.InitializeAsync();
             ap.RunOnStartup();
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't initialize automation processor.", ex);
+            return false;
         }
     }
 
-    private static async Task InitAutomationLocalization()
+    private static async Task<bool> InitAutomationLocalization()
     {
         AutomationTranslator.GetTitleFunc = typeName =>
         {
@@ -821,6 +832,8 @@ public partial class App
                 return Resource.ResourceManager.GetString($"{name}Control_Title") ?? name.Replace("AutomationStep", string.Empty);
             });
         };
+
+        return true;
     }
 
     private static void InitSetLogIndicator()
@@ -843,7 +856,7 @@ public partial class App
         }
     }
 
-    private static async Task InitBatteryFeatureAsync()
+    private static async Task<bool> InitBatteryFeatureAsync()
     {
         try
         {
@@ -853,14 +866,17 @@ public partial class App
             {
                 await feature.EnsureCorrectBatteryModeIsSetAsync();
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't ensure correct battery mode.", ex);
+            return false;
         }
     }
 
-    private static async Task InitSensorsGroupControllerFeatureAsync()
+    private static async Task<bool> InitSensorsGroupControllerFeatureAsync()
     {
         var settings = IoCContainer.Resolve<ApplicationSettings>();
         var OsdSettings = IoCContainer.Resolve<OsdSettings>();
@@ -869,7 +885,7 @@ public partial class App
         {
             if (settings.Store is { EnableHardwareSensors: false })
             {
-                return;
+                return false;
             }
 
             var state = await IoCContainer.Resolve<SensorsGroupController>().IsSupportedAsync();
@@ -878,6 +894,8 @@ public partial class App
             {
                 Current._showPawnIONotify = true;
             }
+
+            return true;
         }
         catch (Exception ex)
         {
@@ -887,10 +905,12 @@ public partial class App
             {
                 Current._showPawnIONotify = true;
             }
+
+            return false;
         }
     }
 
-    private static async Task InitRgbKeyboardControllerAsync()
+    private static async Task<bool> InitRgbKeyboardControllerAsync()
     {
         try
         {
@@ -900,14 +920,17 @@ public partial class App
             {
                 await controller.SetLightControlOwnerAsync(true, true);
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't set light control owner or current preset.", ex);
+            return false;
         }
     }
 
-    private static async Task InitSpectrumKeyboardControllerAsync()
+    private static async Task<bool> InitSpectrumKeyboardControllerAsync()
     {
         try
         {
@@ -917,14 +940,17 @@ public partial class App
             {
                 await controller.StartAuroraIfNeededAsync();
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't start Aurora if needed.", ex);
+            return false;
         }
     }
 
-    private static async Task InitGpuOverclockControllerAsync()
+    private static async Task<bool> InitGpuOverclockControllerAsync()
     {
         try
         {
@@ -934,14 +960,17 @@ public partial class App
             {
                 await controller.EnsureOverclockIsAppliedAsync();
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Couldn't overclock GPU.", ex);
+            return false;
         }
     }
 
-    private static async Task InitAMDOverclocking()
+    private static async Task<bool> InitAMDOverclocking()
     {
         try
         {
@@ -952,18 +981,22 @@ public partial class App
                 await feature.InitializeAsync().ConfigureAwait(false);
                 Log.Instance.Trace($"AMD Overclocking Controller initialized.");
             }
+
+            return true;
         }
         catch (InvalidOperationException)
         {
             Log.Instance.Trace($"Profile apply has been canceled due to AC issue.");
+            return false;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"Failed to apply profile on startup: {ex.Message}", ex);
+            return false;
         }
     }
 
-    private static async Task PostApplyAmdOverclockingProfileAsync()
+    private static async Task<bool> PostApplyAmdOverclockingProfileAsync()
     {
         var feature = IoCContainer.Resolve<AmdOverclockingController>();
 
@@ -971,16 +1004,20 @@ public partial class App
         {
             await feature.ApplyInternalProfileAsync().ConfigureAwait(false);
         }
+
+        return true;
     }
 
-    private static async Task InitHWiNFOAsync()
+    private static async Task<bool> InitHWiNFOAsync()
     {
         await IoCContainer.Resolve<HWiNFOIntegration>().StartStopIfNeededAsync().ConfigureAwait(false);
+        return true;
     }
 
-    private static async Task InitIpcServerAsync()
+    private static async Task<bool> InitIpcServerAsync()
     {
         await IoCContainer.Resolve<IpcServer>().StartStopIfNeededAsync().ConfigureAwait(false);
+        return true;
     }
 
     #endregion
@@ -1070,33 +1107,35 @@ public partial class App
         };
     }
 
-    private static async Task InitLampArrayControllerAsync()
+    private static async Task<bool> InitLampArrayControllerAsync()
     {
         try
         {
             if (!AppFlags.Instance.EnableLampArray)
             {
-                return;
+                return false;
             }
 
             var controller = IoCContainer.Resolve<LampArrayController>();
             var settings = IoCContainer.Resolve<LampArraySettings>();
             controller.SetScreenCaptureProvider(new SpectrumScreenCapture());
             await controller.InitializeAsync(settings).ConfigureAwait(false);
+            return true;
         }
         catch (Exception ex)
         {
             Log.Instance.Trace($"InitLampArrayControllerAsync failed.", ex);
+            return false;
         }
     }
 
-    private async Task SafeInitAsync(Func<Task> action, string taskName)
+    private async Task SafeInitAsync(Func<Task<bool>> action, string taskName)
     {
         try
         {
             var sw = Stopwatch.StartNew();
-            await action();
-            Log.Instance.Trace($"{taskName} initialized successfully. [elapsed={sw.ElapsedMilliseconds}ms]");
+            if (await action())
+                Log.Instance.Trace($"{taskName} initialized successfully. [elapsed={sw.ElapsedMilliseconds}ms]");
         }
         catch (Exception ex)
         {

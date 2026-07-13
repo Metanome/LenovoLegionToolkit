@@ -16,17 +16,17 @@ public sealed class AutomationTriggerRegistry : IAutomationTriggerRegistry
 
     public void Register(ExtensionAutomationTriggerInfo item)
     {
-        Log.Instance.Trace($"[Extension] Registering automation trigger TriggerType={item.TriggerType.FullName}");
+        Log.Instance.Trace($"Registering automation trigger TriggerType={item.TriggerType.FullName}");
 
         if (_triggers.Any(t => t.TriggerType == item.TriggerType))
         {
-            Log.Instance.Trace($"[Extension] Skipping duplicate automation trigger TriggerType={item.TriggerType.FullName}");
+            Log.Instance.Trace($"Skipping duplicate automation trigger TriggerType={item.TriggerType.FullName}");
             return;
         }
 
         _triggers.Add(item);
-        Log.Instance.Trace($"[Extension] Automation trigger registered successfully. Total triggers: {_triggers.Count}");
+        Log.Instance.Trace($"Automation trigger registered successfully. Total triggers: {_triggers.Count}");
         TriggersChanged?.Invoke(this, EventArgs.Empty);
-        Log.Instance.Trace($"[Extension] AutomationTriggers TriggersChanged event raised");
+        Log.Instance.Trace($"AutomationTriggers TriggersChanged event raised");
     }
 }
