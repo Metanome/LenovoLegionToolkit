@@ -13,7 +13,7 @@ namespace LenovoLegionToolkit.WPF.Station.Core;
 public sealed class ExtensionManager(ExtensionContextFactory contextFactory) : IExtensionManager
 {
     private readonly List<IExtensionProvider> _providers = [];
-    private readonly string _pluginRoot = Path.Combine(Folders.AppData, "Plugins");
+    private string _pluginRoot = Path.Combine(Folders.AppData, "Plugins");
 
     public IReadOnlyCollection<IExtensionProvider> Providers => _providers.AsReadOnly();
 
@@ -26,6 +26,15 @@ public sealed class ExtensionManager(ExtensionContextFactory contextFactory) : I
 
     public void Load()
     {
+        if (!Directory.Exists(_pluginRoot))
+        {
+            var singularRoot = Path.Combine(Folders.AppData, "Plugin");
+            if (Directory.Exists(singularRoot))
+            {
+                _pluginRoot = singularRoot;
+            }
+        }
+
         Log.Instance.Trace($"Starting extension discovery. PluginRoot={_pluginRoot}");
 
         if (!Directory.Exists(_pluginRoot))
@@ -52,6 +61,20 @@ public sealed class ExtensionManager(ExtensionContextFactory contextFactory) : I
             var rootDlls = Directory.EnumerateFiles(_pluginRoot, "*.dll", SearchOption.TopDirectoryOnly).ToArray();
             Log.Instance.Trace($"Discovered {rootDlls.Length} plugin assembly file(s) in root.");
             dlls.AddRange(rootDlls);
+
+            foreach (var subDir in Directory.EnumerateDirectories(_pluginRoot))
+            {
+                var folderName = Path.GetFileName(subDir);
+                if (string.Equals(folderName, "Dependency", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var candidateDll = Path.Combine(subDir, $"{folderName}.dll");
+                if (File.Exists(candidateDll))
+                {
+                    Log.Instance.Trace($"Discovered nested plugin assembly file matching folder name: {candidateDll}");
+                    dlls.Add(candidateDll);
+                }
+            }
 
             foreach (var dll in dlls)
             {
@@ -106,6 +129,31 @@ public sealed class ExtensionManager(ExtensionContextFactory contextFactory) : I
             if (assembly.GetName().Name == requestedName.Name)
             {
                 return assembly;
+            }
+        }
+
+        if (args.RequestingAssembly != null && !args.RequestingAssembly.IsDynamic)
+        {
+            try
+            {
+                var requestingLocation = args.RequestingAssembly.Location;
+                if (!string.IsNullOrEmpty(requestingLocation))
+                {
+                    var requestingDir = Path.GetDirectoryName(requestingLocation);
+                    if (!string.IsNullOrEmpty(requestingDir))
+                    {
+                        var candidatePath = Path.Combine(requestingDir, $"{requestedName.Name}.dll");
+                        if (File.Exists(candidatePath))
+                        {
+                            Log.Instance.Trace($"Resolving assembly '{requestedName.Name}' from requesting assembly directory: {candidatePath}");
+                            return Assembly.LoadFrom(candidatePath);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Trace($"Failed to resolve assembly from requesting assembly directory: {ex.Message}", ex);
             }
         }
 

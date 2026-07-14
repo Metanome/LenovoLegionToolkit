@@ -12,7 +12,11 @@ namespace LenovoLegionToolkit.WPF.Station.Core;
 
 public sealed class ExtensionContext : IExtensionContext
 {
-    private static readonly string PluginsBasePath = Path.Combine(Folders.AppData, "Plugins", "Configs");
+    private static readonly string PluginsBasePath = Directory.Exists(Path.Combine(Folders.AppData, "Plugins"))
+        ? Path.Combine(Folders.AppData, "Plugins", "Configs")
+        : (Directory.Exists(Path.Combine(Folders.AppData, "Plugin"))
+            ? Path.Combine(Folders.AppData, "Plugin", "Configs")
+            : Path.Combine(Folders.AppData, "Plugins", "Configs"));
 
     private readonly string _pluginId;
     private readonly SemaphoreSlim _settingsLock = new(1, 1);
