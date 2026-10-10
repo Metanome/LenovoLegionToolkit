@@ -14,7 +14,7 @@ public partial class GpuSensorProvider : ISensorProvider
     private const float MB_PER_GB = 1024f;
     private const float MIN_ACTIVE_GPU_POWER = 10f;
 
-    private const string REGEX_AMD_GPU_INTEGRATED = @"AMD Radeon\(TM\)\s+\d+M";
+    private const string REGEX_AMD_GPU_INTEGRATED = @"AMD Radeon(?:\(TM\))?\s+\d+M";
     [GeneratedRegex(REGEX_AMD_GPU_INTEGRATED, RegexOptions.IgnoreCase, "zh-CN")]
     private static partial Regex IsAmdIGpu();
 
