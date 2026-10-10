@@ -69,7 +69,7 @@ public partial class DashboardPage
 
         int contentIndex = _panel.Children.IndexOf(_content);
         if (contentIndex == -1) contentIndex = 0;
-        
+
         sensorControl.Margin = new Thickness(0, 16, 16, 0);
         _panel.Children.Insert(contentIndex, sensorControl);
 
@@ -126,7 +126,7 @@ public partial class DashboardPage
             _content.ColumnDefinitions.Add(new ColumnDefinition { Width = new(1, GridUnitType.Star) });
             _content.ColumnDefinitions.Add(new ColumnDefinition { Width = new(1, GridUnitType.Star) });
 
-            var initializationTasks = new List<Task> { Task.Delay(TimeSpan.FromSeconds(1)) };
+            var initializationTasks = new List<Task>();
             var controls = new List<DashboardGroupControl>();
 
             foreach (var group in groups)

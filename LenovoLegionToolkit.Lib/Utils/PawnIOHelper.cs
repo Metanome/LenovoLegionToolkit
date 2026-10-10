@@ -23,12 +23,17 @@ public static class PawnIOHelper
 
     private static readonly Version MinimumPawnIOVersion = new(2, 2, 0, 0);
 
+    private const int STATE_CACHE_MS = 10_000;
+    private static PawnIOState? _cachedState;
+    private static long _cachedStateTick;
+
     public static Version RequiredPawnIOVersion => MinimumPawnIOVersion;
 
     public static Func<PawnIOState, Task<bool>>? RequestShowDialogAsync;
 
     public static void OpenPawnIODownloadPage()
     {
+        InvalidateStateCache();
         Process.Start("explorer.exe", $"\"https://pawnio.eu/\"");
     }
 
@@ -111,6 +116,22 @@ public static class PawnIOHelper
     }
 
     public static PawnIOState GetPawnIOState()
+    {
+        var now = Environment.TickCount64;
+        if (_cachedState is { } cached && now - _cachedStateTick < STATE_CACHE_MS)
+        {
+            return cached;
+        }
+
+        var state = DetectPawnIOState();
+        _cachedState = state;
+        _cachedStateTick = now;
+        return state;
+    }
+
+    public static void InvalidateStateCache() => _cachedState = null;
+
+    private static PawnIOState DetectPawnIOState()
     {
         if (!IsPawnIOInstalled())
         {

@@ -208,6 +208,8 @@ public static partial class Compatibility
         return Task.FromResult(_fakeMachineInformation);
     }
 
+    public static MachineInformation? TryGetMachineInformation() => _machineInformation;
+
     public static async Task<MachineInformation> GetMachineInformationAsync()
     {
         if (_machineInformation != null) return _machineInformation.Value;

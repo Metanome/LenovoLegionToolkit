@@ -154,6 +154,7 @@ public class SensorsGroupController : IDisposable
     public event Action<HardwareSensorSnapshot>? SensorsUpdated;
 
     private readonly GPUController _gpuController = IoCContainer.Resolve<GPUController>();
+    private readonly HybridModeFeature _hybridModeFeature = IoCContainer.Resolve<HybridModeFeature>();
 
     private readonly struct SensorSubscription(TimeSpan interval, HardwareUpdateScope scope)
     {
@@ -163,7 +164,7 @@ public class SensorsGroupController : IDisposable
 
     private static readonly IDisposable NoOpDisposable = new LambdaDisposable(() => { });
 
-    private static bool IsDgpuEjectInProgress() => IoCContainer.Resolve<HybridModeFeature>().ShouldKeepDGPUAsleep();
+    private bool IsDgpuEjectInProgress() => _hybridModeFeature.ShouldKeepDGPUAsleep();
 
     public SensorsGroupController()
     {
@@ -254,7 +255,7 @@ public class SensorsGroupController : IDisposable
         return LibreHardwareMonitorInitialState.Fail;
     }
 
-    private void PopulateHardware()
+    private void PopulateHardware(bool updateSensors)
     {
         if (_computer is null)
         {
@@ -272,7 +273,11 @@ public class SensorsGroupController : IDisposable
                     continue;
                 }
 
-                h.Update();
+                if (updateSensors)
+                {
+                    h.Update();
+                }
+
                 _hardware.Add(h);
             }
             catch { /* Ignore */ }
@@ -307,12 +312,14 @@ public class SensorsGroupController : IDisposable
                 };
 
                 _computer.Open();
-                if (!IsDgpuEjectInProgress())
+
+                var dgpuEjectInProgress = IsDgpuEjectInProgress();
+                if (!dgpuEjectInProgress)
                 {
                     _computer.Accept(new UpdateVisitor());
                 }
 
-                PopulateHardware();
+                PopulateHardware(updateSensors: dgpuEjectInProgress);
                 DiscoverHardware();
             }
             catch (Exception ex)
@@ -620,12 +627,13 @@ public class SensorsGroupController : IDisposable
                     return;
                 }
 
-                if (!IsDgpuEjectInProgress())
+                var dgpuEjectInProgress = IsDgpuEjectInProgress();
+                if (!dgpuEjectInProgress)
                 {
                     _computer.Accept(new UpdateVisitor());
                 }
 
-                PopulateHardware();
+                PopulateHardware(updateSensors: dgpuEjectInProgress);
                 DiscoverHardware();
             }
         }
@@ -721,6 +729,12 @@ public class SensorsGroupController : IDisposable
 
             try
             {
+                if (!IsLibreHardwareMonitorInitialized())
+                {
+                    await Task.Delay(50, token).ConfigureAwait(false);
+                    continue;
+                }
+
                 await UpdateAsync(true, scope).ConfigureAwait(false);
 
                 await Task.Delay(minInterval, token).ConfigureAwait(false);

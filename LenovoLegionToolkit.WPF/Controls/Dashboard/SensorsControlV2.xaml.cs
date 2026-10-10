@@ -30,9 +30,11 @@ public partial class SensorsControlV2
     private readonly SensorsControlSettings _sensorsControlSettings = IoCContainer.Resolve<SensorsControlSettings>();
     private readonly HardwareSensorSettings _hardwareSensorSettings = IoCContainer.Resolve<HardwareSensorSettings>();
     private readonly ApplicationSettings _applicationSettings = IoCContainer.Resolve<ApplicationSettings>();
+    private readonly DashboardSettings _dashboardSettings = IoCContainer.Resolve<DashboardSettings>();
     private readonly Lock _updateLock = new();
     private IDisposable? _sensorSubscription;
-    private readonly Task<string> _cpuNameTask;
+    private bool _subscribedToMessages;
+    private Task<string>? _cpuNameTask;
     private Task<string>? _gpuNameTask;
     private readonly HashSet<SensorItem> _activeSensorItems = [];
     private static readonly double[] AvailableRefreshIntervals = [0.5, 1, 2, 3, 4, 5];
@@ -45,12 +47,13 @@ public partial class SensorsControlV2
     {
         InitializeComponent();
         InitializeContextMenu();
-        IsVisibleChanged += SensorsControl_IsVisibleChanged;
+        Loaded += SensorsControl_Loaded;
+        Unloaded += SensorsControl_Unloaded;
+        IsVisibleChanged += (_, _) => SyncSensorUpdates();
         SizeChanged += (_, e) => { if (e.WidthChanged) AdjustCardWidths(); };
 
         _sensorsGroupControllers.SelectedGpuIsIgpu = _hardwareSensorSettings.Store.SelectedGpuIsIgpu;
 
-        _cpuNameTask = GetProcessedCpuName();
         _cardTypeMap = new Dictionary<SensorCardType, FrameworkElement>
         {
             { SensorCardType.CPU, _cpuCard },
@@ -83,52 +86,72 @@ public partial class SensorsControlV2
             { SensorItem.Disk2Temperature, _disk2TemperatureGrid! }
         };
 
-        var mi = Compatibility.GetMachineInformationAsync().Result;
-        if (mi.Properties.IsAmdDevice)
+        if (Compatibility.TryGetMachineInformation() is { } machineInformation)
         {
-            _pchGridName.Text = Resource.SensorsControl_Motherboard_Temperature;
+            ApplyMachineInformation(machineInformation);
         }
 
-        MessagingCenter.Subscribe<DashboardElementChangedMessage>(this, message =>
-        {
-            Dispatcher.Invoke(() =>
-            {
-                lock (_updateLock)
-                {
-                    _activeSensorItems.Clear();
-
-                    foreach (var item in message.Items)
-                    {
-                        _activeSensorItems.Add(item);
-                    }
-
-                    UpdateControlsVisibility();
-                    if (IsVisible && _applicationSettings.Store.EnableHardwareSensors)
-                        StartSensorUpdates();
-                }
-            });
-        });
-
-        MessagingCenter.Subscribe<FeatureStateMessage<HardwareSensorsState>>(this, message =>
-        {
-            Dispatcher.Invoke(() =>
-            {
-                if (message.State == HardwareSensorsState.Off)
-                {
-                    _sensorSubscription?.Dispose();
-                    _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
-                    ClearAllSensorValues();
-                }
-                else if (IsVisible)
-                {
-                    StartSensorUpdates();
-                    _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
-                    _sensorsGroupControllers.SensorsUpdated += OnSensorsUpdated;
-                }
-            });
-        });
-
         _cardWrapPanel.Drop += (s, e) => SaveCardOrder();
+    }
+
+    private void SensorsControl_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (!_subscribedToMessages)
+        {
+            MessagingCenter.Subscribe<DashboardElementChangedMessage>(this, OnDashboardElementChanged);
+            MessagingCenter.Subscribe<FeatureStateMessage<HardwareSensorsState>>(this, OnHardwareSensorsStateChanged);
+            _subscribedToMessages = true;
+        }
+
+        SyncSensorUpdates();
+    }
+
+    private void SensorsControl_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (_subscribedToMessages)
+        {
+            MessagingCenter.Unsubscribe<DashboardElementChangedMessage>(this);
+            MessagingCenter.Unsubscribe<FeatureStateMessage<HardwareSensorsState>>(this);
+            _subscribedToMessages = false;
+        }
+
+        StopSensorUpdates();
+    }
+
+    private void OnDashboardElementChanged(DashboardElementChangedMessage message)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            lock (_updateLock)
+            {
+                _activeSensorItems.Clear();
+
+                foreach (var item in message.Items)
+                {
+                    _activeSensorItems.Add(item);
+                }
+
+                UpdateControlsVisibility();
+                if (ShouldCollect())
+                    StartSensorUpdates();
+            }
+        });
+    }
+
+    private void OnHardwareSensorsStateChanged(FeatureStateMessage<HardwareSensorsState> message)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (message.State == HardwareSensorsState.Off)
+            {
+                StopSensorUpdates();
+                ClearAllSensorValues();
+            }
+            else
+            {
+                SyncSensorUpdates();
+            }
+        });
     }
 
     private void UpdateControlsVisibility()
@@ -173,7 +196,7 @@ public partial class SensorsControlV2
                 _sensorsControlSettings.Store.SensorsRefreshIntervalSeconds = interval;
                 _sensorsControlSettings.SynchronizeStore();
                 InitializeContextMenu();
-                if (IsVisible)
+                if (ShouldCollect())
                 {
                     StartSensorUpdates(interval);
                 }
@@ -194,38 +217,47 @@ public partial class SensorsControlV2
         ContextMenu.Items.Add(customizeItem);
     }
 
-    private void SensorsControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    private void SyncSensorUpdates()
     {
-        if (IsVisible)
+        if (!ShouldCollect())
         {
-            _sensorsGroupControllers.SelectedGpuIsIgpu = _hardwareSensorSettings.Store.SelectedGpuIsIgpu;
-            _sensorsGroupControllers.ShowAverageCpuFrequency = _hardwareSensorSettings.Store.ShowCpuAverageFrequency;
-            _sensorsGroupControllers.CpuTemperatureSource = _hardwareSensorSettings.Store.CpuTemperatureSource;
+            StopSensorUpdates();
+            return;
+        }
 
-            _activeSensorItems.Clear();
-            if (_sensorsControlSettings.Store.VisibleItems != null)
+        if (_sensorSubscription is not null)
+        {
+            return;
+        }
+
+        _sensorsGroupControllers.SelectedGpuIsIgpu = _hardwareSensorSettings.Store.SelectedGpuIsIgpu;
+        _sensorsGroupControllers.ShowAverageCpuFrequency = _hardwareSensorSettings.Store.ShowCpuAverageFrequency;
+        _sensorsGroupControllers.CpuTemperatureSource = _hardwareSensorSettings.Store.CpuTemperatureSource;
+
+        _activeSensorItems.Clear();
+        if (_sensorsControlSettings.Store.VisibleItems != null)
+        {
+            foreach (SensorItem item in _sensorsControlSettings.Store.VisibleItems)
             {
-                foreach (SensorItem item in _sensorsControlSettings.Store.VisibleItems)
-                {
-                    _activeSensorItems.Add(item);
-                }
+                _activeSensorItems.Add(item);
             }
-
-            RestoreCardOrder();
-            UpdateControlsVisibility();
-
-            if (!_applicationSettings.Store.EnableHardwareSensors)
-                return;
-
-            StartSensorUpdates();
-            _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
-            _sensorsGroupControllers.SensorsUpdated += OnSensorsUpdated;
         }
-        else
-        {
-            _sensorSubscription?.Dispose();
-            _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
-        }
+
+        RestoreCardOrder();
+        UpdateControlsVisibility();
+
+        StartSensorUpdates();
+    }
+
+    private bool ShouldCollect() => IsLoaded
+                                    && _dashboardSettings.Store.ShowSensors
+                                    && _applicationSettings.Store.EnableHardwareSensors;
+
+    private void StopSensorUpdates()
+    {
+        _sensorSubscription?.Dispose();
+        _sensorSubscription = null;
+        _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
     }
 
     private void RestoreCardOrder()
@@ -263,12 +295,16 @@ public partial class SensorsControlV2
     private void StartSensorUpdates(double? intervalSeconds = null)
     {
         _sensorSubscription?.Dispose();
+        _sensorSubscription = null;
 
         if (!_applicationSettings.Store.EnableHardwareSensors)
             return;
 
         if (_activeSensorItems.Count == 0)
             return;
+
+        _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
+        _sensorsGroupControllers.SensorsUpdated += OnSensorsUpdated;
 
         _sensorSubscription = _sensorsGroupControllers.Subscribe(TimeSpan.FromSeconds(intervalSeconds ?? _sensorsControlSettings.Store.SensorsRefreshIntervalSeconds), _activeSensorItems);
     }
@@ -296,10 +332,12 @@ public partial class SensorsControlV2
                 }
             });
             var gpuNameTask = GetProcessedGpuName();
+            var cpuNameTask = GetProcessedCpuName();
 
-            await Task.WhenAll(dataTask, batteryInfoTask, gpuNameTask).ConfigureAwait(false);
+            await Task.WhenAll(dataTask, batteryInfoTask, gpuNameTask, cpuNameTask).ConfigureAwait(false);
 
             _gpuNameTask = gpuNameTask;
+            _cpuNameTask = cpuNameTask;
 
             await Dispatcher.BeginInvoke(() => UpdateAllSensorValuesV2(
                 dataTask.Result,
@@ -384,7 +422,7 @@ public partial class SensorsControlV2
                 control.Visibility = _activeSensorItems.Contains(kv.Key) ? Visibility.Visible : Visibility.Collapsed;
             }
 
-            _cpuCardName.Text = _cpuNameTask.Result;
+            _cpuCardName.Text = _cpuNameTask?.Result ?? "UNKNOWN";
             _gpuCardName.Text = _gpuNameTask?.Result ?? "UNKNOWN";
 
             // --- CPU ---
@@ -513,6 +551,14 @@ public partial class SensorsControlV2
     private Task<string> GetProcessedCpuName() => _sensorsGroupControllers.GetCpuNameAsync();
 
     private Task<string> GetProcessedGpuName() => _sensorsGroupControllers.GetGpuNameAsync();
+
+    private void ApplyMachineInformation(MachineInformation machineInformation)
+    {
+        if (machineInformation.Properties.IsAmdDevice)
+        {
+            _pchGridName.Text = Resource.SensorsControl_Motherboard_Temperature;
+        }
+    }
 
     private string GetTemperatureText(double temperature)
     {

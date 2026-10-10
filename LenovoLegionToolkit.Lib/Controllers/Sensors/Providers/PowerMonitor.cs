@@ -15,10 +15,10 @@ public class PowerMonitor
 
     public float Read(float raw)
     {
-        if (raw > MAX_VALID) 
-        { 
-            ResetNeeded?.Invoke(); 
-            return -1; 
+        if (raw > MAX_VALID)
+        {
+            ResetNeeded?.Invoke();
+            return -1;
         }
 
         if (raw <= MIN_VALID)

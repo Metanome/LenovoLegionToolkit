@@ -80,6 +80,8 @@ public partial class App
     private EventWaitHandle? _singleInstanceWaitHandle;
     private bool _showPawnIONotify;
 
+    private readonly List<Task> _deferredInitTasks = [];
+
     public new static App Current => (App)Application.Current;
     public static MainWindow? MainWindowInstance;
 
@@ -197,6 +199,8 @@ public partial class App
             CheckCompatibilityAsyncWrapper(AppFlags.Instance)
         );
 
+        await Compatibility.GetMachineInformationAsync();
+
         if (AppFlags.Instance.Debug)
         {
             Console.WriteLine(@"[Startup] Configuring Render Options...");
@@ -279,6 +283,8 @@ public partial class App
             await SafeInitAsync(InitHWiNFOAsync, "HWiNFO Integration");
             await SafeInitAsync(InitIpcServerAsync, "IPC Server");
         });
+
+        await Task.WhenAll(_deferredInitTasks);
     }
 
     private async Task InitializeUIAsync()
@@ -852,42 +858,31 @@ public partial class App
         }
     }
 
-    private static async Task<bool> InitSensorsGroupControllerFeatureAsync()
+    private Task<bool> InitSensorsGroupControllerFeatureAsync()
     {
-        var settings = IoCContainer.Resolve<ApplicationSettings>();
-        var OsdSettings = IoCContainer.Resolve<OsdSettings>();
-
-        try
+        if (IoCContainer.Resolve<ApplicationSettings>().Store is { EnableHardwareSensors: false })
         {
-            if (settings.Store is { EnableHardwareSensors: false })
-            {
-                return false;
-            }
-
-            var state = await IoCContainer.Resolve<SensorsGroupController>().IsSupportedAsync();
-
-            if (state is not (LibreHardwareMonitorInitialState.Initialized or LibreHardwareMonitorInitialState.Success))
-            {
-                Current._showPawnIONotify = true;
-            }
-            else if (PawnIOHelper.GetPawnIOState() is PawnIOState.UpdateRequired or PawnIOState.ServiceNotRunning)
-            {
-                Current._showPawnIONotify = true;
-            }
-
-            return true;
+            return Task.FromResult(false);
         }
-        catch (Exception ex)
-        {
-            Log.Instance.Trace($"InitSensorsGroupControllerFeatureAsync() raised exception:", ex);
 
-            if (!ex.Message.Contains("LibreHardwareMonitor initialization failed"))
-            {
-                Current._showPawnIONotify = true;
-            }
+        _showPawnIONotify = PawnIOHelper.GetPawnIOState() is not PawnIOState.Installed;
 
-            return false;
-        }
+        _deferredInitTasks.Add(SafeInitAsync(InitSensorsHardwareAsync, "Sensors Hardware"));
+        _deferredInitTasks.Add(SafeInitAsync(InitSensorsControllerAsync, "Sensors Controller"));
+
+        return Task.FromResult(true);
+    }
+
+    private static async Task<bool> InitSensorsHardwareAsync()
+    {
+        await IoCContainer.Resolve<SensorsGroupController>().IsSupportedAsync().ConfigureAwait(false);
+        return true;
+    }
+
+    private static async Task<bool> InitSensorsControllerAsync()
+    {
+        await IoCContainer.Resolve<SensorsController>().IsSupportedAsync().ConfigureAwait(false);
+        return true;
     }
 
     private static async Task<bool> InitRgbKeyboardControllerAsync()
