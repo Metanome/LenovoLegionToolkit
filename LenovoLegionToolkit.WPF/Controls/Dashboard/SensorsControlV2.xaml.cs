@@ -33,6 +33,7 @@ public partial class SensorsControlV2
     private readonly DashboardSettings _dashboardSettings = IoCContainer.Resolve<DashboardSettings>();
     private readonly Lock _updateLock = new();
     private IDisposable? _sensorSubscription;
+    private CancellationTokenSource? _sensorStartCts;
     private bool _subscribedToMessages;
     private Task<string>? _cpuNameTask;
     private Task<string>? _gpuNameTask;
@@ -225,7 +226,7 @@ public partial class SensorsControlV2
             return;
         }
 
-        if (_sensorSubscription is not null)
+        if (_sensorSubscription is not null || _sensorStartCts is not null)
         {
             return;
         }
@@ -250,11 +251,15 @@ public partial class SensorsControlV2
     }
 
     private bool ShouldCollect() => IsLoaded
+                                    && IsVisible
                                     && _dashboardSettings.Store.ShowSensors
                                     && _applicationSettings.Store.EnableHardwareSensors;
 
     private void StopSensorUpdates()
     {
+        _sensorStartCts?.Cancel();
+        _sensorStartCts?.Dispose();
+        _sensorStartCts = null;
         _sensorSubscription?.Dispose();
         _sensorSubscription = null;
         _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
@@ -294,19 +299,51 @@ public partial class SensorsControlV2
 
     private void StartSensorUpdates(double? intervalSeconds = null)
     {
-        _sensorSubscription?.Dispose();
-        _sensorSubscription = null;
+        StopSensorUpdates();
 
-        if (!_applicationSettings.Store.EnableHardwareSensors)
+        if (!ShouldCollect())
             return;
 
         if (_activeSensorItems.Count == 0)
             return;
 
-        _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
-        _sensorsGroupControllers.SensorsUpdated += OnSensorsUpdated;
+        var interval = TimeSpan.FromSeconds(intervalSeconds ?? _sensorsControlSettings.Store.SensorsRefreshIntervalSeconds);
+        var cts = new CancellationTokenSource();
+        _sensorStartCts = cts;
+        _ = StartSensorUpdatesAsync(interval, cts);
+    }
 
-        _sensorSubscription = _sensorsGroupControllers.Subscribe(TimeSpan.FromSeconds(intervalSeconds ?? _sensorsControlSettings.Store.SensorsRefreshIntervalSeconds), _activeSensorItems);
+    private async Task StartSensorUpdatesAsync(TimeSpan interval, CancellationTokenSource cts)
+    {
+        var token = cts.Token;
+        try
+        {
+            var state = await _sensorsGroupControllers.IsSupportedAsync().WaitAsync(token);
+            if (token.IsCancellationRequested || !ShouldCollect() || state is not (LibreHardwareMonitorInitialState.Initialized or LibreHardwareMonitorInitialState.Success))
+            {
+                return;
+            }
+
+            _sensorsGroupControllers.SensorsUpdated += OnSensorsUpdated;
+            _sensorSubscription = _sensorsGroupControllers.Subscribe(interval, _activeSensorItems);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { /* Ignore */ }
+        catch (Exception ex)
+        {
+            Log.Instance.Trace($"Sensor subscription failed.", ex);
+            if (ReferenceEquals(_sensorStartCts, cts))
+            {
+                _sensorsGroupControllers.SensorsUpdated -= OnSensorsUpdated;
+            }
+        }
+        finally
+        {
+            if (ReferenceEquals(_sensorStartCts, cts))
+            {
+                _sensorStartCts = null;
+                cts.Dispose();
+            }
+        }
     }
 
     private async void OnSensorsUpdated(HardwareSensorSnapshot snapshot)
